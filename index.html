@@ -1,39 +1,39 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>لعبة الكلمات الأمازيغية</title>
-
-  <!-- ربط ملف التصميم -->
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-  <div class="game-container">
-    <h1>ⴰⵣⵔⴰⴼ ⵏ ⵜⴰⵡⵉⵍⴰ</h1>
-    <p class="subtitle">لعبة الكلمات الأمازيغية</p>
+  <!-- 🔽 استبدل كل ما كان هنا -->
+  <div class="stage">
+    <div class="stage-title">ⵍⵓⴰⵔ ⵏ ⵜⵉⴼⵉⵏⴰⵖ</div>
 
-    <div id="levelBox">المستوى: 1</div>
-
-    <div id="questionBox"></div>
+    <div class="question-card">
+      <div class="question-count">السؤال 1 / 10</div>
+      <div class="question-text">Man</div>
+    </div>
 
     <input
       type="text"
-      id="answerInput"
-      placeholder="ⴰⵙⴽⵔ ⴰⵡⴰⵍ"
-      autocomplete="off"
+      class="answer-input"
+      placeholder="ⵉⵙⴽⴰⵔ"
     />
 
-    <div class="buttons">
-      <button id="checkBtn">تحقق</button>
-      <button id="resetBtn">إعادة</button>
+    <button class="check-btn">تحقق</button>
+
+    <div class="result success" style="display:none;">
+      إجابة صحيحة
     </div>
 
-    <div id="messageBox"></div>
+    <div class="result error" style="display:none;">
+      إجابة خاطئة
+    </div>
   </div>
+  <!-- 🔼 إلى هنا -->
 
-  <!-- ربط ملف الجافاسكريبت -->
-  <script src="script.js"></script>
 </body>
 </html>
