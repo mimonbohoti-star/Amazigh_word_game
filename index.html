@@ -13,8 +13,8 @@
     <div class="flag-symbol">ⵣ</div>
   </div>
 
-  <!-- اللعبة -->
-  <div class="stage">
+  <!-- اللعبة (مخفية في البداية) -->
+  <div class="stage" id="gameStage" style="display:none;">
     <div class="stage-title">ⵍⵓⴰⵔ ⵏ ⵜⵉⴼⵉⵏⴰⵖ</div>
 
     <div class="question-card">
@@ -39,30 +39,35 @@
     </div>
   </div>
 
-  <!-- JavaScript -->
   <script>
-    document.getElementById("startScreen").onclick = function () {
-      this.style.display = "none";
+    // إخفاء شاشة البداية وإظهار اللعبة
+    const startScreen = document.getElementById("startScreen");
+    const gameStage = document.getElementById("gameStage");
+
+    startScreen.onclick = () => {
+      startScreen.style.display = "none";
+      gameStage.style.display = "block";
     };
+
+    // زر التحقق
+    const checkBtn = document.querySelector(".check-btn");
+    const input = document.querySelector(".answer-input");
+    const success = document.querySelector(".result.success");
+    const error = document.querySelector(".result.error");
+
+    checkBtn.addEventListener("click", () => {
+      success.style.display = "none";
+      error.style.display = "none";
+
+      if (input.value.trim() !== "") {
+        success.style.display = "block";
+      } else {
+        error.style.display = "block";
+        input.classList.add("shake");
+        setTimeout(() => input.classList.remove("shake"), 300);
+      }
+    });
   </script>
-<script>
-  const checkBtn = document.querySelector(".check-btn");
-  const input = document.querySelector(".answer-input");
-  const success = document.querySelector(".result.success");
-  const error = document.querySelector(".result.error");
 
-  checkBtn.addEventListener("click", () => {
-    success.style.display = "none";
-    error.style.display = "none";
-
-    if (input.value.trim() !== "") {
-      success.style.display = "block";
-    } else {
-      error.style.display = "block";
-      input.classList.add("shake");
-      setTimeout(() => input.classList.remove("shake"), 300);
-    }
-  });
-</script>
 </body>
 </html>
