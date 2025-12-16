@@ -1,85 +1,143 @@
+/* ===============================
+   AMAZIGH FLAG COLORS
+   =============================== */
+:root {
+  --blue: #1e88e5;     /* السماء */
+  --green: #2e7d32;    /* الأرض */
+  --yellow: #f9a825;   /* الصحراء */
+  --red: #c62828;      /* ⵣ */
+  --dark: #1b1b1b;
+  --white: #ffffff;
+}
+
+/* ===============================
+   GENERAL PAGE
+   =============================== */
 body {
   margin: 0;
-  padding: 0;
-  font-family: Tahoma, Arial, sans-serif;
-  background: linear-gradient(135deg, #1d3557, #457b9d);
-  color: #fff;
+  font-family: "Arial", sans-serif;
+  background: linear-gradient(180deg, var(--blue), var(--green));
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
 }
 
-.game-container {
-  background: #ffffff;
-  color: #333;
-  width: 90%;
-  max-width: 400px;
+/* ===============================
+   STAGE CONTAINER
+   =============================== */
+.stage {
+  width: 92%;
+  max-width: 420px;
+  background: var(--white);
+  border-radius: 18px;
   padding: 20px;
-  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+/* ===============================
+   TITLE
+   =============================== */
+.stage-title {
   text-align: center;
-}
-
-h1 {
-  margin: 0;
-  font-size: 24px;
-}
-
-.subtitle {
-  font-size: 14px;
+  color: var(--red);
+  font-size: 26px;
+  font-weight: bold;
   margin-bottom: 15px;
 }
 
-#levelBox {
-  background: #1d3557;
-  color: #fff;
-  padding: 8px;
-  border-radius: 6px;
-  margin-bottom: 10px;
+/* ===============================
+   QUESTION CARD
+   =============================== */
+.question-card {
+  background: var(--yellow);
+  border-radius: 14px;
+  padding: 15px;
+  margin-bottom: 15px;
 }
 
-#questionBox {
-  font-size: 18px;
-  margin: 15px 0;
-}
-
-/* إدخال أمازيغي LTR */
-#answerInput {
-  width: 100%;
-  padding: 10px;
-  font-size: 18px;
-  text-align: left;
-  direction: ltr;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  margin-bottom: 10px;
-}
-
-.buttons {
-  display: flex;
-  gap: 10px;
-}
-
-button {
-  flex: 1;
-  padding: 10px;
-  font-size: 16px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-#checkBtn {
-  background: #2a9d8f;
-  color: #fff;
-}
-
-#resetBtn {
-  background: #e63946;
-  color: #fff;
-}
-
-#messageBox {
-  margin-top: 10px;
+/* Question number */
+.question-count {
+  color: var(--red);
   font-weight: bold;
+  margin-bottom: 8px;
+}
+
+/* Question text */
+.question-text {
+  color: var(--dark);
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+
+/* ===============================
+   ANSWER INPUT
+   =============================== */
+.answer-input {
+  width: 100%;
+  padding: 12px;
+  font-size: 20px;
+  border-radius: 10px;
+  border: 2px solid var(--yellow);
+  outline: none;
+  text-align: center;
+}
+
+.answer-input:focus {
+  border-color: var(--green);
+}
+
+/* ===============================
+   CHECK BUTTON
+   =============================== */
+.check-btn {
+  width: 100%;
+  margin-top: 15px;
+  padding: 14px;
+  background: var(--green);
+  color: var(--white);
+  font-size: 18px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.1s ease, background 0.2s ease;
+}
+
+.check-btn:active {
+  transform: scale(0.97);
+}
+
+/* ===============================
+   RESULT MESSAGE
+   =============================== */
+.result {
+  margin-top: 12px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* Success */
+.result.success {
+  color: var(--green);
+}
+
+/* Error */
+.result.error {
+  color: var(--red);
+}
+
+/* ===============================
+   SIMPLE SHAKE (ERROR EFFECT)
+   =============================== */
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  50% { transform: translateX(4px); }
+  75% { transform: translateX(-4px); }
+  100% { transform: translateX(0); }
+}
+
+.shake {
+  animation: shake 0.3s;
 }
