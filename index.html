@@ -5,14 +5,15 @@
   <title>لعبة الكلمات الأمازيغية</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<script>
-  document.getElementById("startScreen").addEventListener("click", function () {
-    this.style.display = "none";
-  });
-</script>
+
 <body>
 
-  <!-- 🔽 استبدل كل ما كان هنا -->
+  <!-- شاشة البداية -->
+  <div class="start-screen" id="startScreen">
+    <div class="flag-symbol">ⵣ</div>
+  </div>
+
+  <!-- اللعبة -->
   <div class="stage">
     <div class="stage-title">ⵍⵓⴰⵔ ⵏ ⵜⵉⴼⵉⵏⴰⵖ</div>
 
@@ -37,12 +38,13 @@
       إجابة خاطئة
     </div>
   </div>
-  <!-- 🔼 إلى هنا -->
-<div class="start-screen" id="startScreen">
-  <div class="flag-symbol">ⵣ</div>
-</div>
+
+  <!-- JavaScript -->
+  <script>
+    document.getElementById("startScreen").onclick = function () {
+      this.style.display = "none";
+    };
+  </script>
+
 </body>
 </html>
-<div class="start-screen" id="startScreen">
-  <div class="flag-symbol">ⵣ</div>
-</div>
