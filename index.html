@@ -5,16 +5,16 @@
   <title>لعبة الكلمات الأمازيغية</title>
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
   <!-- شاشة البداية -->
   <div class="start-screen" id="startScreen">
     <div class="flag-symbol">ⵣ</div>
+    <div class="tap-text">اضغط للدخول</div>
   </div>
 
-  <!-- اللعبة (مخفية في البداية) -->
-  <div class="stage" id="gameStage" style="display:none;">
+  <!-- اللعبة -->
+  <div class="stage" id="gameStage">
     <div class="stage-title">ⵍⵓⴰⵔ ⵏ ⵜⵉⴼⵉⵏⴰⵖ</div>
 
     <div class="question-card">
@@ -30,44 +30,35 @@
 
     <button class="check-btn">تحقق</button>
 
-    <div class="result success" style="display:none;">
-      إجابة صحيحة
-    </div>
-
-    <div class="result error" style="display:none;">
-      إجابة خاطئة
-    </div>
+    <div class="result success">إجابة صحيحة</div>
+    <div class="result error">إجابة خاطئة</div>
   </div>
 
-  <script>
-    // إخفاء شاشة البداية وإظهار اللعبة
-    const startScreen = document.getElementById("startScreen");
-    const gameStage = document.getElementById("gameStage");
+<script>
+  // دخول اللعبة
+  document.getElementById("startScreen").onclick = function () {
+    this.style.display = "none";
+  };
 
-    startScreen.onclick = () => {
-      startScreen.style.display = "none";
-      gameStage.style.display = "block";
-    };
+  // زر التحقق
+  const checkBtn = document.querySelector(".check-btn");
+  const input = document.querySelector(".answer-input");
+  const success = document.querySelector(".result.success");
+  const error = document.querySelector(".result.error");
 
-    // زر التحقق
-    const checkBtn = document.querySelector(".check-btn");
-    const input = document.querySelector(".answer-input");
-    const success = document.querySelector(".result.success");
-    const error = document.querySelector(".result.error");
+  checkBtn.onclick = function () {
+    success.style.display = "none";
+    error.style.display = "none";
 
-    checkBtn.addEventListener("click", () => {
-      success.style.display = "none";
-      error.style.display = "none";
-
-      if (input.value.trim() !== "") {
-        success.style.display = "block";
-      } else {
-        error.style.display = "block";
-        input.classList.add("shake");
-        setTimeout(() => input.classList.remove("shake"), 300);
-      }
-    });
-  </script>
+    if (input.value.trim() !== "") {
+      success.style.display = "block";
+    } else {
+      error.style.display = "block";
+      input.classList.add("shake");
+      setTimeout(() => input.classList.remove("shake"), 300);
+    }
+  };
+</script>
 
 </body>
 </html>
