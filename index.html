@@ -45,6 +45,24 @@
       this.style.display = "none";
     };
   </script>
+<script>
+  const checkBtn = document.querySelector(".check-btn");
+  const input = document.querySelector(".answer-input");
+  const success = document.querySelector(".result.success");
+  const error = document.querySelector(".result.error");
 
+  checkBtn.addEventListener("click", () => {
+    success.style.display = "none";
+    error.style.display = "none";
+
+    if (input.value.trim() !== "") {
+      success.style.display = "block";
+    } else {
+      error.style.display = "block";
+      input.classList.add("shake");
+      setTimeout(() => input.classList.remove("shake"), 300);
+    }
+  });
+</script>
 </body>
 </html>
