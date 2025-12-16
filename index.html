@@ -7,12 +7,10 @@
 </head>
 <body>
 
-<!-- شاشة البداية -->
 <div class="start-screen" id="startScreen">
   <div class="flag-symbol">ⵣ</div>
 </div>
 
-<!-- اللعبة -->
 <div class="stage">
   <div class="stage-title">ⵍⵓⴰⵔ ⵏ ⵜⵉⴼⵉⵏⴰⵖ</div>
 
@@ -21,19 +19,17 @@
     <div class="question-text" id="question"></div>
   </div>
 
-  <input type="text" class="answer-input" id="answer" placeholder="ⵉⵙⴽⴰⵔ">
+  <input id="answer" class="answer-input" placeholder="ⵉⵙⴽⴰⵔ" />
 
-  <button class="check-btn" id="check">تحقق</button>
+  <button id="check" class="check-btn">تحقق</button>
 
-  <div class="result success" id="success">إجابة صحيحة</div>
-  <div class="result error" id="error">إجابة خاطئة</div>
+  <div id="success" class="result success">إجابة صحيحة</div>
+  <div id="error" class="result error">إجابة خاطئة</div>
 </div>
 
 <script>
-/* إخفاء شاشة البداية */
-document.getElementById("startScreen").onclick = function () {
-  this.style.display = "none";
-};
+/* شاشة البداية */
+startScreen.onclick = () => startScreen.style.display = "none";
 
 /* الأسئلة */
 const questions = [
@@ -42,44 +38,48 @@ const questions = [
   { q: "Sun", a: "ⵜⴰⴼⵓⵢⵜ" }
 ];
 
-let index = 0;
+let i = 0;
 
-const qText = document.getElementById("question");
-const count = document.getElementById("count");
-const input = document.getElementById("answer");
-const success = document.getElementById("success");
-const error = document.getElementById("error");
+const q = question;
+const c = count;
+const input = answer;
+const ok = success;
+const no = error;
 
-success.style.display = error.style.display = "none";
+ok.style.display = no.style.display = "none";
 
-function loadQuestion() {
-  qText.textContent = questions[index].q;
-  count.textContent = `السؤال ${index + 1} / ${questions.length}`;
+function showQuestion() {
+  q.textContent = questions[i].q;
+  c.textContent = `السؤال ${i + 1} / ${questions.length}`;
   input.value = "";
 }
 
-loadQuestion();
+showQuestion();
 
-/* زر التحقق */
-document.getElementById("check").onclick = () => {
-  success.style.display = error.style.display = "none";
+/* زر تحقق */
+check.onclick = () => {
+  ok.style.display = no.style.display = "none";
 
-  if (input.value.trim() === questions[index].a) {
-    success.style.display = "block";
+  const user = input.value.trim();
+  const correct = questions[i].a.trim();
+
+  if (user === correct) {
+    ok.style.display = "block";
 
     setTimeout(() => {
-      index++;
-      if (index < questions.length) {
-        loadQuestion();
+      i++;
+      if (i < questions.length) {
+        showQuestion();
       } else {
-        qText.textContent = "🎉 انتهت اللعبة";
-        count.textContent = "";
+        q.textContent = "🎉 أحسنت! انتهت اللعبة";
+        c.textContent = "";
+        check.disabled = true;
       }
-      success.style.display = "none";
-    }, 700);
+      ok.style.display = "none";
+    }, 600);
 
   } else {
-    error.style.display = "block";
+    no.style.display = "block";
   }
 };
 </script>
