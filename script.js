@@ -1,24 +1,31 @@
-// ===== البيانات (المستويات) =====
+// =// =======================
+// المستويات (السؤال بالإنجليزية – الجواب بالأمازيغية)
+// يقبل الإدخال: تيفيناغ أو Latin
+// =======================
+
 const levels = [
   {
-    question: "ⴰⵎⴰⵏ (ماء)",
-    answer: "aman"
+    question: "Water",
+    answers: ["ⴰⵎⴰⵏ", "aman"]
   },
   {
-    question: "ⴰⴼⵓⵙ (يد)",
-    answer: "afus"
+    question: "Hand",
+    answers: ["ⴰⴼⵓⵙ", "afus"]
   },
   {
-    question: "ⴰⴳⴳⴰⵔ (رجل)",
-    answer: "aggar"
+    question: "Man",
+    answers: ["ⴰⴳⴳⴰⵔ", "aggar"]
   },
   {
-    question: "ⵜⴰⵎⴰⵣⵉⵖⵜ (أمازيغية)",
-    answer: "tamazight"
+    question: "Amazigh language",
+    answers: ["ⵜⴰⵎⴰⵣⵉⵖⵜ", "tamazight"]
   }
 ];
 
-// ===== عناصر الصفحة =====
+// =======================
+// عناصر الصفحة
+// =======================
+
 const levelBox = document.getElementById("levelBox");
 const questionBox = document.getElementById("questionBox");
 const answerInput = document.getElementById("answerInput");
@@ -26,20 +33,26 @@ const messageBox = document.getElementById("messageBox");
 const checkBtn = document.getElementById("checkBtn");
 const resetBtn = document.getElementById("resetBtn");
 
-// ===== تحميل التقدم =====
+// =======================
+// تحميل التقدم
+// =======================
+
 let currentLevel = Number(localStorage.getItem("level")) || 0;
 
-// ===== عرض المستوى =====
+// =======================
+// عرض المستوى
+// =======================
+
 function loadLevel() {
   if (currentLevel >= levels.length) {
-    questionBox.textContent = "🎉 أحسنت! أنهيت اللعبة";
+    questionBox.textContent = "🎉 Congratulations! You finished the game.";
     levelBox.textContent = "";
     answerInput.style.display = "none";
     checkBtn.style.display = "none";
     return;
   }
 
-  levelBox.textContent = "المستوى: " + (currentLevel + 1);
+  levelBox.textContent = "Level: " + (currentLevel + 1);
   questionBox.textContent = levels[currentLevel].question;
   answerInput.value = "";
   messageBox.textContent = "";
@@ -47,26 +60,37 @@ function loadLevel() {
 
 loadLevel();
 
-// ===== التحقق =====
+// =======================
+// التحقق من الجواب
+// =======================
+
 checkBtn.addEventListener("click", () => {
-  const userAnswer = answerInput.value.trim().toLowerCase();
+  let userAnswer = answerInput.value.trim().toLowerCase();
 
   if (userAnswer === "") {
-    messageBox.textContent = "❗ أدخل الجواب";
+    messageBox.textContent = "❗ Please enter an answer";
     return;
   }
 
-  if (userAnswer === levels[currentLevel].answer) {
-    messageBox.textContent = "✅ صحيح!";
+  // تحويل الأجوبة إلى صيغة مقارنة
+  const validAnswers = levels[currentLevel].answers.map(
+    ans => ans.trim().toLowerCase()
+  );
+
+  if (validAnswers.includes(userAnswer)) {
+    messageBox.textContent = "✅ Correct!";
     currentLevel++;
     localStorage.setItem("level", currentLevel);
     setTimeout(loadLevel, 700);
   } else {
-    messageBox.textContent = "❌ خطأ، حاول مرة أخرى";
+    messageBox.textContent = "❌ Wrong answer, try again";
   }
 });
 
-// ===== إعادة =====
+// =======================
+// إعادة البداية
+// =======================
+
 resetBtn.addEventListener("click", () => {
   localStorage.removeItem("level");
   location.reload();
