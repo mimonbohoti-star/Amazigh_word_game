@@ -13,44 +13,75 @@
 </div>
 
 <!-- اللعبة -->
-<div class="stage" id="game">
+<div class="stage">
   <div class="stage-title">ⵍⵓⴰⵔ ⵏ ⵜⵉⴼⵉⵏⴰⵖ</div>
 
   <div class="question-card">
-    <div class="question-count">السؤال 1 / 10</div>
-    <div class="question-text">Man</div>
+    <div class="question-count" id="count"></div>
+    <div class="question-text" id="question"></div>
   </div>
 
-  <input type="text" class="answer-input" placeholder="ⵉⵙⴽⴰⵔ">
+  <input type="text" class="answer-input" id="answer" placeholder="ⵉⵙⴽⴰⵔ">
 
-  <button class="check-btn">تحقق</button>
+  <button class="check-btn" id="check">تحقق</button>
 
-  <div class="result success">إجابة صحيحة</div>
-  <div class="result error">إجابة خاطئة</div>
+  <div class="result success" id="success">إجابة صحيحة</div>
+  <div class="result error" id="error">إجابة خاطئة</div>
 </div>
 
 <script>
-  // إخفاء شاشة البداية
-  document.getElementById("startScreen").onclick = function () {
-    this.style.display = "none";
-  };
+/* إخفاء شاشة البداية */
+document.getElementById("startScreen").onclick = function () {
+  this.style.display = "none";
+};
 
-  // زر التحقق
-  const btn = document.querySelector(".check-btn");
-  const input = document.querySelector(".answer-input");
-  const ok = document.querySelector(".success");
-  const no = document.querySelector(".error");
+/* الأسئلة */
+const questions = [
+  { q: "Man", a: "ⵎⴰⵏ" },
+  { q: "Water", a: "ⴰⵎⴰⵏ" },
+  { q: "Sun", a: "ⵜⴰⴼⵓⵢⵜ" }
+];
 
-  ok.style.display = no.style.display = "none";
+let index = 0;
 
-  btn.onclick = () => {
-    ok.style.display = no.style.display = "none";
-    if (input.value.trim() !== "") {
-      ok.style.display = "block";
-    } else {
-      no.style.display = "block";
-    }
-  };
+const qText = document.getElementById("question");
+const count = document.getElementById("count");
+const input = document.getElementById("answer");
+const success = document.getElementById("success");
+const error = document.getElementById("error");
+
+success.style.display = error.style.display = "none";
+
+function loadQuestion() {
+  qText.textContent = questions[index].q;
+  count.textContent = `السؤال ${index + 1} / ${questions.length}`;
+  input.value = "";
+}
+
+loadQuestion();
+
+/* زر التحقق */
+document.getElementById("check").onclick = () => {
+  success.style.display = error.style.display = "none";
+
+  if (input.value.trim() === questions[index].a) {
+    success.style.display = "block";
+
+    setTimeout(() => {
+      index++;
+      if (index < questions.length) {
+        loadQuestion();
+      } else {
+        qText.textContent = "🎉 انتهت اللعبة";
+        count.textContent = "";
+      }
+      success.style.display = "none";
+    }, 700);
+
+  } else {
+    error.style.display = "block";
+  }
+};
 </script>
 
 </body>
