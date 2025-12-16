@@ -1,0 +1,85 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Tahoma, Arial, sans-serif;
+  background: linear-gradient(135deg, #1d3557, #457b9d);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.game-container {
+  background: #ffffff;
+  color: #333;
+  width: 90%;
+  max-width: 400px;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.subtitle {
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+#levelBox {
+  background: #1d3557;
+  color: #fff;
+  padding: 8px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+#questionBox {
+  font-size: 18px;
+  margin: 15px 0;
+}
+
+/* إدخال أمازيغي LTR */
+#answerInput {
+  width: 100%;
+  padding: 10px;
+  font-size: 18px;
+  text-align: left;
+  direction: ltr;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+}
+
+.buttons {
+  display: flex;
+  gap: 10px;
+}
+
+button {
+  flex: 1;
+  padding: 10px;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#checkBtn {
+  background: #2a9d8f;
+  color: #fff;
+}
+
+#resetBtn {
+  background: #e63946;
+  color: #fff;
+}
+
+#messageBox {
+  margin-top: 10px;
+  font-weight: bold;
+}
