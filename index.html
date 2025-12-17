@@ -2,105 +2,110 @@
 <html lang="ar">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>لعبة الكلمات الأمازيغية</title>
 
 <style>
 body {
-  margin: 0;
   font-family: sans-serif;
-  background: linear-gradient(135deg, #1fa463, #138a72);
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
+  background: #f2f2f2;
+  text-align: center;
+  direction: rtl;
 }
 
-.hidden { display: none; }
-
-.box {
-  background: rgba(255,255,255,0.15);
-  padding: 20px;
-  border-radius: 10px;
-  text-align: center;
+.game-box {
+  margin: 50px auto;
   width: 90%;
   max-width: 400px;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
 }
 
 input {
-  width: 100%;
   padding: 10px;
-  font-size: 18px;
-  margin-top: 10px;
+  font-size: 20px;
+  text-align: center;
+  direction: ltr;
 }
 
 button {
   margin-top: 10px;
   padding: 10px 20px;
-  font-size: 18px;
+  font-size: 16px;
 }
 </style>
 </head>
 
 <body>
 
-<div id="start" class="box">
-  <h2>لعبة الكلمات الأمازيغية</h2>
-  <button id="startBtn">ابدأ</button>
-</div>
+<div class="game-box">
+  <h2>🟡 لعبة الكلمات الأمازيغية</h2>
+  <p id="question"></p>
 
-<div id="game" class="box hidden">
-  <div id="q"></div>
-  <input id="a" placeholder="اكتب الجواب">
-  <button id="check">تحقق</button>
-  <div id="ok" class="hidden">✔ صحيح</div>
-  <div id="no" class="hidden">✖ خطأ</div>
+  <input type="text" id="answer" placeholder="ⵜⵉⴼⵉⵏⴰⵖ">
+  <br>
+  <button onclick="checkAnswer()">تحقق</button>
+
+  <p id="result"></p>
 </div>
 
 <script>
+// =========================
+// بيانات المستويات
+// =========================
 const levels = [
-  { q: "Man / رجل", a: ["ⴰⵔⴳⴰⵣ","argaz"] },
-  { q: "Woman / امرأة", a: ["ⵜⴰⵎⴳⴳⴰⵣⵜ","tamggazt"] }
+  { q: "شمس", a: "ⵜⴰⴼⵓⵢⵜ" },
+  { q: "ماء", a: "ⴰⵎⴰⵏ" },
+  { q: "قلب", a: "ⵓⵍ" }
 ];
 
-let i = 0;
+let currentLevel = 0;
 
-const start = document.getElementById("start");
-const game = document.getElementById("game");
-const q = document.getElementById("q");
-const a = document.getElementById("a");
-const ok = document.getElementById("ok");
-const no = document.getElementById("no");
-
-document.getElementById("startBtn").onclick = () => {
-  start.classList.add("hidden");
-  game.classList.remove("hidden");
-  load();
-};
-
-function load() {
-  if (i >= levels.length) {
-    q.textContent = "🎉 انتهت اللعبة";
-    a.style.display = "none";
-    return;
-  }
-  q.textContent = levels[i].q;
-  a.value = "";
-  ok.classList.add("hidden");
-  no.classList.add("hidden");
+// =========================
+// عرض السؤال
+// =========================
+function loadLevel() {
+  document.getElementById("question").textContent =
+    "ترجم إلى الأمازيغية: " + levels[currentLevel].q;
+  document.getElementById("answer").value = "";
+  document.getElementById("result").textContent = "";
 }
 
-document.getElementById("check").onclick = () => {
-  const v = a.value.trim().toLowerCase();
-  if (levels[i].a.map(x=>x.toLowerCase()).includes(v)) {
-    ok.classList.remove("hidden");
-    i++;
-    setTimeout(load, 500);
+// =========================
+// رسالة الفوز
+// =========================
+function showWinMessage() {
+  const messages = [
+    "ⵣⵣⵣ ⵜⵉⵣⵣⵉ!",
+    "ⴰⵣⵣⵓ! ⵜⴰⵎⴰⵣⵉⵖⵜ",
+    "ⵎⴰⵣⴰⵍ!",
+    "ⵉⵍⵍⴰ ⵜⵓⵙⵙⵏⴰ!"
+  ];
+  alert(messages[Math.floor(Math.random() * messages.length)]);
+}
+
+// =========================
+// التحقق من الجواب
+// =========================
+function checkAnswer() {
+  const userAnswer = document.getElementById("answer").value.trim();
+
+  if (userAnswer === levels[currentLevel].a) {
+    showWinMessage();
+    currentLevel++;
+
+    if (currentLevel < levels.length) {
+      loadLevel();
+    } else {
+      document.getElementById("question").textContent = "🎉 انتهت اللعبة!";
+    }
   } else {
-    no.classList.remove("hidden");
+    document.getElementById("result").textContent = "❌ حاول مرة أخرى";
   }
-};
+}
+
+// تشغيل أول مستوى
+loadLevel();
 </script>
 
 </body>
