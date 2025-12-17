@@ -5,11 +5,11 @@
 const levels = [
   {
     question: "Man / رجل",
-    answers: ["ⴰⵎⴳⴳⴰⵣ", "amggaz"]
+    answers: ["ⴰⵔⴳⴰⵣ", "amggaz"]
   },
   {
     question: "Woman / امرأة",
-    answers: ["ⵜⴰⵎⴳⴳⴰⵣⵜ", "tamggazt"]
+    answers: ["ⵜⴰⵎⵖⴰⵔⵜ", "tamggazt"]
   }
 ];
 
