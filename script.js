@@ -20,3 +20,12 @@ checkBtn.onclick = (e) => {
     successMsg.classList.add("hidden");
   }
 };
+const startBtn = document.getElementById("startBtn");
+const startScreen = document.getElementById("startScreen");
+const gameScreen = document.getElementById("gameScreen");
+
+startBtn.onclick = () => {
+  startScreen.classList.add("hidden");
+  gameScreen.classList.remove("hidden");
+  loadLevel();
+};
