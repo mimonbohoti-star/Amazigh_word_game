@@ -27,23 +27,25 @@ const errorMsg = document.getElementById("errorMsg");
 const countBox = document.querySelector(".count");
 
 let currentLevel = 0;
+let locked = false;
 
 // =======================
-// بدء اللعبة
+// شاشة البداية
 // =======================
 
-startScreen.addEventListener("click", () => {
+startScreen.onclick = () => {
   startScreen.classList.add("hidden");
   game.classList.remove("hidden");
   loadLevel();
-});
+};
 
 // =======================
 // تحميل السؤال
 // =======================
 
 function loadLevel() {
-  // نهاية اللعبة
+  locked = false;
+
   if (currentLevel >= levels.length) {
     questionBox.textContent = "🎉 End / انتهت اللعبة";
     countBox.textContent = "";
@@ -54,7 +56,6 @@ function loadLevel() {
     return;
   }
 
-  // عرض السؤال
   questionBox.textContent = levels[currentLevel].question;
   countBox.textContent = `Question ${currentLevel + 1} / ${levels.length}`;
   answerInput.value = "";
@@ -66,25 +67,24 @@ function loadLevel() {
 // التحقق من الجواب
 // =======================
 
-checkBtn.addEventListener("click", () => {
+checkBtn.onclick = () => {
+  if (locked) return;
+  locked = true;
+
   const userAnswer = answerInput.value.trim().toLowerCase();
+  const correctAnswers = levels[currentLevel].answers.map(a => a.toLowerCase());
 
-  if (!userAnswer) return;
-
-  const validAnswers = levels[currentLevel].answers.map(a =>
-    a.toLowerCase()
-  );
-
-  if (validAnswers.includes(userAnswer)) {
+  if (correctAnswers.includes(userAnswer)) {
     successMsg.classList.remove("hidden");
     errorMsg.classList.add("hidden");
 
     setTimeout(() => {
       currentLevel++;
       loadLevel();
-    }, 600);
+    }, 700);
   } else {
+    locked = false;
     errorMsg.classList.remove("hidden");
     successMsg.classList.add("hidden");
   }
-});
+};
