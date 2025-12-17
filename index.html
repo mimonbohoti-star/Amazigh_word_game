@@ -1,28 +1,107 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
-  <meta charset="UTF-8">
-  <title>لعبة الكلمات الأمازيغية</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لعبة الكلمات الأمازيغية</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background: linear-gradient(135deg, #1fa463, #138a72);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.hidden { display: none; }
+
+.box {
+  background: rgba(255,255,255,0.15);
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  width: 90%;
+  max-width: 400px;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  font-size: 18px;
+  margin-top: 10px;
+}
+
+button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  font-size: 18px;
+}
+</style>
 </head>
+
 <body>
 
-<div id="startScreen" class="screen">
-  <h1>🎮 لعبة الكلمات الأمازيغية</h1>
+<div id="start" class="box">
+  <h2>لعبة الكلمات الأمازيغية</h2>
   <button id="startBtn">ابدأ</button>
 </div>
 
-<div id="game" class="screen hidden">
-  <h2 id="questionBox"></h2>
-
-  <input id="answerInput" placeholder="اكتب الجواب هنا">
-  <br>
-  <button id="checkBtn">تحقق</button>
-
-  <p id="successMsg" class="success hidden">✔ صحيح</p>
-  <p id="errorMsg" class="error hidden">✖ خطأ</p>
+<div id="game" class="box hidden">
+  <div id="q"></div>
+  <input id="a" placeholder="اكتب الجواب">
+  <button id="check">تحقق</button>
+  <div id="ok" class="hidden">✔ صحيح</div>
+  <div id="no" class="hidden">✖ خطأ</div>
 </div>
 
-<script src="script.js?v=4"></script>
+<script>
+const levels = [
+  { q: "Man / رجل", a: ["ⴰⵔⴳⴰⵣ","argaz"] },
+  { q: "Woman / امرأة", a: ["ⵜⴰⵎⴳⴳⴰⵣⵜ","tamggazt"] }
+];
+
+let i = 0;
+
+const start = document.getElementById("start");
+const game = document.getElementById("game");
+const q = document.getElementById("q");
+const a = document.getElementById("a");
+const ok = document.getElementById("ok");
+const no = document.getElementById("no");
+
+document.getElementById("startBtn").onclick = () => {
+  start.classList.add("hidden");
+  game.classList.remove("hidden");
+  load();
+};
+
+function load() {
+  if (i >= levels.length) {
+    q.textContent = "🎉 انتهت اللعبة";
+    a.style.display = "none";
+    return;
+  }
+  q.textContent = levels[i].q;
+  a.value = "";
+  ok.classList.add("hidden");
+  no.classList.add("hidden");
+}
+
+document.getElementById("check").onclick = () => {
+  const v = a.value.trim().toLowerCase();
+  if (levels[i].a.map(x=>x.toLowerCase()).includes(v)) {
+    ok.classList.remove("hidden");
+    i++;
+    setTimeout(load, 500);
+  } else {
+    no.classList.remove("hidden");
+  }
+};
+</script>
+
 </body>
 </html>
