@@ -1,38 +1,111 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Amazigh Word Game</title>
-<link rel="stylesheet" href="style.css">
+
+<style>
+body{
+  margin:0;
+  font-family: sans-serif;
+  background:#3498db;
+  color:white;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+
+.screen{
+  display:none;
+  text-align:center;
+  width:100%;
+}
+
+.active{
+  display:block;
+}
+
+button{
+  padding:12px 24px;
+  font-size:18px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+input{
+  padding:10px;
+  font-size:18px;
+  margin-top:10px;
+  width:200px;
+  text-align:center;
+}
+</style>
 </head>
 
 <body>
 
-<div id="start" class="start-screen">
-  <div class="z">ⵣ</div>
-  <button id="startBtn">Start / ⴱⴷⴷⵓ</button>
+<!-- Start Screen -->
+<div id="start" class="screen active">
+  <h2>ⵣ Amazigh Word Game</h2>
+  <button onclick="startGame()">Start / ⵓⵔⴰⵔ</button>
 </div>
 
-<div id="game" class="game hidden">
-  <div class="title">ⵍⵓⴰⵔ ⵏ ⵜⵉⴼⵉⵏⴰⵖ</div>
+<!-- Game Screen -->
+<div id="game" class="screen">
+  <h3 id="question"></h3>
+  <input id="answer" placeholder="ⵜⵉⴼⵉⵏⴰⵖ">
+  <br><br>
+  <button onclick="checkAnswer()">Check</button>
+  <p id="result"></p>
+</div>
 
-  <div class="card">
-    <div class="count">Question 1 / 1</div>
-    <div class="question">Man / رجل</div>
-  </div>
-
-  <input type="text" placeholder="ⵜⴰⵎⴰⵣⵉⵖⵜ">
-
-  <button>Check</button>
+<!-- End Screen -->
+<div id="end" class="screen">
+  <h2>🎉 انتهت اللعبة</h2>
+  <button onclick="location.reload()">إعادة</button>
 </div>
 
 <script>
-window.onload = function () {
-  document.getElementById("startBtn").onclick = function () {
-    document.getElementById("start").style.display = "none";
-    document.getElementById("game").style.display = "block";
-  };
-};
+const questions = [
+  { q: "شمس", a: "ⵜⴰⴼⵓⵢⵜ" },
+  { q: "ماء", a: "ⴰⵎⴰⵏ" },
+  { q: "قمر", a: "ⴰⵢⵓⵔ" }
+];
+
+let index = 0;
+
+function startGame(){
+  showScreen("game");
+  loadQuestion();
+}
+
+function loadQuestion(){
+  document.getElementById("question").innerText = questions[index].q;
+  document.getElementById("answer").value = "";
+  document.getElementById("result").innerText = "";
+}
+
+function checkAnswer(){
+  const user = document.getElementById("answer").value.trim();
+  if(user === questions[index].a){
+    index++;
+    if(index < questions.length){
+      loadQuestion();
+    }else{
+      showScreen("end");
+    }
+  }else{
+    document.getElementById("result").innerText = "❌ حاول مرة أخرى";
+  }
+}
+
+function showScreen(id){
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
 </script>
 
 </body>
