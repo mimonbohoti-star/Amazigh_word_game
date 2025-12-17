@@ -3,62 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <title>Amazigh Word Game</title>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       margin: 0;
       font-family: sans-serif;
       background: #2f8de4;
+      color: white;
+      text-align: center;
       min-height: 100vh;
-    }
-
-    .hidden { display: none; }
-
-    .start-screen {
-      height: 100vh;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      color: white;
-      cursor: pointer;
     }
 
-    .flag-symbol {
-      font-size: 64px;
-      margin-bottom: 10px;
-    }
+    .hidden { display: none; }
 
-    .game {
-      max-width: 420px;
-      margin: 60px auto;
+    .box {
       background: white;
+      color: black;
       padding: 20px;
-      border-radius: 16px;
-      text-align: center;
-    }
-
-    .title {
-      color: #b60000;
-      font-size: 22px;
-      margin-bottom: 10px;
-    }
-
-    .card {
-      background: #f3a92f;
-      padding: 15px;
       border-radius: 12px;
-      margin-bottom: 10px;
-    }
-
-    .count {
-      font-size: 14px;
-      margin-bottom: 5px;
-    }
-
-    .question {
-      font-size: 20px;
-      font-weight: bold;
+      width: 90%;
+      max-width: 350px;
     }
 
     input {
@@ -66,91 +34,58 @@
       padding: 10px;
       font-size: 18px;
       margin-top: 10px;
-      border-radius: 8px;
-      border: 2px solid #ddd;
       text-align: center;
     }
 
     button {
-      width: 100%;
-      padding: 12px;
       margin-top: 10px;
+      padding: 10px;
+      width: 100%;
       font-size: 18px;
-      background: #2f8d46;
-      color: white;
-      border: none;
-      border-radius: 10px;
       cursor: pointer;
     }
 
-    .msg {
-      margin-top: 10px;
-      font-weight: bold;
-    }
-
-    .success { color: green; }
-    .error { color: red; }
+    .ok { color: green; }
+    .no { color: red; }
   </style>
 </head>
 <body>
 
 <!-- شاشة البداية -->
-<div class="start-screen" id="startScreen">
-  <div class="flag-symbol">ⵣ</div>
-  <p>Start / ⴱⴷⴷⵓ</p>
+<div id="start">
+  <h1>ⵣ</h1>
+  <button onclick="startGame()">Start / ⴱⴷⴷⵓ</button>
 </div>
 
 <!-- اللعبة -->
-<div class="game hidden" id="game">
-  <div class="title">ⵍⵓⴰⵔ ⵏ ⵜⵉⴼⵉⵏⴰⵖ</div>
+<div id="game" class="hidden box">
+  <p><strong>Man / رجل</strong></p>
 
-  <div class="card">
-    <div class="count">Question 1 / 1</div>
-    <div class="question" id="questionBox">
-      Man / رجل
-    </div>
-  </div>
+  <input id="answer" placeholder="ⵜⵉⴼⵉⵏⴰⵖ أو Latin">
 
-  <input
-    type="text"
-    id="answerInput"
-    placeholder="ⵜⵉⴼⵉⵏⴰⵖ أو Latin"
-  >
+  <button onclick="check()">Check</button>
 
-  <button id="checkBtn">Check</button>
-
-  <div class="msg success hidden" id="successMsg">
-    ✅ Correct / إجابة صحيحة
-  </div>
-  <div class="msg error hidden" id="errorMsg">
-    ❌ Wrong / إجابة خاطئة
-  </div>
+  <p id="msg"></p>
 </div>
 
 <script>
-  const startScreen = document.getElementById("startScreen");
-  const game = document.getElementById("game");
-  const input = document.getElementById("answerInput");
-  const checkBtn = document.getElementById("checkBtn");
-  const successMsg = document.getElementById("successMsg");
-  const errorMsg = document.getElementById("errorMsg");
+  function startGame() {
+    document.getElementById("start").classList.add("hidden");
+    document.getElementById("game").classList.remove("hidden");
+  }
 
-  startScreen.onclick = () => {
-    startScreen.classList.add("hidden");
-    game.classList.remove("hidden");
-  };
-
-  checkBtn.onclick = () => {
-    const val = input.value.trim().toLowerCase();
-    successMsg.classList.add("hidden");
-    errorMsg.classList.add("hidden");
+  function check() {
+    const val = document.getElementById("answer").value.trim().toLowerCase();
+    const msg = document.getElementById("msg");
 
     if (val === "ⴰⴳⴳⴰⵔ" || val === "aggar") {
-      successMsg.classList.remove("hidden");
+      msg.textContent = "✅ Correct / إجابة صحيحة";
+      msg.className = "ok";
     } else {
-      errorMsg.classList.remove("hidden");
+      msg.textContent = "❌ Wrong / إجابة خاطئة";
+      msg.className = "no";
     }
-  };
+  }
 </script>
 
 </body>
