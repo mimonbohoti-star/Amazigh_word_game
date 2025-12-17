@@ -1,4 +1,8 @@
-// const levels = [
+// =======================
+// الأسئلة (للتجريب فقط)
+// =======================
+
+const levels = [
   {
     question: "Man / رجل",
     answers: ["ⴰⵎⴳⴳⴰⵣ", "amggaz"]
@@ -52,22 +56,3 @@ function loadLevel() {
   successMsg.classList.add("hidden");
   errorMsg.classList.add("hidden");
 }
-
-// =======================
-// التحقق
-// =======================
-
-checkBtn.onclick = () => {
-  const userAnswer = answerInput.value.trim().toLowerCase();
-  const validAnswers = levels[currentLevel].answers.map(a => a.toLowerCase());
-
-  if (validAnswers.includes(userAnswer)) {
-    successMsg.classList.remove("hidden");
-    errorMsg.classList.add("hidden");
-    currentLevel++;
-    setTimeout(loadLevel, 700);
-  } else {
-    errorMsg.classList.remove("hidden");
-    successMsg.classList.add("hidden");
-  }
-};
