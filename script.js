@@ -1,5 +1,5 @@
-// =// =======================
-// المستويات (السؤال بالإنجليزية – الجواب بالأمازيغية)
+// =======================
+// المستويات (السؤال عربي + إنجليزي – الجواب بالأمازيغية)
 // يقبل الإدخال: تيفيناغ أو Latin
 // =======================
 
@@ -40,20 +40,23 @@ const resetBtn = document.getElementById("resetBtn");
 let currentLevel = Number(localStorage.getItem("level")) || 0;
 
 // =======================
-// عرض المستوى
+// عرض المستوى (✔ عربي + إنجليزي)
 // =======================
 
 function loadLevel() {
   if (currentLevel >= levels.length) {
-    questionBox.textContent = "🎉 Congratulations! You finished the game.";
+    questionBox.textContent = "🎉 Congratulations! / انتهت اللعبة";
     levelBox.textContent = "";
     answerInput.style.display = "none";
     checkBtn.style.display = "none";
     return;
   }
 
-  levelBox.textContent = "Level: " + (currentLevel + 1);
-  questionBox.textContent = levels[currentLevel].question;
+  levelBox.textContent = "Level " + (currentLevel + 1);
+
+  const q = levels[currentLevel].question;
+  questionBox.textContent = `${q.ar} / ${q.en}`;
+
   answerInput.value = "";
   messageBox.textContent = "";
 }
@@ -65,25 +68,24 @@ loadLevel();
 // =======================
 
 checkBtn.addEventListener("click", () => {
-  let userAnswer = answerInput.value.trim().toLowerCase();
+  const userAnswer = answerInput.value.trim().toLowerCase();
 
-  if (userAnswer === "") {
-    messageBox.textContent = "❗ Please enter an answer";
+  if (!userAnswer) {
+    messageBox.textContent = "❗ Please enter an answer / أدخل الجواب";
     return;
   }
 
-  // تحويل الأجوبة إلى صيغة مقارنة
   const validAnswers = levels[currentLevel].answers.map(
-    ans => ans.trim().toLowerCase()
+    a => a.toLowerCase()
   );
 
   if (validAnswers.includes(userAnswer)) {
-    messageBox.textContent = "✅ Correct!";
+    messageBox.textContent = "✅ Correct! / صحيح";
     currentLevel++;
     localStorage.setItem("level", currentLevel);
     setTimeout(loadLevel, 700);
   } else {
-    messageBox.textContent = "❌ Wrong answer, try again";
+    messageBox.textContent = "❌ Wrong answer / جواب خاطئ";
   }
 });
 
