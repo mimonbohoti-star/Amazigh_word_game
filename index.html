@@ -2,86 +2,40 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>لعبة الكلمات الأمازيغية</title>
+  <title>Amazigh Word Game</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="start-screen" id="startScreen">
-  <div class="flag-symbol">ⵣ</div>
+<div class="start-screen" id="start">
+  <h1>ⵣ</h1>
+  <p>Start / ⴱⴷⴷⵓ</p>
 </div>
 
-<div class="stage">
-  <div class="stage-title">ⵍⵓⴰⵔ ⵏ ⵜⵉⴼⵉⵏⴰⵖ</div>
+<div class="game hidden" id="game">
+  <div class="title">ⵍⵓⴰⵔ ⵏ ⵜⵉⴼⵉⵏⴰⵖ</div>
 
-  <div class="question-card">
-    <div class="question-count" id="count"></div>
-    <div class="question-text" id="question"></div>
+  <div class="card">
+    <div class="count">Question 1 / 10</div>
+    <div class="question">Man</div>
   </div>
 
-  <input id="answer" class="answer-input" placeholder="ⵉⵙⴽⴰⵔ" />
+  <input type="text" placeholder="ⵜⴰⵎⴰⵣⵉⵖⵜ">
 
-  <button id="check" class="check-btn">تحقق</button>
+  <button id="check">Check</button>
 
-  <div id="success" class="result success">إجابة صحيحة</div>
-  <div id="error" class="result error">إجابة خاطئة</div>
+  <div class="msg success hidden">Correct ✔</div>
+  <div class="msg error hidden">Wrong ✖</div>
 </div>
 
 <script>
-/* شاشة البداية */
-startScreen.onclick = () => startScreen.style.display = "none";
+  const start = document.getElementById("start");
+  const game = document.getElementById("game");
 
-/* الأسئلة */
-const questions = [
-  { q: "Man", a: "ⵎⴰⵏ" },
-  { q: "Water", a: "ⴰⵎⴰⵏ" },
-  { q: "Sun", a: "ⵜⴰⴼⵓⵢⵜ" }
-];
-
-let i = 0;
-
-const q = question;
-const c = count;
-const input = answer;
-const ok = success;
-const no = error;
-
-ok.style.display = no.style.display = "none";
-
-function showQuestion() {
-  q.textContent = questions[i].q;
-  c.textContent = `السؤال ${i + 1} / ${questions.length}`;
-  input.value = "";
-}
-
-showQuestion();
-
-/* زر تحقق */
-check.onclick = () => {
-  ok.style.display = no.style.display = "none";
-
-  const user = input.value.trim();
-  const correct = questions[i].a.trim();
-
-  if (user === correct) {
-    ok.style.display = "block";
-
-    setTimeout(() => {
-      i++;
-      if (i < questions.length) {
-        showQuestion();
-      } else {
-        q.textContent = "🎉 أحسنت! انتهت اللعبة";
-        c.textContent = "";
-        check.disabled = true;
-      }
-      ok.style.display = "none";
-    }, 600);
-
-  } else {
-    no.style.display = "block";
-  }
-};
+  start.onclick = () => {
+    start.classList.add("hidden");
+    game.classList.remove("hidden");
+  };
 </script>
 
 </body>
