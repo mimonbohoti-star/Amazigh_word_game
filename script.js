@@ -4,21 +4,24 @@
 // =======================
 
 const levels = [
+  {const levels = [
   {
-    question: "Water",
+    question: { ar: "ماء", en: "Water" },
     answers: ["ⴰⵎⴰⵏ", "aman"]
   },
   {
-    question: "Hand",
+    question: { ar: "يد", en: "Hand" },
     answers: ["ⴰⴼⵓⵙ", "afus"]
   },
   {
-    question: "Man",
+    question: { ar: "رجل", en: "Man" },
     answers: ["ⴰⴳⴳⴰⵔ", "aggar"]
   },
   {
-    question: "Amazigh language",
+    question: { ar: "اللغة الأمازيغية", en: "Amazigh language" },
     answers: ["ⵜⴰⵎⴰⵣⵉⵖⵜ", "tamazight"]
+  }
+];]
   }
 ];
 
