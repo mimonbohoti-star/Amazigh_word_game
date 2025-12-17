@@ -1,89 +1,78 @@
-body {
-  margin: 0;
-  font-family: sans-serif;
-  background: linear-gradient(#2f8de4, #2f8d46, #f3a92f);
-  min-height: 100vh;
-}
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>Amazigh Word Game</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-.hidden { display: none; }
+<!-- START SCREEN -->
+<div class="start-screen" id="start">
+  <div class="z">ⵣ</div>
+  <button id="startBtn">Start / ⴱⴷⴷⵓ</button>
+</div>
 
-.start-screen {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background: #2f8de4;
-  color: white;
-  cursor: pointer;
-}
+<!-- GAME -->
+<div class="game hidden" id="game">
+  <div class="title">ⵍⵓⴰⵔ ⵏ ⵜⵉⴼⵉⵏⴰⵖ</div>
 
-.z {
-  font-size: 120px;
-  color: #b60000;
-}
+  <div class="card">
+    <div class="count" id="count">Question 1 / 2</div>
+    <div class="question" id="question">Man / رجل</div>
+  </div>
 
-.start-text {
-  font-size: 20px;
-}
+  <input type="text" id="answer" placeholder="ⵜⴰⵎⴰⵣⵉⵖⵜ">
 
-.game {
-  max-width: 400px;
-  margin: 80px auto;
-  background: white;
-  padding: 20px;
-  border-radius: 16px;
-  text-align: center;
-}
+  <button id="check">Check</button>
 
-.title {
-  color: #b60000;
-  font-size: 22px;
-  margin-bottom: 10px;
-}
+  <div class="msg success hidden" id="success">Correct / إجابة صحيحة</div>
+  <div class="msg error hidden" id="error">Wrong / إجابة خاطئة</div>
+</div>
 
-.card {
-  background: #f3a92f;
-  padding: 15px;
-  border-radius: 12px;
-  margin-bottom: 10px;
-}
+<script>
+const data = [
+  { q: "Man / رجل", a: "ⴰⵔⴳⴰⵣ" },
+  { q: "Woman / امرأة", a: "ⵜⴰⵎⴳⴰⵔⵜ" }
+];
 
-.count {
-  font-size: 14px;
-}
+let i = 0;
 
-.question {
-  font-size: 20px;
-  font-weight: bold;
-}
+const start = document.getElementById("start");
+const game = document.getElementById("game");
+const startBtn = document.getElementById("startBtn");
+const question = document.getElementById("question");
+const count = document.getElementById("count");
+const answer = document.getElementById("answer");
+const check = document.getElementById("check");
+const success = document.getElementById("success");
+const error = document.getElementById("error");
 
-input {
-  width: 100%;
-  padding: 10px;
-  font-size: 18px;
-  margin-top: 10px;
-  border-radius: 8px;
-  border: 2px solid #ddd;
-  text-align: center;
-}
+startBtn.onclick = () => {
+  start.classList.add("hidden");
+  game.classList.remove("hidden");
+};
 
-button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  font-size: 18px;
-  background: #2f8d46;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-}
+check.onclick = () => {
+  success.classList.add("hidden");
+  error.classList.add("hidden");
 
-.msg {
-  margin-top: 10px;
-  font-weight: bold;
-}
+  if (answer.value.trim() === data[i].a) {
+    success.classList.remove("hidden");
+    i++;
+    if (i < data.length) {
+      question.textContent = data[i].q;
+      count.textContent = `Question ${i+1} / ${data.length}`;
+      answer.value = "";
+    } else {
+      question.textContent = "Game Over / انتهت اللعبة";
+      check.disabled = true;
+    }
+  } else {
+    error.classList.remove("hidden");
+  }
+};
+</script>
 
-.success { color: green; }
-.error { color: red; }
+</body>
+</html>
