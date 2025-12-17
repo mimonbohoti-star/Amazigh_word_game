@@ -2,91 +2,36 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>Amazigh Word Game</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amazigh Word Game</title>
   <style>
     body {
-      margin: 0;
       font-family: sans-serif;
-      background: #2f8de4;
-      color: white;
       text-align: center;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .hidden { display: none; }
-
-    .box {
-      background: white;
-      color: black;
       padding: 20px;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 350px;
     }
-
     input {
-      width: 100%;
-      padding: 10px;
       font-size: 18px;
-      margin-top: 10px;
-      text-align: center;
+      padding: 8px;
     }
-
     button {
-      margin-top: 10px;
-      padding: 10px;
-      width: 100%;
       font-size: 18px;
-      cursor: pointer;
+      padding: 8px 15px;
+      margin-top: 10px;
     }
-
-    .ok { color: green; }
-    .no { color: red; }
   </style>
 </head>
 <body>
 
-<!-- شاشة البداية -->
-<div id="start">
-  <h1>ⵣ</h1>
-  <button onclick="startGame()">Start / ⴱⴷⴷⵓ</button>
-</div>
+  <h2 id="question">...</h2>
 
-<!-- اللعبة -->
-<div id="game" class="hidden box">
-  <p><strong>Man / رجل</strong></p>
+  <input id="answerInput" placeholder="اكتب الجواب">
+  <br>
+  <button onclick="checkAnswer()">تحقق</button>
 
-  <input id="answer" placeholder="ⵜⵉⴼⵉⵏⴰⵖ أو Latin">
+  <p id="result"></p>
 
-  <button onclick="check()">Check</button>
-
-  <p id="msg"></p>
-</div>
-
-<script>
-  function startGame() {
-    document.getElementById("start").classList.add("hidden");
-    document.getElementById("game").classList.remove("hidden");
-  }
-
-  function check() {
-    const val = document.getElementById("answer").value.trim().toLowerCase();
-    const msg = document.getElementById("msg");
-
-    if (val === "ⴰⴳⴳⴰⵔ" || val === "aggar") {
-      msg.textContent = "✅ Correct / إجابة صحيحة";
-      msg.className = "ok";
-    } else {
-      msg.textContent = "❌ Wrong / إجابة خاطئة";
-      msg.className = "no";
-    }
-  }
-</script>
-
+  <!-- مهم جدًا: لا تغيّر هذا -->
+  <script src="script.js?v=3"></script>
 </body>
 </html>
