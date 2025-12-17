@@ -4,7 +4,6 @@
 // =======================
 
 const levels = [
-  {const levels = [
   {
     question: { ar: "ماء", en: "Water" },
     answers: ["ⴰⵎⴰⵏ", "aman"]
@@ -20,8 +19,6 @@ const levels = [
   {
     question: { ar: "اللغة الأمازيغية", en: "Amazigh language" },
     answers: ["ⵜⴰⵎⴰⵣⵉⵖⵜ", "tamazight"]
-  }
-];]
   }
 ];
 
