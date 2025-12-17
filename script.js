@@ -1,36 +1,77 @@
-// شاشة البداية
+// =======================
+// الأسئلة (سؤال عربي / إنجليزي – جواب أمازيغي)
+// =======================
+
+const levels = [
+  {
+    question: "Man / رجل",
+    answers: ["ⴰⴳⴳⴰⵔ", "aggar"]
+  },
+  {
+    question: "Water / ماء",
+    answers: ["ⴰⵎⴰⵏ", "aman"]
+  }
+];
+
+// =======================
+// عناصر الصفحة
+// =======================
+
 const startScreen = document.getElementById("startScreen");
 const game = document.getElementById("game");
-
-startScreen.onclick = () => {
-  startScreen.classList.add("hidden");
-  game.classList.remove("hidden");
-};
-
-// عناصر اللعبة
+const questionBox = document.getElementById("questionBox");
 const answerInput = document.getElementById("answerInput");
 const checkBtn = document.getElementById("checkBtn");
 const successMsg = document.getElementById("successMsg");
 const errorMsg = document.getElementById("errorMsg");
+const countBox = document.querySelector(".count");
 
-// الجواب الصحيح (تيفيناغ + Latin)
-const validAnswers = ["ⴰⴳⴳⴰⵔ", "aggar"];
+let currentLevel = 0;
 
-checkBtn.onclick = () => {
-  const userAnswer = answerInput.value.trim().toLowerCase();
+// =======================
+// شاشة البداية
+// =======================
 
-  successMsg.classList.add("hidden");
-  errorMsg.classList.add("hidden");
+startScreen.onclick = () => {
+  startScreen.classList.add("hidden");
+  game.classList.remove("hidden");
+  loadLevel();
+};
 
-  if (userAnswer === "") {
-    errorMsg.textContent = "❗ Please enter an answer";
-    errorMsg.classList.remove("hidden");
+// =======================
+// تحميل السؤال
+// =======================
+
+function loadLevel() {
+  if (currentLevel >= levels.length) {
+    questionBox.textContent = "🎉 End / انتهت اللعبة";
+    answerInput.style.display = "none";
+    checkBtn.style.display = "none";
     return;
   }
 
+  questionBox.textContent = levels[currentLevel].question;
+  countBox.textContent = `Question ${currentLevel + 1} / ${levels.length}`;
+  answerInput.value = "";
+  successMsg.classList.add("hidden");
+  errorMsg.classList.add("hidden");
+}
+
+// =======================
+// التحقق
+// =======================
+
+checkBtn.onclick = () => {
+  const userAnswer = answerInput.value.trim().toLowerCase();
+  const validAnswers = levels[currentLevel].answers.map(a => a.toLowerCase());
+
   if (validAnswers.includes(userAnswer)) {
     successMsg.classList.remove("hidden");
+    errorMsg.classList.add("hidden");
+    currentLevel++;
+    setTimeout(loadLevel, 700);
   } else {
     errorMsg.classList.remove("hidden");
+    successMsg.classList.add("hidden");
   }
 };
