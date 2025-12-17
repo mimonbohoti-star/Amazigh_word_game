@@ -35,3 +35,32 @@ button {
 .error {
   color: #fecaca;
 }
+/* ===== إصلاح تمركز الواجهة على الهاتف ===== */
+body {
+  min-height: 100vh;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#startScreen,
+#game {
+  width: 100%;
+  max-width: 420px;
+  margin: auto;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+/* تحسين العرض على الهاتف */
+@media (max-width: 600px) {
+  body {
+    align-items: flex-start;
+  }
+
+  #startScreen,
+  #game {
+    margin-top: 40px;
+  }
+}
