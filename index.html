@@ -1,76 +1,37 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Amazigh Word Game</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>Amazigh Word Game</title>
+<link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<!-- START SCREEN -->
-<div class="start-screen" id="start">
+<div id="start" class="start-screen">
   <div class="z">ⵣ</div>
   <button id="startBtn">Start / ⴱⴷⴷⵓ</button>
 </div>
 
-<!-- GAME -->
-<div class="game hidden" id="game">
+<div id="game" class="game hidden">
   <div class="title">ⵍⵓⴰⵔ ⵏ ⵜⵉⴼⵉⵏⴰⵖ</div>
 
   <div class="card">
-    <div class="count" id="count">Question 1 / 2</div>
-    <div class="question" id="question">Man / رجل</div>
+    <div class="count">Question 1 / 1</div>
+    <div class="question">Man / رجل</div>
   </div>
 
-  <input type="text" id="answer" placeholder="ⵜⴰⵎⴰⵣⵉⵖⵜ">
+  <input type="text" placeholder="ⵜⴰⵎⴰⵣⵉⵖⵜ">
 
-  <button id="check">Check</button>
-
-  <div class="msg success hidden" id="success">Correct / إجابة صحيحة</div>
-  <div class="msg error hidden" id="error">Wrong / إجابة خاطئة</div>
+  <button>Check</button>
 </div>
 
 <script>
-const data = [
-  { q: "Man / رجل", a: "ⴰⵔⴳⴰⵣ" },
-  { q: "Woman / امرأة", a: "ⵜⴰⵎⴳⴰⵔⵜ" }
-];
-
-let i = 0;
-
-const start = document.getElementById("start");
-const game = document.getElementById("game");
-const startBtn = document.getElementById("startBtn");
-const question = document.getElementById("question");
-const count = document.getElementById("count");
-const answer = document.getElementById("answer");
-const check = document.getElementById("check");
-const success = document.getElementById("success");
-const error = document.getElementById("error");
-
-startBtn.onclick = () => {
-  start.classList.add("hidden");
-  game.classList.remove("hidden");
-};
-
-check.onclick = () => {
-  success.classList.add("hidden");
-  error.classList.add("hidden");
-
-  if (answer.value.trim() === data[i].a) {
-    success.classList.remove("hidden");
-    i++;
-    if (i < data.length) {
-      question.textContent = data[i].q;
-      count.textContent = `Question ${i+1} / ${data.length}`;
-      answer.value = "";
-    } else {
-      question.textContent = "Game Over / انتهت اللعبة";
-      check.disabled = true;
-    }
-  } else {
-    error.classList.remove("hidden");
-  }
+window.onload = function () {
+  document.getElementById("startBtn").onclick = function () {
+    document.getElementById("start").style.display = "none";
+    document.getElementById("game").style.display = "block";
+  };
 };
 </script>
 
