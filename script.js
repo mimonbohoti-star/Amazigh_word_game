@@ -1,103 +1,36 @@
-// =======================
-// المستويات
-// السؤال: عربي + إنجليزي
-// الجواب: أمازيغية (تيفيناغ أو Latin)
-// =======================
+// شاشة البداية
+const startScreen = document.getElementById("startScreen");
+const game = document.getElementById("game");
 
-const levels = [
-  {
-    question: { ar: "ماء", en: "Water" },
-    answers: ["ⴰⵎⴰⵏ", "aman"]
-  },
-  {
-    question: { ar: "يد", en: "Hand" },
-    answers: ["ⴰⴼⵓⵙ", "afus"]
-  },
-  {
-    question: { ar: "رجل", en: "Man" },
-    answers: ["ⴰⴳⴳⴰⵔ", "aggar"]
-  },
-  {
-    question: { ar: "اللغة الأمازيغية", en: "Amazigh language" },
-    answers: ["ⵜⴰⵎⴰⵣⵉⵖⵜ", "tamazight"]
-  }
-];
+startScreen.onclick = () => {
+  startScreen.classList.add("hidden");
+  game.classList.remove("hidden");
+};
 
-// =======================
-// عناصر الصفحة
-// =======================
-
-const levelBox   = document.getElementById("levelBox");
-const questionBox = document.getElementById("questionBox");
+// عناصر اللعبة
 const answerInput = document.getElementById("answerInput");
-const messageBox  = document.getElementById("messageBox");
-const checkBtn    = document.getElementById("checkBtn");
-const resetBtn    = document.getElementById("resetBtn");
+const checkBtn = document.getElementById("checkBtn");
+const successMsg = document.getElementById("successMsg");
+const errorMsg = document.getElementById("errorMsg");
 
-// =======================
-// التقدم
-// =======================
+// الجواب الصحيح (تيفيناغ + Latin)
+const validAnswers = ["ⴰⴳⴳⴰⵔ", "aggar"];
 
-let currentLevel = Number(localStorage.getItem("level")) || 0;
-
-// =======================
-// تحميل المستوى
-// =======================
-
-function loadLevel() {
-  if (currentLevel >= levels.length) {
-    questionBox.textContent = "🎉 Congratulations! / 🎉 انتهت اللعبة";
-    levelBox.textContent = "";
-    answerInput.style.display = "none";
-    checkBtn.style.display = "none";
-    return;
-  }
-
-  levelBox.textContent = "Level " + (currentLevel + 1);
-
-  // ⭐⭐⭐ هنا التصحيح المهم ⭐⭐⭐
-  questionBox.textContent =
-    levels[currentLevel].question.ar +
-    " / " +
-    levels[currentLevel].question.en;
-
-  answerInput.value = "";
-  messageBox.textContent = "";
-}
-
-loadLevel();
-
-// =======================
-// التحقق من الجواب
-// =======================
-
-checkBtn.addEventListener("click", () => {
+checkBtn.onclick = () => {
   const userAnswer = answerInput.value.trim().toLowerCase();
 
+  successMsg.classList.add("hidden");
+  errorMsg.classList.add("hidden");
+
   if (userAnswer === "") {
-    messageBox.textContent = "❗ Please enter an answer / أدخل الجواب";
+    errorMsg.textContent = "❗ Please enter an answer";
+    errorMsg.classList.remove("hidden");
     return;
   }
 
-  const validAnswers = levels[currentLevel].answers.map(
-    a => a.toLowerCase()
-  );
-
   if (validAnswers.includes(userAnswer)) {
-    messageBox.textContent = "✅ Correct! / إجابة صحيحة";
-    currentLevel++;
-    localStorage.setItem("level", currentLevel);
-    setTimeout(loadLevel, 600);
+    successMsg.classList.remove("hidden");
   } else {
-    messageBox.textContent = "❌ Wrong answer / جواب خاطئ";
+    errorMsg.classList.remove("hidden");
   }
-});
-
-// =======================
-// إعادة البداية
-// =======================
-
-resetBtn.addEventListener("click", () => {
-  localStorage.removeItem("level");
-  location.reload();
-});
+};
