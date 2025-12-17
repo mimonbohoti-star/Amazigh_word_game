@@ -1,3 +1,7 @@
+// =======================
+// الأسئلة (مرحلة التجريب)
+// =======================
+
 const levels = [
   {
     question: "Man / رجل",
@@ -41,8 +45,11 @@ startScreen.onclick = () => {
 function loadLevel() {
   if (currentLevel >= levels.length) {
     questionBox.textContent = "🎉 End / انتهت اللعبة";
+    countBox.textContent = "";
     answerInput.style.display = "none";
     checkBtn.style.display = "none";
+    successMsg.classList.add("hidden");
+    errorMsg.classList.add("hidden");
     return;
   }
 
@@ -52,3 +59,27 @@ function loadLevel() {
   successMsg.classList.add("hidden");
   errorMsg.classList.add("hidden");
 }
+
+// =======================
+// التحقق من الجواب
+// =======================
+
+checkBtn.onclick = () => {
+  const userAnswer = answerInput.value.trim().toLowerCase();
+  const correctAnswers = levels[currentLevel].answers.map(a =>
+    a.toLowerCase()
+  );
+
+  if (correctAnswers.includes(userAnswer)) {
+    successMsg.classList.remove("hidden");
+    errorMsg.classList.add("hidden");
+
+    setTimeout(() => {
+      currentLevel++;
+      loadLevel();
+    }, 600);
+  } else {
+    errorMsg.classList.remove("hidden");
+    successMsg.classList.add("hidden");
+  }
+};
