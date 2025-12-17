@@ -1,37 +1,28 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Amazigh Word Game</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      padding: 20px;
-    }
-    input {
-      font-size: 18px;
-      padding: 8px;
-    }
-    button {
-      font-size: 18px;
-      padding: 8px 15px;
-      margin-top: 10px;
-    }
-  </style>
+  <title>لعبة الكلمات الأمازيغية</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <h2 id="question">...</h2>
+<div id="startScreen" class="screen">
+  <h1>🎮 لعبة الكلمات الأمازيغية</h1>
+  <button id="startBtn">ابدأ</button>
+</div>
 
-  <input id="answerInput" placeholder="اكتب الجواب">
+<div id="game" class="screen hidden">
+  <h2 id="questionBox"></h2>
+
+  <input id="answerInput" placeholder="اكتب الجواب هنا">
   <br>
-  <button onclick="checkAnswer()">تحقق</button>
+  <button id="checkBtn">تحقق</button>
 
-  <p id="result"></p>
+  <p id="successMsg" class="success hidden">✔ صحيح</p>
+  <p id="errorMsg" class="error hidden">✖ خطأ</p>
+</div>
 
-  <!-- مهم جدًا: لا تغيّر هذا -->
-  <script src="script.js?v=3"></script>
+<script src="script.js?v=4"></script>
 </body>
 </html>
