@@ -2,7 +2,7 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>Amazigh Word Game</title>
+  <title>Game</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -20,21 +20,18 @@
     <div class="question">Man</div>
   </div>
 
-  <input type="text" placeholder="ⵜⴰⵎⴰⵣⵉⵖⵜ">
+  <input type="text">
 
-  <button id="check">Check</button>
+  <button>Check</button>
 
-  <div class="msg success hidden">Correct ✔</div>
-  <div class="msg error hidden">Wrong ✖</div>
+  <div class="msg success hidden">Correct</div>
+  <div class="msg error hidden">Wrong</div>
 </div>
 
 <script>
-  const start = document.getElementById("start");
-  const game = document.getElementById("game");
-
-  start.onclick = () => {
-    start.classList.add("hidden");
-    game.classList.remove("hidden");
+  document.getElementById("start").onclick = () => {
+    document.getElementById("start").classList.add("hidden");
+    document.getElementById("game").classList.remove("hidden");
   };
 </script>
 
