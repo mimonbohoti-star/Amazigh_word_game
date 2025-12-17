@@ -1,15 +1,11 @@
-// =======================
-// الأسئلة (سؤال عربي / إنجليزي – جواب أمازيغي)
-// =======================
-
-const levels = [
+// const levels = [
   {
     question: "Man / رجل",
-    answers: ["ⴰⴳⴳⴰⵔ", "aggar"]
+    answers: ["ⴰⵎⴳⴳⴰⵣ", "amggaz"]
   },
   {
-    question: "Water / ماء",
-    answers: ["ⴰⵎⴰⵏ", "aman"]
+    question: "Woman / امرأة",
+    answers: ["ⵜⴰⵎⴳⴳⴰⵣⵜ", "tamggazt"]
   }
 ];
 
