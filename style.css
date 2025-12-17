@@ -1,99 +1,81 @@
-:root{
-  --blue:#1e88e5;
-  --green:#2e7d32;
-  --yellow:#f9a825;
-  --red:#c62828;
-  --white:#fff;
-  --dark:#222;
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background: linear-gradient(#2f8de4, #2f8d46, #f3a92f);
+  min-height: 100vh;
 }
 
-html,body{
-  margin:0;
-  width:100%;
-  height:100%;
-  overflow:hidden;
-  font-family: Arial, sans-serif;
+.hidden { display: none; }
+
+.start-screen {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #2f8de4;
+  color: white;
+  cursor: pointer;
 }
 
-body{
-  background: linear-gradient(
-    180deg,
-    var(--blue) 0%,
-    var(--blue) 33%,
-    var(--green) 33%,
-    var(--green) 66%,
-    var(--yellow) 66%,
-    var(--yellow) 100%
-  );
-  display:flex;
-  justify-content:center;
-  align-items:center;
+.game {
+  max-width: 400px;
+  margin: 80px auto;
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  text-align: center;
 }
 
-/* شاشة البداية */
-.start-screen{
-  position:fixed;
-  inset:0;
-  background:inherit;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  z-index:10;
+.title {
+  color: #b60000;
+  font-size: 22px;
+  margin-bottom: 10px;
 }
 
-.flag-symbol{
-  font-size:120px;
-  color:var(--red);
+.card {
+  background: #f3a92f;
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 10px;
 }
 
-/* اللعبة */
-.stage{
-  width:90%;
-  max-width:420px;
-  background:var(--white);
-  border-radius:16px;
-  padding:20px;
-  box-shadow:0 8px 25px rgba(0,0,0,.25);
-  text-align:center;
+.count {
+  font-size: 14px;
+  color: #333;
 }
 
-.stage-title{
-  color:var(--red);
-  font-size:24px;
-  margin-bottom:15px;
+.question {
+  font-size: 20px;
+  font-weight: bold;
 }
 
-.question-card{
-  background:var(--yellow);
-  border-radius:12px;
-  padding:15px;
-  margin-bottom:15px;
+input {
+  width: 100%;
+  padding: 10px;
+  font-size: 18px;
+  margin-top: 10px;
+  border-radius: 8px;
+  border: 2px solid #ddd;
+  text-align: center;
 }
 
-.answer-input{
-  width:100%;
-  padding:12px;
-  font-size:18px;
-  text-align:center;
-  border-radius:10px;
-  border:2px solid var(--yellow);
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  font-size: 18px;
+  background: #2f8d46;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
 }
 
-.check-btn{
-  width:100%;
-  margin-top:15px;
-  padding:14px;
-  font-size:18px;
-  border:none;
-  border-radius:12px;
-  background:var(--green);
-  color:#fff;
+.msg {
+  margin-top: 10px;
+  font-weight: bold;
 }
 
-.result{
-  margin-top:12px;
-  font-weight:bold;
-}
-
-.success{ color:var(--green); }
-.error{ color:var(--red); }
+.success { color: green; }
+.error { color: red; }
