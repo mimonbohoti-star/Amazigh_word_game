@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Grid Drag Test</title>
+<title>Simple Grid Drag</title>
 
 <style>
   body {
@@ -28,7 +28,6 @@
     aspect-ratio: 1 / 1;
     background: #1e2f2f;
     border-radius: 12px;
-    transition: background 0.15s;
   }
 
   .cell.active {
@@ -42,81 +41,67 @@
 <div class="grid" id="grid"></div>
 
 <script>
-  const gridSize = 7;
+  const size = 7;
   const grid = document.getElementById("grid");
-  let cells = [];
+  const cells = [];
+
   let isDragging = false;
   let startIndex = null;
+  let startRow = null;
 
   // إنشاء الشبكة
-  for (let i = 0; i < gridSize * gridSize; i++) {
-    const cell = document.createElement("div");
-    cell.className = "cell";
-    cell.dataset.index = i;
-    grid.appendChild(cell);
-    cells.push(cell);
+  for (let i = 0; i < size * size; i++) {
+    const c = document.createElement("div");
+    c.className = "cell";
+    c.dataset.index = i;
+    grid.appendChild(c);
+    cells.push(c);
   }
 
   function clearActive() {
     cells.forEach(c => c.classList.remove("active"));
   }
 
-  function getLineIndices(start, end) {
-    const sx = start % gridSize;
-    const sy = Math.floor(start / gridSize);
-    const ex = end % gridSize;
-    const ey = Math.floor(end / gridSize);
-
-    const dx = Math.sign(ex - sx);
-    const dy = Math.sign(ey - sy);
-
-    // السماح فقط بخط مستقيم (أفقي / عمودي / قطري)
-    if (!(dx === 0 || dy === 0 || Math.abs(ex - sx) === Math.abs(ey - sy))) {
-      return [];
-    }
-
-    let x = sx;
-    let y = sy;
-    let indices = [];
-
-    while (true) {
-      indices.push(y * gridSize + x);
-      if (x === ex && y === ey) break;
-      x += dx;
-      y += dy;
-    }
-
-    return indices;
-  }
-
-  function handleMove(index) {
-    if (!isDragging || startIndex === null) return;
-    clearActive();
-    const line = getLineIndices(startIndex, index);
-    line.forEach(i => cells[i].classList.add("active"));
-  }
-
   cells.forEach(cell => {
-    cell.addEventListener("pointerdown", e => {
+
+    cell.addEventListener("pointerdown", () => {
+      clearActive();
       isDragging = true;
       startIndex = Number(cell.dataset.index);
-      clearActive();
+      startRow = Math.floor(startIndex / size);
       cell.classList.add("active");
     });
 
-    cell.addEventListener("pointerenter", e => {
-      handleMove(Number(cell.dataset.index));
+    cell.addEventListener("pointerenter", () => {
+      if (!isDragging) return;
+
+      const index = Number(cell.dataset.index);
+      const row = Math.floor(index / size);
+
+      // ❗ سحب أفقي فقط
+      if (row !== startRow) return;
+
+      clearActive();
+
+      const startCol = startIndex % size;
+      const endCol = index % size;
+
+      const from = Math.min(startCol, endCol);
+      const to   = Math.max(startCol, endCol);
+
+      for (let col = from; col <= to; col++) {
+        const i = startRow * size + col;
+        cells[i].classList.add("active");
+      }
     });
 
-    cell.addEventListener("pointerup", e => {
+    cell.addEventListener("pointerup", () => {
       isDragging = false;
-      startIndex = null;
     });
   });
 
   document.addEventListener("pointerup", () => {
     isDragging = false;
-    startIndex = null;
   });
 </script>
 
