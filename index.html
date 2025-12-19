@@ -17,7 +17,7 @@ body {
 .hidden { display: none !important; }
 
 button {
-  padding: 10px 18px;
+  padding: 10px 14px;
   font-size: 16px;
   border: none;
   border-radius: 8px;
@@ -43,32 +43,45 @@ button {
   background: #1e293b;
   padding: 20px;
   border-radius: 12px;
-  width: 90%;
+  width: 95%;
   max-width: 420px;
 }
 
 .word {
   font-size: 26px;
-  margin: 20px 0;
+  margin: 15px 0;
   letter-spacing: 2px;
   direction: ltr;
 }
 
-/* ⭐⭐⭐ الإصلاح هنا ⭐⭐⭐ */
 input {
   padding: 10px;
-  font-size: 18px;
+  font-size: 20px;
   text-align: center;
   direction: ltr;
   border-radius: 6px;
   border: none;
-  width: 80%;
-  color: #000;          /* ← يظهر الحروف */
-  background: #fff;     /* ← خلفية بيضاء */
+  width: 90%;
+  color: #000;
+}
+
+/* لوحة الحروف */
+.keyboard {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+}
+
+.keyboard button {
+  background: #334155;
+  color: #fff;
+  min-width: 42px;
 }
 
 .message {
-  margin-top: 15px;
+  margin-top: 12px;
   min-height: 24px;
 }
 </style>
@@ -92,8 +105,13 @@ input {
   <div class="level-box">
     <h3 id="levelTitle"></h3>
     <div class="word" id="question"></div>
-    <input id="answerInput" placeholder="ⵣⵣⵣ">
-    <br><br>
+
+    <input id="answerInput" readonly>
+
+    <!-- ⭐ لوحة الحروف الأمازيغية ⭐ -->
+    <div class="keyboard" id="keyboard"></div>
+
+    <br>
     <button onclick="checkAnswer()">تحقق</button>
     <div class="message" id="message"></div>
     <br>
@@ -119,6 +137,8 @@ const levels = {
     { q: "RAIN", a: "ⴰⵏⵣⴰⵔ" }
   ]
 };
+
+const letters = ["ⴰ","ⴱ","ⴳ","ⴷ","ⴹ","ⴻ","ⴼ","ⴽ","ⵉ","ⵍ","ⵎ","ⵏ","ⵔ","ⵙ","ⵜ","ⵓ","ⵢ","ⵣ"];
 
 let currentLevel = 1;
 let currentIndex = 0;
@@ -147,10 +167,27 @@ function loadQuestion() {
   question.innerText = levels[currentLevel][currentIndex].q;
   answerInput.value = "";
   message.innerText = "";
+  buildKeyboard();
+}
+
+function buildKeyboard() {
+  keyboard.innerHTML = "";
+  letters.forEach(l => {
+    const b = document.createElement("button");
+    b.textContent = l;
+    b.onclick = () => answerInput.value += l;
+    keyboard.appendChild(b);
+  });
+
+  const del = document.createElement("button");
+  del.textContent = "⌫";
+  del.onclick = () =>
+    answerInput.value = answerInput.value.slice(0, -1);
+  keyboard.appendChild(del);
 }
 
 function checkAnswer() {
-  if (answerInput.value.trim() === levels[currentLevel][currentIndex].a) {
+  if (answerInput.value === levels[currentLevel][currentIndex].a) {
     currentIndex++;
     currentIndex >= levels[currentLevel].length
       ? message.innerText = "✔️ أحسنت! انتهت المرحلة"
