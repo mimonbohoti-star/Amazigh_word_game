@@ -65,6 +65,11 @@ button {
 .key:active {
   background: #3a3f6b;
 }
+
+#message {
+  margin-top: 15px;
+  font-size: 18px;
+}
 </style>
 </head>
 
@@ -90,17 +95,31 @@ button {
 
 <button class="verify-btn" onclick="checkAnswer()">تحقق</button>
 
+<div id="message"></div>
+
 <script>
+const correctAnswer = "ⵣⵉⵔ"; // جواب STAR بالأمازيغية
+
 function addChar(char) {
   document.getElementById("answer").value += char;
 }
 
 function clearAnswer() {
   document.getElementById("answer").value = "";
+  document.getElementById("message").innerText = "";
 }
 
 function checkAnswer() {
-  alert("التحقق غير مفعّل بعد");
+  const userAnswer = document.getElementById("answer").value;
+  const message = document.getElementById("message");
+
+  if (userAnswer === correctAnswer) {
+    message.style.color = "#2ecc71";
+    message.innerText = "✔️ جواب صحيح";
+  } else {
+    message.style.color = "#e74c3c";
+    message.innerText = "❌ جواب خاطئ";
+  }
 }
 </script>
 
