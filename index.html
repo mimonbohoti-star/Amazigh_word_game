@@ -9,7 +9,6 @@
 body {
   margin: 0;
   background: linear-gradient(#0f3d3d, #4fa3a3);
-  font-family: sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -18,14 +17,14 @@ body {
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(7, 45px);
+  grid-template-columns: repeat(7, 46px);
   gap: 8px;
-  touch-action: none; /* مهم للسحب */
+  touch-action: none;
 }
 
 .cell {
-  width: 45px;
-  height: 45px;
+  width: 46px;
+  height: 46px;
   background: #1e2f2f;
   border-radius: 8px;
 }
@@ -43,9 +42,9 @@ body {
 <script>
 const grid = document.getElementById("grid");
 const size = 7;
-let cells = [];
+const cells = [];
 let isDragging = false;
-let startCell = null;
+let startIndex = null;
 let direction = null;
 
 // إنشاء الشبكة
@@ -57,70 +56,66 @@ for (let i = 0; i < size * size; i++) {
   cells.push(cell);
 }
 
-// أدوات
-function getRow(index) {
-  return Math.floor(index / size);
-}
-function getCol(index) {
-  return index % size;
-}
+function getRow(i) { return Math.floor(i / size); }
+function getCol(i) { return i % size; }
+
 function clearSelection() {
   cells.forEach(c => c.classList.remove("active"));
 }
 
-// بداية السحب
-cells.forEach(cell => {
-  cell.addEventListener("pointerdown", e => {
-    clearSelection();
-    isDragging = true;
-    startCell = cell;
-    direction = null;
-    cell.classList.add("active");
-    cell.setPointerCapture(e.pointerId);
-  });
+grid.addEventListener("pointerdown", e => {
+  const target = e.target;
+  if (!target.classList.contains("cell")) return;
 
-  cell.addEventListener("pointerenter", () => {
-    if (!isDragging) return;
+  clearSelection();
+  isDragging = true;
+  startIndex = +target.dataset.index;
+  direction = null;
+  target.classList.add("active");
+});
 
-    const startIndex = +startCell.dataset.index;
-    const currentIndex = +cell.dataset.index;
+grid.addEventListener("pointermove", e => {
+  if (!isDragging) return;
 
-    const sr = getRow(startIndex);
-    const sc = getCol(startIndex);
-    const cr = getRow(currentIndex);
-    const cc = getCol(currentIndex);
+  const el = document.elementFromPoint(e.clientX, e.clientY);
+  if (!el || !el.classList.contains("cell")) return;
 
-    // تحديد الاتجاه
-    if (!direction) {
-      if (sr === cr) direction = "row";
-      else if (sc === cc) direction = "col";
-      else return;
+  const currentIndex = +el.dataset.index;
+
+  const sr = getRow(startIndex);
+  const sc = getCol(startIndex);
+  const cr = getRow(currentIndex);
+  const cc = getCol(currentIndex);
+
+  if (!direction) {
+    if (sr === cr) direction = "row";
+    else if (sc === cc) direction = "col";
+    else return;
+  }
+
+  clearSelection();
+
+  if (direction === "row" && sr === cr) {
+    const min = Math.min(sc, cc);
+    const max = Math.max(sc, cc);
+    for (let c = min; c <= max; c++) {
+      cells[sr * size + c].classList.add("active");
     }
+  }
 
-    clearSelection();
-
-    if (direction === "row" && sr === cr) {
-      const min = Math.min(sc, cc);
-      const max = Math.max(sc, cc);
-      for (let c = min; c <= max; c++) {
-        cells[sr * size + c].classList.add("active");
-      }
+  if (direction === "col" && sc === cc) {
+    const min = Math.min(sr, cr);
+    const max = Math.max(sr, cr);
+    for (let r = min; r <= max; r++) {
+      cells[r * size + sc].classList.add("active");
     }
+  }
+});
 
-    if (direction === "col" && sc === cc) {
-      const min = Math.min(sr, cr);
-      const max = Math.max(sr, cr);
-      for (let r = min; r <= max; r++) {
-        cells[r * size + sc].classList.add("active");
-      }
-    }
-  });
-
-  cell.addEventListener("pointerup", () => {
-    isDragging = false;
-    startCell = null;
-    direction = null;
-  });
+window.addEventListener("pointerup", () => {
+  isDragging = false;
+  startIndex = null;
+  direction = null;
 });
 </script>
 
