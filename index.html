@@ -1,218 +1,197 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>لعبة الكلمات الأمازيغية</title>
 
 <style>
-body{
-  margin:0;
-  font-family: sans-serif;
-  background: linear-gradient(180deg,#0f3d3a,#1f6f67);
-  color:#fff;
-  text-align:center;
+body {
+  margin: 0;
+  font-family: Tahoma, Arial, sans-serif;
+  background: #0f172a;
+  color: #fff;
+  text-align: center;
 }
 
-.container{
-  max-width:500px;
-  margin:auto;
-  padding:20px;
+.hidden { display: none; }
+
+button {
+  padding: 10px 18px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  background: #22c55e;
+  color: #000;
+  cursor: pointer;
 }
 
-.hidden{display:none;}
-
-button{
-  border:none;
-  padding:12px 20px;
-  border-radius:25px;
-  font-size:16px;
-  cursor:pointer;
+button:disabled {
+  background: #555;
+  color: #aaa;
 }
 
-.start-btn{background:#4cafef;color:#000;}
-.next-btn{background:#7ed957;}
-.delete-btn{background:#e57373;}
-
-.answer{
-  display:flex;
-  justify-content:center;
-  gap:10px;
-  margin:20px 0;
+.start-screen, .menu, .game {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
-.box{
-  width:55px;
-  height:55px;
-  background:#1c2f33;
-  border-radius:12px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:28px;
-  box-shadow: inset 0 -4px #6cff75;
+.flag-symbol {
+  font-size: 80px;
+  margin-bottom: 20px;
 }
 
-.letters{
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:10px;
-  margin-top:20px;
+.level-box {
+  background: #1e293b;
+  padding: 20px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 420px;
 }
 
-.letter{
-  background:#243c40;
-  padding:15px;
-  border-radius:12px;
-  font-size:24px;
-  cursor:pointer;
+.word {
+  font-size: 26px;
+  margin: 20px 0;
+  letter-spacing: 2px;
+  direction: ltr;
 }
 
-.top-info{
-  margin-bottom:15px;
-  line-height:1.8;
+input {
+  padding: 10px;
+  font-size: 18px;
+  text-align: center;
+  direction: ltr;
+  border-radius: 6px;
+  border: none;
+  width: 80%;
+}
+
+.message {
+  margin-top: 15px;
+  min-height: 24px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-
 <!-- شاشة البداية -->
-<div id="startScreen">
-  <h2>ⴰⵣⵣⵓⵍ</h2>
-  <p>لعبة الكلمات الأمازيغية</p>
-  <button class="start-btn" onclick="startGame()">ابدأ اللعب</button>
+<div class="start-screen" id="startScreen">
+  <div class="flag-symbol">ⵣ</div>
+  <button onclick="goToMenu()">ابدأ</button>
+</div>
+
+<!-- القائمة -->
+<div class="menu hidden" id="menu">
+  <h2>اختر المرحلة</h2>
+  <button onclick="startLevel(1)">المرحلة 1</button><br><br>
+  <button onclick="startLevel(2)">المرحلة 2</button><br><br>
+  <button onclick="startLevel(3)">المرحلة 3</button>
 </div>
 
 <!-- اللعبة -->
-<div id="gameScreen" class="hidden">
-
-  <div class="top-info">
-    <div>المرحلة: <span id="stageNum"></span></div>
-    <div>السؤال: <span id="questionNum"></span> / 3</div>
-    <div>النقاط: <span id="score"></span></div>
+<div class="game hidden" id="game">
+  <div class="level-box">
+    <h3 id="levelTitle"></h3>
+    <div class="word" id="question"></div>
+    <input id="answerInput" placeholder="ⵣⵣⵣ">
+    <br><br>
+    <button onclick="checkAnswer()">تحقق</button>
+    <div class="message" id="message"></div>
+    <br>
+    <button onclick="goToMenu()">الرجوع للقائمة</button>
   </div>
-
-  <h3 id="questionText"></h3>
-
-  <div class="answer" id="answerBoxes"></div>
-
-  <div class="letters" id="lettersBox"></div>
-
-  <div style="margin-top:20px;">
-    <button class="next-btn" onclick="nextQuestion()">سؤال آخر</button>
-    <button class="delete-btn" onclick="deleteLetter()">مسح حرف</button>
-  </div>
-
-</div>
-
 </div>
 
 <script>
-const stages = [
-  [
-    {q:"حيوان أليف", a:"ⴰⵢⴷⵉ"},
-    {q:"النار بالأمازيغية", a:"ⵜⵉⵙⵙ"},
-    {q:"السماء", a:"ⴰⵙⵎⴰ"}
+// ===============================
+// تنظيم الكلمات حسب المراحل (ثابت)
+// ===============================
+const levels = {
+  1: [
+    { q: "SUN", a: "ⵜⴰⴼⵓⵢⵜ" },
+    { q: "WATER", a: "ⴰⵎⴰⵏ" },
+    { q: "FIRE", a: "ⵜⵉⵙⵉ" }
   ],
-  [
-    {q:"الحرية بالأمازيغية", a:"ⵜⴰⵙⵍⴰ"},
-    {q:"رمز الأمازيغ", a:"ⵣ"},
-    {q:"الأرض", a:"ⴰⴳⴳⴰ"}
+  2: [
+    { q: "MOON", a: "ⴰⵢⵓⵔ" },
+    { q: "STAR", a: "ⵉⵜⵔⵉ" },
+    { q: "EARTH", a: "ⴰⴽⴰⵍ" }
   ],
-  [
-    {q:"الماء", a:"ⴰⵎⴰⵏ"},
-    {q:"الشمس", a:"ⵜⴰⴼⵓⵢⵜ"},
-    {q:"القمر", a:"ⴰⵢⵢⵓⵔ"}
+  3: [
+    { q: "MOUNTAIN", a: "ⴰⴷⵔⴰⵔ" },
+    { q: "WIND", a: "ⴰⴼⴰⵙ" },
+    { q: "RAIN", a: "ⴰⵏⵣⴰⵔ" }
   ]
-];
+};
 
-let stage=0, qIndex=0, score=0;
-let currentAnswer="", userAnswer="";
+// ===============================
+// متغيرات الحالة
+// ===============================
+let currentLevel = 1;
+let currentIndex = 0;
 
-function startGame(){
+// ===============================
+// التنقل
+// ===============================
+function goToMenu() {
   document.getElementById("startScreen").classList.add("hidden");
-  document.getElementById("gameScreen").classList.remove("hidden");
+  document.getElementById("game").classList.add("hidden");
+  document.getElementById("menu").classList.remove("hidden");
+}
+
+function startLevel(level) {
+  currentLevel = level;
+  currentIndex = 0;
+  localStorage.setItem("amazighLevel", level);
+  showGame();
+}
+
+function showGame() {
+  document.getElementById("menu").classList.add("hidden");
+  document.getElementById("game").classList.remove("hidden");
+  document.getElementById("levelTitle").innerText = "المرحلة " + currentLevel;
   loadQuestion();
 }
 
-function loadQuestion(){
-  const data = stages[stage][qIndex];
-  currentAnswer = data.a;
-  userAnswer = "";
-
-  document.getElementById("stageNum").innerText = stage+1;
-  document.getElementById("questionNum").innerText = qIndex+1;
-  document.getElementById("score").innerText = score;
-  document.getElementById("questionText").innerText = data.q;
-
-  const answerBoxes = document.getElementById("answerBoxes");
-  answerBoxes.innerHTML="";
-  for(let i=0;i<currentAnswer.length;i++){
-    const d=document.createElement("div");
-    d.className="box";
-    d.innerText="";
-    answerBoxes.appendChild(d);
-  }
-
-  generateLetters();
+// ===============================
+// منطق اللعبة
+// ===============================
+function loadQuestion() {
+  const item = levels[currentLevel][currentIndex];
+  document.getElementById("question").innerText = item.q;
+  document.getElementById("answerInput").value = "";
+  document.getElementById("message").innerText = "";
 }
 
-function generateLetters(){
-  const box=document.getElementById("lettersBox");
-  box.innerHTML="";
-  let letters=currentAnswer.split("");
+function checkAnswer() {
+  const input = document.getElementById("answerInput").value.trim();
+  const correct = levels[currentLevel][currentIndex].a;
 
-  const extra="ⴰⵉⵎⵔⵙⵏⴳⵍⵢⴷⵜⴼⵣ".split("");
-  while(letters.length<10){
-    letters.push(extra[Math.floor(Math.random()*extra.length)]);
-  }
-
-  letters.sort(()=>Math.random()-0.5);
-
-  letters.forEach(l=>{
-    const b=document.createElement("div");
-    b.className="letter";
-    b.innerText=l;
-    b.onclick=()=>addLetter(l);
-    box.appendChild(b);
-  });
-}
-
-function addLetter(l){
-  if(userAnswer.length>=currentAnswer.length) return;
-  userAnswer+=l;
-  updateBoxes();
-}
-
-function deleteLetter(){
-  userAnswer=userAnswer.slice(0,-1);
-  updateBoxes();
-}
-
-function updateBoxes(){
-  const boxes=document.querySelectorAll(".box");
-  boxes.forEach((b,i)=>b.innerText=userAnswer[i]||"");
-}
-
-function nextQuestion(){
-  if(userAnswer!==currentAnswer) return;
-
-  score+=100;
-  qIndex++;
-
-  if(qIndex===3){
-    stage++;
-    qIndex=0;
-    if(stage===stages.length){
-      alert("🎉 مبروك! وصلت للنهاية\nالنقاط: "+score);
-      location.reload();
-      return;
+  if (input === correct) {
+    currentIndex++;
+    if (currentIndex >= levels[currentLevel].length) {
+      document.getElementById("message").innerText = "✔️ أحسنت! انتهت المرحلة";
+    } else {
+      loadQuestion();
     }
+  } else {
+    document.getElementById("message").innerText = "❌ حاول مرة أخرى";
   }
-  loadQuestion();
 }
+
+// ===============================
+// استرجاع التقدم
+// ===============================
+window.onload = () => {
+  const saved = localStorage.getItem("amazighLevel");
+  if (saved) {
+    currentLevel = parseInt(saved);
+  }
+};
 </script>
 
 </body>
