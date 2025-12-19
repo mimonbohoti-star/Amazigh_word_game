@@ -18,12 +18,9 @@ body{
   justify-content:space-between;
   padding:10px 15px;
   font-size:18px;
-  background:#000;
 }
 
-h1{
-  margin:20px 0;
-}
+h1{margin:15px 0;}
 
 .card{
   width:90%;
@@ -32,13 +29,13 @@ h1{
   font-size:20px;
   border-radius:14px;
   border:none;
-  cursor:pointer;
 }
 
-.stage-btn{background:#eee;color:#000;}
-.locked{background:#555;color:#aaa;cursor:not-allowed;}
-.answer{background:#333;color:#fff;}
-.correct{background:#22c55e;color:#fff;}
+.stage{background:#eee;color:#000;cursor:pointer;}
+.locked{background:#555;color:#aaa;}
+.answer{background:#222;color:#fff;cursor:pointer;}
+.correct{background:#22c55e;}
+.wrong{background:#ef4444;}
 
 #menu,#game{display:none;}
 </style>
@@ -47,56 +44,50 @@ h1{
 <body>
 
 <div class="top-bar">
-  <div>❤️ <span id="lives">3</span></div>
-  <div>⏱ <span id="time">10</span> ث</div>
   <div>⭐ <span id="stars">0</span></div>
+  <div>⏱ <span id="time">10</span> ث</div>
+  <div>❤️ <span id="lives">3</span></div>
 </div>
 
 <h1>🎮 لعبة الأسئلة</h1>
 
-<!-- MENU -->
 <div id="menu">
-  <button class="card stage-btn" onclick="startStage(1)">المرحلة 1</button>
-  <button class="card stage-btn" id="stage2" onclick="startStage(2)">المرحلة 2</button>
-  <button class="card locked" id="stage3">🔒 المرحلة 3</button>
-  <button class="card stage-btn" onclick="resetGame()">إعادة التصفير</button>
+  <button class="card stage" onclick="startStage(1)">المرحلة 1</button>
+  <button class="card stage" onclick="startStage(2)">المرحلة 2</button>
+  <button class="card locked">🔒 المرحلة 3</button>
+  <button class="card stage" onclick="resetGame()">إعادة التصفير</button>
 </div>
 
-<!-- GAME -->
 <div id="game">
   <h2 id="question"></h2>
   <div id="answers"></div>
 </div>
 
 <script>
-let data={
+let questions={
   1:[
-    {q:"كم 2 + 2 ؟",a:["3","4","5"],c:1},
-    {q:"لون السماء؟",a:["أزرق","أخضر","أحمر"],c:0},
-    {q:"كم يوم في الأسبوع؟",a:["5","6","7"],c:2}
+    {q:"2 + 2 = ؟",a:["3","4","5"],c:1},
+    {q:"لون السماء؟",a:["أخضر","أزرق","أحمر"],c:1}
   ],
   2:[
-    {q:"عاصمة المغرب؟",a:["فاس","الرباط","مراكش"],c:1},
-    {q:"كم شهر في السنة؟",a:["10","11","12"],c:2},
-    {q:"5 × 2 = ؟",a:["10","12","8"],c:0}
-  ],
-  3:[
-    {q:"مرحلة متقدمة 🔥",a:["A","B","C"],c:0}
+    {q:"عاصمة المغرب؟",a:["فاس","الرباط","طنجة"],c:1},
+    {q:"عدد أيام الأسبوع؟",a:["5","6","7"],c:2}
   ]
 };
 
 let stage=1,index=0;
-let progress=JSON.parse(localStorage.getItem("progress"))||{1:true,2:false,3:false};
+let timer;
+let time=10;
+let lives=3;
+let stars=0;
+
+const timeEl=document.getElementById("time");
+const livesEl=document.getElementById("lives");
+const starsEl=document.getElementById("stars");
 
 function showMenu(){
   menu.style.display="block";
   game.style.display="none";
-
-  if(progress[2]) stage2.classList.remove("locked");
-  if(progress[3]){
-    stage3.classList.remove("locked");
-    stage3.onclick=()=>startStage(3);
-  }
 }
 
 function startStage(s){
@@ -106,37 +97,75 @@ function startStage(s){
   loadQuestion();
 }
 
+function startTimer(){
+  clearInterval(timer);
+  time=10;
+  timeEl.textContent=time;
+
+  timer=setInterval(()=>{
+    time--;
+    timeEl.textContent=time;
+    if(time===0){
+      clearInterval(timer);
+      loseLife();
+    }
+  },1000);
+}
+
 function loadQuestion(){
-  let q=data[stage][index];
-  question.innerText=`(${index+1}/${data[stage].length}) `+q.q;
+  startTimer();
+  let q=questions[stage][index];
+  question.textContent=q.q;
   answers.innerHTML="";
   q.a.forEach((txt,i)=>{
     let b=document.createElement("button");
     b.className="card answer";
-    b.innerText=txt;
-    b.onclick=()=>check(i);
+    b.textContent=txt;
+    b.onclick=()=>check(i,b);
     answers.appendChild(b);
   });
 }
 
-function check(i){
-  if(i===data[stage][index].c){
-    index++;
-    if(index<data[stage].length) loadQuestion();
-    else completeStage();
-  }else alert("❌ خطأ");
+function check(i,btn){
+  clearInterval(timer);
+  let correct=questions[stage][index].c;
+  if(i===correct){
+    btn.classList.add("correct");
+    stars++; starsEl.textContent=stars;
+    setTimeout(nextQuestion,600);
+  }else{
+    btn.classList.add("wrong");
+    loseLife();
+  }
 }
 
-function completeStage(){
-  alert(`✅ أحسنت! المرحلة ${stage} مكتملة`);
-  progress[stage+1]=true;
-  localStorage.setItem("progress",JSON.stringify(progress));
-  showMenu();
+function nextQuestion(){
+  index++;
+  if(index<questions[stage].length){
+    loadQuestion();
+  }else{
+    alert("✅ المرحلة مكتملة");
+    showMenu();
+  }
+}
+
+function loseLife(){
+  lives--;
+  livesEl.textContent=lives;
+  if(lives===0){
+    alert("❌ خسرت اللعبة");
+    resetGame();
+  }else{
+    loadQuestion();
+  }
 }
 
 function resetGame(){
-  localStorage.clear();
-  location.reload();
+  clearInterval(timer);
+  lives=3; stars=0;
+  livesEl.textContent=lives;
+  starsEl.textContent=stars;
+  showMenu();
 }
 
 showMenu();
