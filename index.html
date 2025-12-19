@@ -3,146 +3,152 @@
 <head>
 <meta charset="UTF-8">
 <title>لعبة الأسئلة</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body {
-  margin: 0;
-  font-family: sans-serif;
-  background: linear-gradient(#000, #111);
-  color: #fff;
-  text-align: center;
+body{
+  margin:0;
+  font-family: Arial, sans-serif;
+  background:#000;
+  color:#fff;
+  text-align:center;
 }
 
-.top-bar {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px 15px;
-  font-size: 16px;
+.top-bar{
+  display:flex;
+  justify-content:space-between;
+  padding:10px 15px;
+  font-size:18px;
 }
 
-.top-bar span {
-  display: flex;
-  align-items: center;
-  gap: 5px;
+h1{
+  margin:20px 0;
 }
 
-h1 {
-  margin: 20px 0;
+button{
+  width:90%;
+  padding:15px;
+  margin:10px auto;
+  font-size:20px;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
 }
 
-.container {
-  max-width: 500px;
-  margin: auto;
-  padding: 10px;
-}
+.stage-btn{background:#eee;color:#000;}
+.locked{background:#555;color:#aaa;cursor:not-allowed;}
+.correct{background:#22c55e;color:#fff;}
+.answer{background:#444;color:#fff;}
 
-.btn {
-  width: 100%;
-  padding: 15px;
-  margin: 10px 0;
-  font-size: 18px;
-  border: none;
-  border-radius: 14px;
-  cursor: pointer;
-}
-
-.btn-open {
-  background: #f2f2f2;
-  color: #000;
-}
-
-.btn-done {
-  background: #1fbf5b;
-  color: #fff;
-}
-
-.btn-lock {
-  background: #555;
-  color: #bbb;
-  cursor: not-allowed;
-}
-
-#message {
-  margin: 15px 0;
-  padding: 12px;
-  border-radius: 12px;
-  display: none;
-  font-size: 16px;
-}
-
-.success {
-  background: #1fbf5b;
-  color: #fff;
-}
-
-.info {
-  background: #333;
-}
-
-.fade {
-  animation: fadeIn 0.4s ease;
-}
-
-@keyframes fadeIn {
-  from {opacity: 0; transform: translateY(10px);}
-  to {opacity: 1; transform: translateY(0);}
-}
-
-.reset {
-  background: #f2f2f2;
-  color: #000;
-}
+#game,#menu{display:none;}
 </style>
 </head>
 
 <body>
 
 <div class="top-bar">
-  <span>⭐ <b id="points">10</b></span>
-  <span>⏱️ <b id="time">9</b> ث</span>
-  <span>❤️ <b id="hearts">3</b></span>
+  <div>❤️ <span id="lives">3</span></div>
+  <div>⏱ <span id="time">10</span> ث</div>
+  <div>⭐ <span id="stars">0</span></div>
 </div>
 
 <h1>🎮 لعبة الأسئلة</h1>
 
-<div class="container">
+<!-- MENU -->
+<div id="menu">
+  <button class="stage-btn" onclick="startStage(1)">المرحلة 1</button>
+  <button class="stage-btn" onclick="startStage(2)" id="stage2">المرحلة 2</button>
+  <button class="stage-btn locked" id="stage3">🔒 المرحلة 3</button>
+  <button class="stage-btn" onclick="resetGame()">إعادة التصفير</button>
+</div>
 
-  <div id="message"></div>
-
-  <button id="stage1" class="btn btn-done">✔️ المرحلة 1</button>
-  <button id="stage2" class="btn btn-done">✔️ المرحلة 2</button>
-  <button id="stage3" class="btn btn-lock">🔒 المرحلة 3</button>
-
-  <button class="btn reset" onclick="resetGame()">إعادة التصفير</button>
+<!-- GAME -->
+<div id="game">
+  <h2 id="question"></h2>
+  <div id="answers"></div>
 </div>
 
 <script>
-function showMessage(text, type="info") {
-  const msg = document.getElementById("message");
-  msg.className = type + " fade";
-  msg.innerText = text;
-  msg.style.display = "block";
+let data = {
+  1: [
+    {q:"كم 2 + 2 ؟", a:["3","4","5"], c:1},
+    {q:"لون السماء؟", a:["أزرق","أخضر","أحمر"], c:0},
+    {q:"كم يوم في الأسبوع؟", a:["5","6","7"], c:2}
+  ],
+  2: [
+    {q:"عاصمة المغرب؟", a:["فاس","الرباط","مراكش"], c:1},
+    {q:"كم شهر في السنة؟", a:["10","11","12"], c:2},
+    {q:"5 × 2 = ؟", a:["10","12","8"], c:0}
+  ],
+  3: [
+    {q:"مرحلة متقدمة 🔥", a:["A","B","C"], c:0}
+  ]
+};
+
+let stage=1, index=0;
+let progress = JSON.parse(localStorage.getItem("progress")) || {1:true,2:false,3:false};
+
+function showMenu(){
+  document.getElementById("menu").style.display="block";
+  document.getElementById("game").style.display="none";
+
+  if(progress[2]) document.getElementById("stage2").classList.remove("locked");
+  if(progress[3]){
+    let s3=document.getElementById("stage3");
+    s3.classList.remove("locked");
+    s3.onclick=()=>startStage(3);
+  }
 }
 
-document.getElementById("stage1").onclick = () => {
-  showMessage("أحسنت! المرحلة 1 مكتملة ✅", "success");
-};
-
-document.getElementById("stage2").onclick = () => {
-  showMessage("تم اجتياز المرحلة 2 بنجاح 🎉", "success");
-};
-
-document.getElementById("stage3").onclick = () => {
-  showMessage("المرحلة 3 مازال مقفلة 🔒", "info");
-};
-
-function resetGame() {
-  showMessage("تمت إعادة التصفير 🔄", "info");
-  document.getElementById("points").innerText = 0;
-  document.getElementById("time").innerText = 10;
-  document.getElementById("hearts").innerText = 3;
+function startStage(s){
+  stage=s;
+  index=0;
+  document.getElementById("menu").style.display="none";
+  document.getElementById("game").style.display="block";
+  loadQuestion();
 }
+
+function loadQuestion(){
+  let q=data[stage][index];
+  document.getElementById("question").innerText =
+    `(${index+1}/${data[stage].length}) ` + q.q;
+
+  let answers=document.getElementById("answers");
+  answers.innerHTML="";
+  q.a.forEach((txt,i)=>{
+    let b=document.createElement("button");
+    b.className="answer";
+    b.innerText=txt;
+    b.onclick=()=>check(i);
+    answers.appendChild(b);
+  });
+}
+
+function check(i){
+  if(i===data[stage][index].c){
+    index++;
+    if(index < data[stage].length){
+      loadQuestion();
+    }else{
+      completeStage();
+    }
+  }else{
+    alert("❌ خطأ");
+  }
+}
+
+function completeStage(){
+  alert(`✅ أحسنت! المرحلة ${stage} مكتملة`);
+  progress[stage+1]=true;
+  localStorage.setItem("progress",JSON.stringify(progress));
+  showMenu();
+}
+
+function resetGame(){
+  localStorage.clear();
+  location.reload();
+}
+
+showMenu();
 </script>
 
 </body>
