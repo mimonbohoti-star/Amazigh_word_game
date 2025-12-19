@@ -108,7 +108,7 @@ input {
 
 <script>
 // ===============================
-// تنظيم الكلمات حسب المراحل (ثابت)
+// تنظيم الكلمات حسب المراحل
 // ===============================
 const levels = {
   1: [
@@ -129,16 +129,14 @@ const levels = {
 };
 
 // ===============================
-// متغيرات الحالة
-// ===============================
 let currentLevel = 1;
 let currentIndex = 0;
 
 // ===============================
-// التنقل
+// التنقل (الإصلاح هنا)
 // ===============================
 function goToMenu() {
-  document.getElementById("startScreen").classList.add("hidden");
+  document.getElementById("startScreen").classList.add("hidden"); // ✅ الإصلاح
   document.getElementById("game").classList.add("hidden");
   document.getElementById("menu").classList.remove("hidden");
 }
@@ -157,8 +155,6 @@ function showGame() {
   loadQuestion();
 }
 
-// ===============================
-// منطق اللعبة
 // ===============================
 function loadQuestion() {
   const item = levels[currentLevel][currentIndex];
@@ -184,13 +180,9 @@ function checkAnswer() {
 }
 
 // ===============================
-// استرجاع التقدم
-// ===============================
 window.onload = () => {
   const saved = localStorage.getItem("amazighLevel");
-  if (saved) {
-    currentLevel = parseInt(saved);
-  }
+  if (saved) currentLevel = parseInt(saved);
 };
 </script>
 
