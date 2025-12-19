@@ -7,7 +7,7 @@
 <style>
 body{
   margin:0;
-  font-family: Arial, sans-serif;
+  font-family:Arial, sans-serif;
   background:#000;
   color:#fff;
   text-align:center;
@@ -18,28 +18,29 @@ body{
   justify-content:space-between;
   padding:10px 15px;
   font-size:18px;
+  background:#000;
 }
 
 h1{
   margin:20px 0;
 }
 
-button{
+.card{
   width:90%;
-  padding:15px;
-  margin:10px auto;
+  margin:12px auto;
+  padding:16px;
   font-size:20px;
+  border-radius:14px;
   border:none;
-  border-radius:12px;
   cursor:pointer;
 }
 
 .stage-btn{background:#eee;color:#000;}
 .locked{background:#555;color:#aaa;cursor:not-allowed;}
+.answer{background:#333;color:#fff;}
 .correct{background:#22c55e;color:#fff;}
-.answer{background:#444;color:#fff;}
 
-#game,#menu{display:none;}
+#menu,#game{display:none;}
 </style>
 </head>
 
@@ -55,10 +56,10 @@ button{
 
 <!-- MENU -->
 <div id="menu">
-  <button class="stage-btn" onclick="startStage(1)">المرحلة 1</button>
-  <button class="stage-btn" onclick="startStage(2)" id="stage2">المرحلة 2</button>
-  <button class="stage-btn locked" id="stage3">🔒 المرحلة 3</button>
-  <button class="stage-btn" onclick="resetGame()">إعادة التصفير</button>
+  <button class="card stage-btn" onclick="startStage(1)">المرحلة 1</button>
+  <button class="card stage-btn" id="stage2" onclick="startStage(2)">المرحلة 2</button>
+  <button class="card locked" id="stage3">🔒 المرحلة 3</button>
+  <button class="card stage-btn" onclick="resetGame()">إعادة التصفير</button>
 </div>
 
 <!-- GAME -->
@@ -68,55 +69,50 @@ button{
 </div>
 
 <script>
-let data = {
-  1: [
-    {q:"كم 2 + 2 ؟", a:["3","4","5"], c:1},
-    {q:"لون السماء؟", a:["أزرق","أخضر","أحمر"], c:0},
-    {q:"كم يوم في الأسبوع؟", a:["5","6","7"], c:2}
+let data={
+  1:[
+    {q:"كم 2 + 2 ؟",a:["3","4","5"],c:1},
+    {q:"لون السماء؟",a:["أزرق","أخضر","أحمر"],c:0},
+    {q:"كم يوم في الأسبوع؟",a:["5","6","7"],c:2}
   ],
-  2: [
-    {q:"عاصمة المغرب؟", a:["فاس","الرباط","مراكش"], c:1},
-    {q:"كم شهر في السنة؟", a:["10","11","12"], c:2},
-    {q:"5 × 2 = ؟", a:["10","12","8"], c:0}
+  2:[
+    {q:"عاصمة المغرب؟",a:["فاس","الرباط","مراكش"],c:1},
+    {q:"كم شهر في السنة؟",a:["10","11","12"],c:2},
+    {q:"5 × 2 = ؟",a:["10","12","8"],c:0}
   ],
-  3: [
-    {q:"مرحلة متقدمة 🔥", a:["A","B","C"], c:0}
+  3:[
+    {q:"مرحلة متقدمة 🔥",a:["A","B","C"],c:0}
   ]
 };
 
-let stage=1, index=0;
-let progress = JSON.parse(localStorage.getItem("progress")) || {1:true,2:false,3:false};
+let stage=1,index=0;
+let progress=JSON.parse(localStorage.getItem("progress"))||{1:true,2:false,3:false};
 
 function showMenu(){
-  document.getElementById("menu").style.display="block";
-  document.getElementById("game").style.display="none";
+  menu.style.display="block";
+  game.style.display="none";
 
-  if(progress[2]) document.getElementById("stage2").classList.remove("locked");
+  if(progress[2]) stage2.classList.remove("locked");
   if(progress[3]){
-    let s3=document.getElementById("stage3");
-    s3.classList.remove("locked");
-    s3.onclick=()=>startStage(3);
+    stage3.classList.remove("locked");
+    stage3.onclick=()=>startStage(3);
   }
 }
 
 function startStage(s){
-  stage=s;
-  index=0;
-  document.getElementById("menu").style.display="none";
-  document.getElementById("game").style.display="block";
+  stage=s; index=0;
+  menu.style.display="none";
+  game.style.display="block";
   loadQuestion();
 }
 
 function loadQuestion(){
   let q=data[stage][index];
-  document.getElementById("question").innerText =
-    `(${index+1}/${data[stage].length}) ` + q.q;
-
-  let answers=document.getElementById("answers");
+  question.innerText=`(${index+1}/${data[stage].length}) `+q.q;
   answers.innerHTML="";
   q.a.forEach((txt,i)=>{
     let b=document.createElement("button");
-    b.className="answer";
+    b.className="card answer";
     b.innerText=txt;
     b.onclick=()=>check(i);
     answers.appendChild(b);
@@ -126,14 +122,9 @@ function loadQuestion(){
 function check(i){
   if(i===data[stage][index].c){
     index++;
-    if(index < data[stage].length){
-      loadQuestion();
-    }else{
-      completeStage();
-    }
-  }else{
-    alert("❌ خطأ");
-  }
+    if(index<data[stage].length) loadQuestion();
+    else completeStage();
+  }else alert("❌ خطأ");
 }
 
 function completeStage(){
