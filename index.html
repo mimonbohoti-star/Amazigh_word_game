@@ -6,192 +6,147 @@
 <title>لعبة الكلمات الأمازيغية</title>
 
 <style>
-/* ====== ألوان عامة ====== */
-body{
-  margin:0;
-  font-family:sans-serif;
-  background: linear-gradient(180deg, #0e1624, #12263a);
-  color:#eaf2f8;
+/* ====== إعدادات عامة ====== */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(180deg, #0b132b, #1c2541);
+  color: white;
+  text-align: center;
+  position: relative;
+  overflow-x: hidden;
 }
 
-/* توسيط الصفحات */
-.page{
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
+/* ====== ⵣ في الخلفية ====== */
+body::before {
+  content: "ⵣ";
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 280px;
+  color: rgba(255, 255, 255, 0.05);
+  z-index: 0;
+  pointer-events: none;
 }
 
-.hidden{display:none;}
-
-/* ====== حرف ⵣ ====== */
-#start div{
-  font-size:96px;
-  color:#2ecc71; /* أخضر هادئ */
-  margin-bottom:20px;
+/* ====== المحتوى فوق ⵣ ====== */
+body > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* ====== العناوين ====== */
-h2{
-  color:#a9d6e5; /* أزرق فاتح */
-  margin-bottom:10px;
+h1, h2 {
+  margin-top: 20px;
 }
 
-/* ====== السؤال ====== */
-#question{
-  font-size:28px;
-  margin:10px;
-  color:#f6e58d; /* أصفر خفيف */
-  font-weight:bold;
+/* ====== حركة تنفّس ====== */
+@keyframes breathe {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+  100% { transform: scale(1); }
 }
 
 /* ====== الأزرار ====== */
-button{
-  background: linear-gradient(135deg, #2ecc71, #27ae60);
-  border:none;
-  padding:12px 22px;
-  border-radius:10px;
-  font-size:18px;
-  cursor:pointer;
-  margin:8px;
-  color:#fff;
+button {
+  background: linear-gradient(180deg, #2ecc71, #27ae60);
+  border: none;
+  border-radius: 14px;
+  padding: 12px 22px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+  transition: all 0.15s ease;
+  animation: breathe 3s ease-in-out infinite;
 }
 
-button:active{
-  transform:scale(0.96);
+button:hover {
+  transform: translateY(-2px);
 }
 
-/* ====== خانة الجواب ====== */
-input{
-  font-size:22px;
-  padding:10px;
-  width:80%;
-  border-radius:8px;
-  border:none;
-  text-align:center;
-  margin-top:10px;
+button:active {
+  transform: translateY(2px) scale(0.97);
 }
 
-/* ====== أزرار الحروف ====== */
-.letters{
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:center;
-  gap:10px;
-  margin:20px;
+/* ====== أزرار خاصة ====== */
+.verify-btn {
+  background: linear-gradient(180deg, #f1c40f, #f39c12);
+  color: #000;
 }
 
-.letters button{
-  width:56px;
-  height:56px;
-  font-size:24px;
-  font-weight:bold;
-  border-radius:10px;
-  background:#1e3a5f; /* أزرق غامق */
-  color:#eaf2f8;
+.clear-btn {
+  background: linear-gradient(180deg, #1abc9c, #16a085);
+}
+
+.back-btn {
+  margin-top: 15px;
+}
+
+/* ====== الحقل ====== */
+input {
+  padding: 10px;
+  font-size: 18px;
+  border-radius: 10px;
+  border: none;
+  width: 220px;
+  text-align: center;
+}
+
+/* ====== لوحة الحروف ====== */
+.keyboard {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  margin: 20px;
+}
+
+.key {
+  background: #2c2f4a;
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 20px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.key:hover {
+  background: #3a3f6b;
+  transform: translateY(-2px);
+}
+
+.key:active {
+  transform: scale(0.95);
 }
 </style>
 </head>
 
 <body>
 
-<!-- صفحة الدخول -->
-<div id="start" class="page">
-  <div>ⵣ</div>
-  <button onclick="showLevels()">ابدأ</button>
+<h2>المرحلة 3</h2>
+<h1>STAR</h1>
+
+<input type="text" placeholder="أدخل الجواب">
+
+<br><br>
+
+<button class="clear-btn">مسح</button>
+
+<div class="keyboard">
+  <div class="key">ⵣ</div>
+  <div class="key">ⵉ</div>
+  <div class="key">ⵔ</div>
+  <div class="key">ⴰ</div>
+  <div class="key">ⵙ</div>
+  <div class="key">ⵏ</div>
 </div>
 
-<!-- اختيار المرحلة -->
-<div id="levels" class="page hidden">
-  <h2>اختر المرحلة</h2>
-  <button onclick="startGame(1)">المرحلة 1</button>
-  <button onclick="startGame(2)">المرحلة 2</button>
-  <button onclick="startGame(3)">المرحلة 3</button>
-</div>
-
-<!-- اللعبة -->
-<div id="game" class="page hidden">
-  <h2 id="levelTitle"></h2>
-  <div id="question"></div>
-
-  <input id="answer" readonly>
-
-  <button onclick="eraseLetter()">⌫ مسح</button>
-
-  <div class="letters" id="letters"></div>
-
-  <button onclick="checkAnswer()">تحقق</button>
-  <button onclick="backToLevels()">الرجوع للقائمة</button>
-</div>
-
-<audio id="clickSound">
-  <source src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg">
-</audio>
-
-<script>
-const levelsData = {
-  1:[{q:"SUN",a:"ⵜⵉⵎⵉ"}],
-  2:[{q:"MOON",a:"ⴰⵢⵓⵔ"}],
-  3:[{q:"STAR",a:"ⵉⵜⵔⵉ"}]
-};
-
-const tifinagh = [
- "ⴰ","ⴱ","ⵛ","ⴷ","ⴻ","ⴼ",
- "ⴳ","ⵀ","ⵉ","ⵊ","ⴽ","ⵍ",
- "ⵎ","ⵏ","ⵓ","ⵔ","ⵙ","ⵜ",
- "ⵡ","ⵢ","ⵣ"
-];
-
-let currentAnswer="";
-
-function playSound(){
-  document.getElementById("clickSound").play();
-}
-
-function showLevels(){
-  start.classList.add("hidden");
-  levels.classList.remove("hidden");
-}
-
-function startGame(lv){
-  levels.classList.add("hidden");
-  game.classList.remove("hidden");
-  levelTitle.innerText="المرحلة "+lv;
-  question.innerText=levelsData[lv][0].q;
-  currentAnswer=levelsData[lv][0].a;
-  answer.value="";
-  buildLetters();
-}
-
-function buildLetters(){
-  letters.innerHTML="";
-  tifinagh.forEach(l=>{
-    const b=document.createElement("button");
-    b.textContent=l;
-    b.onclick=()=>{
-      answer.value+=l;
-      playSound();
-    };
-    letters.appendChild(b);
-  });
-}
-
-function eraseLetter(){
-  answer.value = answer.value.slice(0,-1);
-  playSound();
-}
-
-function checkAnswer(){
-  alert(answer.value===currentAnswer ? "✔️ صحيح" : "❌ خطأ");
-}
-
-function backToLevels(){
-  game.classList.add("hidden");
-  levels.classList.remove("hidden");
-}
-</script>
+<button class="verify-btn">تحقق</button>
+<br>
+<button class="back-btn">الرجوع للقائمة</button>
 
 </body>
 </html>
