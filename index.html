@@ -3,37 +3,36 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>لعبة السحب – الأساس</title>
+<title>Grid Drag HV</title>
 
 <style>
-body {
-  margin: 0;
-  min-height: 100vh;
-  background: linear-gradient(#0f3d3d, #5fa3a3);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-family: Arial, sans-serif;
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background: linear-gradient(#0f3d3d,#5fa3a3);
+  touch-action:none;
 }
 
-/* الشبكة */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(7, 44px);
-  gap: 10px;
+/* شبكة مستطيلة (صفوف/أعمدة) */
+.grid{
+  display:grid;
+  grid-template-columns: repeat(10, 42px); /* أعمدة */
+  gap:8px;
 }
 
-/* المربعات */
-.cell {
-  width: 44px;
-  height: 44px;
-  background: #1e2f2f;
-  border-radius: 10px;
-  touch-action: none;
+/* مربعات */
+.cell{
+  width:42px;
+  height:42px;
+  background:#1e2f2f;
+  border-radius:8px;
 }
 
-.cell.active {
-  background: #66cfff;
+.cell.active{
+  background:#66cfff;
 }
 </style>
 </head>
@@ -43,56 +42,84 @@ body {
 <div class="grid" id="grid"></div>
 
 <script>
-const rows = 7;
-const cols = 7;
+const rows = 4;     // عدد الصفوف (أفقي)
+const cols = 10;    // عدد الأعمدة (عمودي)
 const grid = document.getElementById("grid");
 
-let isDragging = false;
-let startRow = null;
+let isDragging=false;
+let startRow=null;
+let startCol=null;
+let mode=null; // 'row' أو 'col'
 
 // إنشاء الشبكة
-for (let r = 0; r < rows; r++) {
-  for (let c = 0; c < cols; c++) {
-    const cell = document.createElement("div");
-    cell.className = "cell";
-    cell.dataset.row = r;
-    cell.dataset.col = c;
+for(let r=0;r<rows;r++){
+  for(let c=0;c<cols;c++){
+    const cell=document.createElement("div");
+    cell.className="cell";
+    cell.dataset.row=r;
+    cell.dataset.col=c;
     grid.appendChild(cell);
   }
 }
 
-const cells = document.querySelectorAll(".cell");
+const cells=[...document.querySelectorAll(".cell")];
 
-// بداية السحب
-cells.forEach(cell => {
-  cell.addEventListener("pointerdown", e => {
+function clearActive(){
+  cells.forEach(c=>c.classList.remove("active"));
+}
+
+cells.forEach(cell=>{
+  cell.addEventListener("pointerdown", ()=>{
     clearActive();
-    isDragging = true;
-    startRow = cell.dataset.row;
-    activateCell(cell);
+    isDragging=true;
+    startRow=cell.dataset.row;
+    startCol=cell.dataset.col;
+    mode=null;
+    cell.classList.add("active");
   });
 
-  cell.addEventListener("pointerenter", e => {
-    if (!isDragging) return;
-    if (cell.dataset.row === startRow) {
-      activateCell(cell);
+  cell.addEventListener("pointerenter", ()=>{
+    if(!isDragging) return;
+
+    const r=cell.dataset.row;
+    const c=cell.dataset.col;
+
+    if(!mode){
+      if(r===startRow) mode="row";
+      else if(c===startCol) mode="col";
+      else return;
+    }
+
+    clearActive();
+
+    if(mode==="row" && r===startRow){
+      const min=Math.min(startCol,c);
+      const max=Math.max(startCol,c);
+      cells.forEach(x=>{
+        if(x.dataset.row===startRow && x.dataset.col>=min && x.dataset.col<=max){
+          x.classList.add("active");
+        }
+      });
+    }
+
+    if(mode==="col" && c===startCol){
+      const min=Math.min(startRow,r);
+      const max=Math.max(startRow,r);
+      cells.forEach(x=>{
+        if(x.dataset.col===startCol && x.dataset.row>=min && x.dataset.row<=max){
+          x.classList.add("active");
+        }
+      });
     }
   });
 });
 
-// نهاية السحب
-document.addEventListener("pointerup", () => {
-  isDragging = false;
-  startRow = null;
+document.addEventListener("pointerup", ()=>{
+  isDragging=false;
+  startRow=null;
+  startCol=null;
+  mode=null;
 });
-
-function activateCell(cell) {
-  cell.classList.add("active");
-}
-
-function clearActive() {
-  cells.forEach(c => c.classList.remove("active"));
-}
 </script>
 
 </body>
