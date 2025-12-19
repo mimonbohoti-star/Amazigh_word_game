@@ -6,87 +6,73 @@
 <title>لعبة الكلمات الأمازيغية</title>
 
 <style>
-body {
-  margin: 0;
-  font-family: sans-serif;
-  background: linear-gradient(180deg,#0f3c3c,#2f7f7f);
-  color: #fff;
-  text-align: center;
+body{
+  margin:0;
+  font-family:sans-serif;
+  background:linear-gradient(180deg,#0f3c3c,#2f7f7f);
+  color:#fff;
+  text-align:center;
 }
-
-.screen {
-  display: none;
-  min-height: 100vh;
-  padding: 40px 15px;
+.screen{display:none;min-height:100vh;padding:40px 15px}
+.screen.active{display:block}
+h1{margin-top:120px;font-size:26px}
+button{
+  border:none;
+  padding:12px 22px;
+  border-radius:20px;
+  font-size:16px;
+  cursor:pointer;
 }
-
-.screen.active {
-  display: block;
+#startBtn{margin-top:30px;background:#5dd6e8}
+.question{font-size:22px;margin:30px 0}
+.answer{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin-bottom:25px;
 }
-
-h1 {
-  margin-top: 120px;
-  font-size: 26px;
+.slot{
+  width:55px;
+  height:55px;
+  background:#1f3236;
+  border-radius:12px;
+  line-height:55px;
+  font-size:28px;
 }
-
-button {
-  border: none;
-  padding: 12px 22px;
-  border-radius: 20px;
-  font-size: 16px;
-  cursor: pointer;
+.grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:10px;
+  max-width:320px;
+  margin:auto;
 }
-
-#startBtn {
-  margin-top: 30px;
-  background: #5dd6e8;
+.cell{
+  background:#24383c;
+  padding:18px 0;
+  border-radius:10px;
+  font-size:22px;
 }
-
-.word {
-  font-size: 32px;
-  letter-spacing: 10px;
-  margin: 20px 0;
+.cell.used{
+  opacity:.3;
+  pointer-events:none;
 }
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 10px;
-  max-width: 320px;
-  margin: auto;
-}
-
-.cell {
-  background: #24383c;
-  padding: 18px 0;
-  border-radius: 10px;
-  font-size: 22px;
-}
-
-.cell.active {
-  background: #6fd3ff;
-  color: #000;
-}
-
-#nextBtn {
-  margin-top: 30px;
-  background: #7fc97f;
-}
+#nextBtn{margin-top:30px;background:#7fc97f}
 </style>
 </head>
 
 <body>
 
-<!-- شاشة البداية -->
+<!-- البداية -->
 <div class="screen active" id="startScreen">
   <h1>ⵣ لعبة الكلمات الأمازيغية ⵣ</h1>
   <button id="startBtn">ابدأ اللعب</button>
 </div>
 
-<!-- شاشة اللعبة -->
+<!-- اللعبة -->
 <div class="screen" id="gameScreen">
-  <div id="question">حيوان أليف</div>
-  <div class="word" id="answer">ⴰ ⴽ ⴰ</div>
+  <div class="question" id="question"></div>
+
+  <div class="answer" id="answerSlots"></div>
 
   <div class="grid" id="grid"></div>
 
@@ -94,43 +80,60 @@ button {
 </div>
 
 <script>
-const questions = [
-  { q: "حيوان أليف", a: ["ⴰ","ⴽ","ⴰ"] },
-  { q: "لون السماء", a: ["ⴰ","ⵣ","ⵣ"] }
+const questions=[
+ {q:"حيوان أليف",a:["ⵎ","ⵓ","ⵛ"]},
+ {q:"لون السماء",a:["ⴰ","ⵣ","ⵣ"]}
 ];
 
-let index = 0;
+let index=0,slotIndex=0;
 
-const startScreen = document.getElementById("startScreen");
-const gameScreen  = document.getElementById("gameScreen");
-const questionEl  = document.getElementById("question");
-const answerEl    = document.getElementById("answer");
-const gridEl      = document.getElementById("grid");
+const startScreen=document.getElementById("startScreen");
+const gameScreen=document.getElementById("gameScreen");
+const questionEl=document.getElementById("question");
+const slotsEl=document.getElementById("answerSlots");
+const gridEl=document.getElementById("grid");
 
-document.getElementById("startBtn").onclick = () => {
-  startScreen.classList.remove("active");
-  gameScreen.classList.add("active");
-  loadQuestion();
+document.getElementById("startBtn").onclick=()=>{
+ startScreen.classList.remove("active");
+ gameScreen.classList.add("active");
+ loadQuestion();
 };
 
-document.getElementById("nextBtn").onclick = () => {
-  index = (index + 1) % questions.length;
-  loadQuestion();
+document.getElementById("nextBtn").onclick=()=>{
+ index=(index+1)%questions.length;
+ loadQuestion();
 };
 
-function loadQuestion() {
-  const item = questions[index];
-  questionEl.textContent = item.q;
-  answerEl.textContent = item.a.join(" ");
-  gridEl.innerHTML = "";
+function loadQuestion(){
+ const item=questions[index];
+ slotIndex=0;
+ questionEl.textContent=item.q;
+ slotsEl.innerHTML="";
+ gridEl.innerHTML="";
 
-  item.a.forEach(letter => {
-    const div = document.createElement("div");
-    div.className = "cell";
-    div.textContent = letter;
-    div.onclick = () => div.classList.toggle("active");
-    gridEl.appendChild(div);
-  });
+ item.a.forEach(()=> {
+  const s=document.createElement("div");
+  s.className="slot";
+  slotsEl.appendChild(s);
+ });
+
+ shuffle([...item.a]).forEach(letter=>{
+  const c=document.createElement("div");
+  c.className="cell";
+  c.textContent=letter;
+  c.onclick=()=>{
+    if(slotIndex<slotsEl.children.length){
+      slotsEl.children[slotIndex].textContent=letter;
+      slotIndex++;
+      c.classList.add("used");
+    }
+  };
+  gridEl.appendChild(c);
+ });
+}
+
+function shuffle(arr){
+ return arr.sort(()=>Math.random()-0.5);
 }
 </script>
 
