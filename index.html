@@ -6,121 +6,250 @@
 <title>لعبة الكلمات الأمازيغية</title>
 
 <style>
+:root{
+  --bg:#0b132b;
+  --card:#1c2541;
+  --blue:#5bc0eb;
+  --green:#2ec4b6;
+  --yellow:#ffd166;
+  --text:#ffffff;
+}
+
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: #0b132b;
-  color: white;
+  font-family: Tahoma, Arial, sans-serif;
+  background: radial-gradient(circle at top, #14213d, var(--bg));
+  color: var(--text);
   text-align: center;
 }
 
-h1, h2 {
-  margin-top: 20px;
-}
-
-input {
-  padding: 12px;
-  font-size: 18px;
-  border-radius: 10px;
-  border: none;
-  width: 220px;
-  text-align: center;
-}
+.hidden { display: none !important; }
 
 button {
-  margin: 10px;
-  padding: 12px 20px;
+  padding: 12px 18px;
   font-size: 16px;
   border: none;
   border-radius: 10px;
   cursor: pointer;
 }
 
-.clear-btn {
-  background: #16a085;
-  color: white;
+.start-screen,
+.menu,
+.game {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
-.verify-btn {
-  background: #f1c40f;
-  color: black;
+.flag-symbol {
+  font-size: 90px;
+  margin-bottom: 25px;
+  color: var(--yellow);
+}
+
+.start-screen button{
+  background: var(--green);
+  color:#000;
+}
+
+.menu button{
+  background: var(--blue);
+  color:#000;
+  width:200px;
+}
+
+.level-box {
+  background: linear-gradient(180deg, var(--card), #111827);
+  padding: 22px;
+  border-radius: 16px;
+  width: 95%;
+  max-width: 420px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.4);
+}
+
+.level-box h3{
+  margin-top:0;
+  color: var(--yellow);
+}
+
+.word {
+  font-size: 26px;
+  margin: 10px 0 15px;
+  letter-spacing: 2px;
+  direction: ltr;
+  color: var(--blue);
+}
+
+.symbol-center{
+  font-size:60px;
+  color: var(--yellow);
+  margin: 5px 0 15px;
+}
+
+input {
+  padding: 12px;
+  font-size: 22px;
+  text-align: center;
+  direction: ltr;
+  border-radius: 10px;
+  border: none;
+  width: 90%;
+  margin-bottom: 10px;
+  color: #000;
 }
 
 .keyboard {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 10px;
-  margin: 20px;
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
 }
 
-.key {
-  background: #2c2f4a;
-  padding: 15px;
-  border-radius: 10px;
-  font-size: 20px;
-  cursor: pointer;
-  user-select: none;
+.keyboard button {
+  background: #334155;
+  color: #fff;
+  min-width: 42px;
+  border-radius: 8px;
 }
 
-.key:active {
-  background: #3a3f6b;
+.check-btn{
+  background: var(--yellow);
+  color:#000;
+  margin-top:10px;
 }
 
-#message {
-  margin-top: 15px;
-  font-size: 18px;
+.back-btn{
+  background: var(--green);
+  color:#000;
+  margin-top:12px;
+}
+
+.message {
+  margin-top: 10px;
+  min-height: 24px;
 }
 </style>
 </head>
 
 <body>
 
-<h2>المرحلة 1</h2>
-<h1>STAR</h1>
-
-<input type="text" id="answer" placeholder="أدخل الجواب" readonly>
-
-<br>
-
-<button class="clear-btn" onclick="clearAnswer()">مسح</button>
-
-<div class="keyboard">
-  <div class="key" onclick="addChar('ⵣ')">ⵣ</div>
-  <div class="key" onclick="addChar('ⵉ')">ⵉ</div>
-  <div class="key" onclick="addChar('ⵔ')">ⵔ</div>
-  <div class="key" onclick="addChar('ⴰ')">ⴰ</div>
-  <div class="key" onclick="addChar('ⵙ')">ⵙ</div>
-  <div class="key" onclick="addChar('ⵏ')">ⵏ</div>
+<div class="start-screen" id="startScreen">
+  <div class="flag-symbol">ⵣ</div>
+  <button onclick="showMenu()">ابدأ</button>
 </div>
 
-<button class="verify-btn" onclick="checkAnswer()">تحقق</button>
+<div class="menu hidden" id="menu">
+  <h2>اختر المرحلة</h2>
+  <button onclick="startLevel(1)">المرحلة 1</button><br><br>
+  <button onclick="startLevel(2)">المرحلة 2</button><br><br>
+  <button onclick="startLevel(3)">المرحلة 3</button>
+</div>
 
-<div id="message"></div>
+<div class="game hidden" id="game">
+  <div class="level-box">
+    <h3 id="levelTitle"></h3>
+
+    <div class="symbol-center">ⵣ</div>
+
+    <div class="word" id="question"></div>
+
+    <input id="answerInput" readonly>
+
+    <div class="keyboard" id="keyboard"></div>
+
+    <button class="check-btn" onclick="checkAnswer()">تحقق</button>
+
+    <div class="message" id="message"></div>
+
+    <button class="back-btn" onclick="showMenu()">الرجوع للقائمة</button>
+  </div>
+</div>
 
 <script>
-const correctAnswer = "ⵣⵉⵔ"; // جواب STAR بالأمازيغية
+const levels = {
+  1: [
+    { q: "SUN", a: "ⵜⴰⴼⵓⵢⵜ" },
+    { q: "WATER", a: "ⴰⵎⴰⵏ" },
+    { q: "FIRE", a: "ⵜⵉⵙⵉ" }
+  ],
+  2: [
+    { q: "MOON", a: "ⴰⵢⵓⵔ" },
+    { q: "STAR", a: "ⵉⵜⵔⵉ" },
+    { q: "EARTH", a: "ⴰⴽⴰⵍ" }
+  ],
+  3: [
+    { q: "MOUNTAIN", a: "ⴰⴷⵔⴰⵔ" },
+    { q: "WIND", a: "ⴰⴼⴰⵙ" },
+    { q: "RAIN", a: "ⴰⵏⵣⴰⵔ" }
+  ]
+};
 
-function addChar(char) {
-  document.getElementById("answer").value += char;
+const letters = ["ⴰ","ⴱ","ⴳ","ⴷ","ⴹ","ⴻ","ⴼ","ⴽ","ⵉ","ⵍ","ⵎ","ⵏ","ⵔ","ⵙ","ⵜ","ⵓ","ⵢ","ⵣ"];
+
+let currentLevel = 1;
+let currentIndex = 0;
+
+function hideAll() {
+  startScreen.classList.add("hidden");
+  menu.classList.add("hidden");
+  game.classList.add("hidden");
 }
 
-function clearAnswer() {
-  document.getElementById("answer").value = "";
-  document.getElementById("message").innerText = "";
+function showMenu() {
+  hideAll();
+  menu.classList.remove("hidden");
+}
+
+function startLevel(level) {
+  currentLevel = level;
+  currentIndex = 0;
+  hideAll();
+  game.classList.remove("hidden");
+  levelTitle.innerText = "المرحلة " + level;
+  loadQuestion();
+}
+
+function loadQuestion() {
+  question.innerText = levels[currentLevel][currentIndex].q;
+  answerInput.value = "";
+  message.innerText = "";
+  buildKeyboard();
+}
+
+function buildKeyboard() {
+  keyboard.innerHTML = "";
+  letters.forEach(l => {
+    const b = document.createElement("button");
+    b.textContent = l;
+    b.onclick = () => answerInput.value += l;
+    keyboard.appendChild(b);
+  });
+
+  const del = document.createElement("button");
+  del.textContent = "⌫";
+  del.onclick = () =>
+    answerInput.value = answerInput.value.slice(0, -1);
+  keyboard.appendChild(del);
 }
 
 function checkAnswer() {
-  const userAnswer = document.getElementById("answer").value;
-  const message = document.getElementById("message");
-
-  if (userAnswer === correctAnswer) {
-    message.style.color = "#2ecc71";
-    message.innerText = "✔️ جواب صحيح";
+  if (answerInput.value === levels[currentLevel][currentIndex].a) {
+    currentIndex++;
+    currentIndex >= levels[currentLevel].length
+      ? message.innerText = "✔️ أحسنت! انتهت المرحلة"
+      : loadQuestion();
   } else {
-    message.style.color = "#e74c3c";
-    message.innerText = "❌ جواب خاطئ";
+    message.innerText = "❌ حاول مرة أخرى";
   }
 }
+
+window.onload = () => {
+  hideAll();
+  startScreen.classList.remove("hidden");
+};
 </script>
 
 </body>
