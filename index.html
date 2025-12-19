@@ -9,64 +9,41 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: linear-gradient(180deg, #0b132b, #1c2541);
+  background: #0b132b;
   color: white;
   text-align: center;
-  overflow-x: hidden;
 }
 
-/* ====== خلفية ⵣ (آمنة) ====== */
-.z-bg {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 300px;
-  color: rgba(255, 255, 255, 0.05);
-  z-index: 0;
-  pointer-events: none;
-}
-
-/* ====== المحتوى ====== */
-.app {
-  position: relative;
-  z-index: 2;
-}
-
-/* ====== الأزرار ====== */
-button {
-  background: linear-gradient(180deg, #2ecc71, #27ae60);
-  border: none;
-  border-radius: 14px;
-  padding: 12px 22px;
-  font-size: 16px;
-  font-weight: bold;
-  color: white;
-  cursor: pointer;
-  box-shadow: 0 6px 12px rgba(0,0,0,0.3);
-  transition: 0.15s;
-}
-
-button:active {
-  transform: scale(0.96);
-}
-
-.verify-btn {
-  background: linear-gradient(180deg, #f1c40f, #f39c12);
-  color: #000;
-}
-
-.clear-btn {
-  background: linear-gradient(180deg, #1abc9c, #16a085);
+h1, h2 {
+  margin-top: 20px;
 }
 
 input {
   padding: 12px;
   font-size: 18px;
-  border-radius: 12px;
+  border-radius: 10px;
   border: none;
-  width: 230px;
+  width: 220px;
   text-align: center;
+}
+
+button {
+  margin: 10px;
+  padding: 12px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.clear-btn {
+  background: #16a085;
+  color: white;
+}
+
+.verify-btn {
+  background: #f1c40f;
+  color: black;
 }
 
 .keyboard {
@@ -78,49 +55,54 @@ input {
 
 .key {
   background: #2c2f4a;
-  border-radius: 12px;
-  padding: 16px;
+  padding: 15px;
+  border-radius: 10px;
   font-size: 20px;
   cursor: pointer;
+  user-select: none;
 }
 
 .key:active {
-  transform: scale(0.95);
+  background: #3a3f6b;
 }
 </style>
 </head>
 
 <body>
 
-<!-- ⵣ في الخلفية -->
-<div class="z-bg">ⵣ</div>
+<h2>المرحلة 1</h2>
+<h1>STAR</h1>
 
-<!-- التطبيق -->
-<div class="app">
+<input type="text" id="answer" placeholder="أدخل الجواب" readonly>
 
-  <h2>المرحلة 3</h2>
-  <h1>STAR</h1>
+<br>
 
-  <input type="text" placeholder="أدخل الجواب">
+<button class="clear-btn" onclick="clearAnswer()">مسح</button>
 
-  <br><br>
-
-  <button class="clear-btn">مسح</button>
-
-  <div class="keyboard">
-    <div class="key">ⵣ</div>
-    <div class="key">ⵉ</div>
-    <div class="key">ⵔ</div>
-    <div class="key">ⴰ</div>
-    <div class="key">ⵙ</div>
-    <div class="key">ⵏ</div>
-  </div>
-
-  <button class="verify-btn">تحقق</button>
-  <br><br>
-  <button>الرجوع للقائمة</button>
-
+<div class="keyboard">
+  <div class="key" onclick="addChar('ⵣ')">ⵣ</div>
+  <div class="key" onclick="addChar('ⵉ')">ⵉ</div>
+  <div class="key" onclick="addChar('ⵔ')">ⵔ</div>
+  <div class="key" onclick="addChar('ⴰ')">ⴰ</div>
+  <div class="key" onclick="addChar('ⵙ')">ⵙ</div>
+  <div class="key" onclick="addChar('ⵏ')">ⵏ</div>
 </div>
+
+<button class="verify-btn" onclick="checkAnswer()">تحقق</button>
+
+<script>
+function addChar(char) {
+  document.getElementById("answer").value += char;
+}
+
+function clearAnswer() {
+  document.getElementById("answer").value = "";
+}
+
+function checkAnswer() {
+  alert("التحقق غير مفعّل بعد");
+}
+</script>
 
 </body>
 </html>
