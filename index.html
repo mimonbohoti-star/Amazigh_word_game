@@ -2,65 +2,53 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>لعبة الأسئلة</title>
 
 <style>
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: linear-gradient(#001a14, #003b2f);
-  color: #fff;
+  font-family: Tahoma, Arial;
+  background: linear-gradient(180deg, #001a14, #003b2f);
+  color: white;
   text-align: center;
 }
 
-.hidden { display: none; }
-
-.top-bar {
+header {
   display: flex;
   justify-content: space-around;
-  padding: 10px;
+  padding: 15px;
   font-size: 18px;
 }
 
 .container {
+  max-width: 500px;
+  margin: auto;
   padding: 20px;
 }
 
 h1 {
-  color: #6fffcf;
+  color: #7CFFCB;
 }
 
-.btn {
-  display: block;
-  margin: 15px auto;
+button {
+  width: 100%;
   padding: 15px;
-  width: 90%;
-  max-width: 400px;
-  border: none;
-  border-radius: 15px;
+  margin: 10px 0;
   font-size: 18px;
+  border: none;
+  border-radius: 12px;
+  background: #1fae6e;
+  color: white;
   cursor: pointer;
 }
 
-.btn-green {
-  background: linear-gradient(to right, #2ecc71, #27ae60);
-  color: #fff;
-}
-
-.btn-white {
-  background: #f2f2f2;
-  color: #000;
+button:hover {
+  opacity: 0.9;
 }
 
 .answer {
-  background: #0b3d2e;
-  color: #fff;
-  border: 2px solid #1abc9c;
-}
-
-.answer:hover {
-  background: #1abc9c;
+  background: transparent;
+  border: 2px solid #1fae6e;
 }
 
 .correct {
@@ -70,149 +58,140 @@ h1 {
 .wrong {
   background: #e74c3c !important;
 }
+
+.hidden {
+  display: none;
+}
 </style>
 </head>
 
 <body>
 
-<div class="top-bar">
-  <div id="stars">⭐ 0</div>
-  <div id="timer">⏱ 0</div>
-  <div id="hearts">❤️ 3</div>
-</div>
+<header>
+  <div>❤️ <span id="lives">3</span></div>
+  <div>⏱️ <span id="timer">10</span></div>
+  <div>⭐ <span id="score">0</span></div>
+</header>
 
 <div class="container">
 
   <!-- القائمة -->
   <div id="menu">
     <h1>🎮 لعبة الأسئلة</h1>
-    <button class="btn btn-green" onclick="startStage(0)">المرحلة 1</button>
-    <button class="btn btn-green" onclick="startStage(1)">المرحلة 2</button>
-    <button class="btn btn-green" onclick="startStage(2)">المرحلة 3</button>
-    <button class="btn btn-white" onclick="resetGame()">إعادة التصفير</button>
+    <button onclick="startGame()">المرحلة 1</button>
+    <button onclick="resetGame()">إعادة التصفير</button>
   </div>
 
-  <!-- السؤال -->
-  <div id="quiz" class="hidden">
+  <!-- اللعبة -->
+  <div id="game" class="hidden">
     <h2 id="question"></h2>
-    <div id="answers"></div>
+    <button class="answer" onclick="checkAnswer(0)"></button>
+    <button class="answer" onclick="checkAnswer(1)"></button>
+    <button class="answer" onclick="checkAnswer(2)"></button>
   </div>
 
 </div>
 
 <script>
-/* ================= البيانات ================= */
-const stages = [
-  [
-    {
-      q: "تعني HTML ؟",
-      a: ["لغة برمجة", "لغة ترميز", "نظام"],
-      c: 1
-    },
-    {
-      q: "تعني CSS ؟",
-      a: ["تنسيق", "برمجة", "قاعدة بيانات"],
-      c: 0
-    }
-  ],
-  [
-    {
-      q: "JavaScript تُستعمل في؟",
-      a: ["الواجهة", "التفاعل", "التصميم"],
-      c: 1
-    }
-  ],
-  [
-    {
-      q: "GitHub هو؟",
-      a: ["محرر", "مستودع كود", "لغة"],
-      c: 1
-    }
-  ]
+const questions = [
+  {
+    q: "تعني HTML ؟",
+    a: ["لغة برمجة", "لغة ترميز", "نظام"],
+    c: 1
+  },
+  {
+    q: "CSS تُستعمل من أجل؟",
+    a: ["التصميم", "البرمجة", "التخزين"],
+    c: 0
+  }
 ];
 
-/* ================= الحالة ================= */
-let stageIndex = 0;
-let questionIndex = 0;
-let stars = 0;
-let hearts = 3;
+let index = 0;
+let score = 0;
+let lives = 3;
+let time = 10;
+let timerInterval;
 
-/* ================= التحكم ================= */
-function startStage(index) {
-  stageIndex = index;
-  questionIndex = 0;
+const qEl = document.getElementById("question");
+const answers = document.querySelectorAll(".answer");
+const timerEl = document.getElementById("timer");
+
+function startGame() {
   document.getElementById("menu").classList.add("hidden");
-  document.getElementById("quiz").classList.remove("hidden");
-  history.pushState({page: "quiz"}, "");
-  showQuestion();
+  document.getElementById("game").classList.remove("hidden");
+  index = 0;
+  score = 0;
+  lives = 3;
+  updateUI();
+  loadQuestion();
 }
 
-function showQuestion() {
-  const q = stages[stageIndex][questionIndex];
-  document.getElementById("question").textContent = q.q;
+function loadQuestion() {
+  clearInterval(timerInterval);
+  time = 10;
+  timerEl.textContent = time;
 
-  const answersDiv = document.getElementById("answers");
-  answersDiv.innerHTML = "";
-
-  q.a.forEach((text, i) => {
-    const btn = document.createElement("button");
-    btn.className = "btn answer";
-    btn.textContent = text;
-    btn.onclick = () => checkAnswer(i, btn);
-    answersDiv.appendChild(btn);
+  const q = questions[index];
+  qEl.textContent = q.q;
+  answers.forEach((btn, i) => {
+    btn.textContent = q.a[i];
+    btn.className = "answer";
+    btn.disabled = false;
   });
+
+  timerInterval = setInterval(() => {
+    time--;
+    timerEl.textContent = time;
+    if (time === 0) {
+      clearInterval(timerInterval);
+      lives--;
+      updateUI();
+      nextQuestion();
+    }
+  }, 1000);
 }
 
-function checkAnswer(i, btn) {
-  const correct = stages[stageIndex][questionIndex].c;
-  const buttons = document.querySelectorAll(".answer");
+function checkAnswer(choice) {
+  clearInterval(timerInterval);
+  answers.forEach(b => b.disabled = true);
 
-  buttons.forEach(b => b.disabled = true);
-
-  if (i === correct) {
-    btn.classList.add("correct");
-    stars += 10;
+  if (choice === questions[index].c) {
+    answers[choice].classList.add("correct");
+    score += 10;
   } else {
-    btn.classList.add("wrong");
-    hearts--;
+    answers[choice].classList.add("wrong");
+    lives--;
   }
 
-  updateTop();
-
+  updateUI();
   setTimeout(nextQuestion, 800);
 }
 
 function nextQuestion() {
-  questionIndex++;
-
-  if (questionIndex >= stages[stageIndex].length) {
-    backToMenu();
-  } else {
-    showQuestion();
+  if (lives <= 0) {
+    alert("انتهت المحاولة ❌");
+    location.reload();
+    return;
   }
+
+  index++;
+  if (index >= questions.length) {
+    alert("أحسنت 🎉 النقاط: " + score);
+    location.reload();
+    return;
+  }
+
+  loadQuestion();
 }
 
-function backToMenu() {
-  document.getElementById("quiz").classList.add("hidden");
-  document.getElementById("menu").classList.remove("hidden");
-  history.pushState({page: "menu"}, "");
+function updateUI() {
+  document.getElementById("score").textContent = score;
+  document.getElementById("lives").textContent = lives;
 }
 
 function resetGame() {
-  stars = 0;
-  hearts = 3;
-  updateTop();
+  location.reload();
 }
-
-function updateTop() {
-  document.getElementById("stars").textContent = "⭐ " + stars;
-  document.getElementById("hearts").textContent = "❤️ " + hearts;
-}
-
-/* ================= زر الرجوع ================= */
-window.onpopstate = function () {
-  backToMenu();
-};
 </script>
 
 </body>
