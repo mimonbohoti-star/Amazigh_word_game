@@ -2,164 +2,173 @@
 <html lang="ar">
 <head>
 <meta charset="UTF-8">
-<title>لعبة الكلمات</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لعبة الحروف</title>
+
 <style>
+*{box-sizing:border-box}
 body{
   margin:0;
-  font-family: sans-serif;
-  background:#111;
-  color:#fff;
+  min-height:100vh;
   display:flex;
   justify-content:center;
   align-items:center;
-  height:100vh;
+  background:linear-gradient(#0f3d3d,#1b6b6b);
+  font-family:sans-serif;
+  color:#fff;
 }
 .game{
-  width:320px;
-  background:#1c1c1c;
-  padding:15px;
-  border-radius:12px;
+  width:100%;
+  max-width:360px;
+  padding:16px;
+  text-align:center;
 }
 .question{
-  text-align:center;
-  margin-bottom:10px;
-  font-size:18px;
+  font-size:20px;
+  margin-bottom:16px;
 }
-.answer-box{
+.answer{
   display:flex;
   justify-content:center;
-  gap:6px;
-  margin:10px 0;
+  gap:8px;
+  margin-bottom:18px;
 }
-.answer-box div{
-  width:36px;
-  height:36px;
-  border-bottom:2px solid #0f0;
+.answer div{
+  width:42px;
+  height:42px;
+  border-radius:10px;
+  background:#223;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:20px;
+  font-size:22px;
+  border-bottom:3px solid #6f6;
 }
 .letters{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  justify-content:center;
-  margin-top:10px;
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:10px;
+  margin-bottom:16px;
 }
 .letters button{
-  width:40px;
-  height:40px;
+  height:46px;
   border:none;
-  border-radius:8px;
-  background:#333;
+  border-radius:12px;
+  font-size:20px;
+  background:#2d3f3f;
   color:#fff;
-  font-size:18px;
 }
-.letters button:disabled{
-  opacity:.4;
-}
+.letters button:disabled{opacity:.4}
 .controls{
-  text-align:center;
-  margin-top:10px;
+  display:flex;
+  gap:10px;
+  justify-content:center;
 }
 .controls button{
-  padding:6px 12px;
+  padding:10px 14px;
   border:none;
-  border-radius:6px;
-  background:#a00;
-  color:#fff;
+  border-radius:20px;
+  font-size:14px;
 }
-.success{
-  color:#0f0;
-  text-align:center;
-  margin-top:8px;
-}
+.next{background:#7acb7a}
+.clear{background:#e07a7a}
+.msg{margin-top:10px;color:#9f9}
 </style>
 </head>
+
 <body>
 
 <div class="game">
   <div class="question">حيوان أليف</div>
 
-  <div class="answer-box" id="answerBox"></div>
+  <div class="answer" id="answerBox"></div>
 
-  <div class="letters" id="letters"></div>
+  <div class="letters" id="lettersBox"></div>
 
   <div class="controls">
-    <button onclick="removeLetter()">مسح حرف</button>
+    <button class="next" onclick="loadQuestion()">سؤال آخر</button>
+    <button class="clear" onclick="removeLetter()">مسح حرف</button>
   </div>
 
-  <div class="success" id="success"></div>
+  <div class="msg" id="msg"></div>
 </div>
 
 <script>
-const question = {
-  q:"حيوان أليف",
-  answer:"ⴰⵣⴰⵔ"
-};
+const questions = [
+  {q:"حيوان أليف", a:"ⴰⵣⴰⵔ"}
+];
 
-// حروف زايدة (نفس العائلة)
-const extraLetters = ["ⴱ","ⴳ","ⴷ","ⵎ"];
+const extra = ["ⴱ","ⴳ","ⴷ","ⵎ","ⵔ","ⵙ","ⵍ"];
 
-let answerArr = question.answer.split("");
-let userAnswer = [];
+let current, user=[];
 
 const answerBox = document.getElementById("answerBox");
-const lettersBox = document.getElementById("letters");
-const successBox = document.getElementById("success");
+const lettersBox = document.getElementById("lettersBox");
+const msg = document.getElementById("msg");
 
-// إنشاء خانات الجواب
-answerArr.forEach(()=> {
-  const d = document.createElement("div");
-  answerBox.appendChild(d);
-});
+function loadQuestion(){
+  msg.textContent="";
+  user=[];
+  lettersBox.innerHTML="";
+  answerBox.innerHTML="";
 
-// توليد الحروف (الجواب + الزايد)
-let letters = [...answerArr, ...extraLetters];
-letters.sort(()=>Math.random()-0.5);
+  current = questions[0];
+  const answerLetters = current.a.split("");
 
-letters.forEach(l=>{
-  const b = document.createElement("button");
-  b.textContent = l;
-  b.onclick = ()=>{
-    if(userAnswer.length < answerArr.length){
-      userAnswer.push(l);
-      b.disabled = true;
-      updateAnswer();
-    }
-  };
-  lettersBox.appendChild(b);
-});
-
-function updateAnswer(){
-  [...answerBox.children].forEach((d,i)=>{
-    d.textContent = userAnswer[i] || "";
+  answerLetters.forEach(()=>{
+    const d=document.createElement("div");
+    answerBox.appendChild(d);
   });
 
-  if(userAnswer.length === answerArr.length){
-    if(userAnswer.join("") === question.answer){
-      successBox.textContent = "✔ جواب صحيح";
+  // توليد الحروف: الجواب كامل + تشويش
+  let letters=[...answerLetters];
+  while(letters.length<10){
+    letters.push(extra[Math.floor(Math.random()*extra.length)]);
+  }
+  letters.sort(()=>Math.random()-0.5);
+
+  letters.forEach(l=>{
+    const b=document.createElement("button");
+    b.textContent=l;
+    b.onclick=()=>{
+      if(user.length<answerLetters.length){
+        user.push(l);
+        b.disabled=true;
+        render();
+      }
+    };
+    lettersBox.appendChild(b);
+  });
+}
+
+function render(){
+  [...answerBox.children].forEach((d,i)=>{
+    d.textContent=user[i]||"";
+  });
+
+  if(user.length===current.a.length){
+    if(user.join("")===current.a){
+      msg.textContent="✔ جواب صحيح";
     }else{
-      successBox.textContent = "✖ خطأ";
+      msg.textContent="✖ حاول مرة أخرى";
     }
   }
 }
 
 function removeLetter(){
-  if(userAnswer.length===0) return;
-  const last = userAnswer.pop();
-
+  if(!user.length) return;
+  const last=user.pop();
   [...lettersBox.children].forEach(b=>{
     if(b.textContent===last && b.disabled){
-      b.disabled = false;
+      b.disabled=false;
       return;
     }
   });
-
-  successBox.textContent="";
-  updateAnswer();
+  msg.textContent="";
+  render();
 }
+
+loadQuestion();
 </script>
 
 </body>
