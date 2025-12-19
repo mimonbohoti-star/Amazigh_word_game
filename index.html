@@ -88,18 +88,28 @@ button {
   margin: 5px 0 15px;
 }
 
-input {
-  padding: 12px;
-  font-size: 22px;
-  text-align: center;
-  direction: ltr;
-  border-radius: 10px;
-  border: none;
-  width: 90%;
-  margin-bottom: 10px;
-  color: #000;
+/* ===== مربعات الجواب ===== */
+.answer-boxes{
+  display:flex;
+  justify-content:center;
+  gap:8px;
+  margin:10px 0 15px;
 }
 
+.answer-box{
+  width:42px;
+  height:48px;
+  border-radius:8px;
+  background:#fff;
+  color:#000;
+  font-size:26px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+}
+
+/* لوحة الحروف */
 .keyboard {
   margin-top: 12px;
   display: flex;
@@ -156,7 +166,8 @@ input {
 
     <div class="word" id="question"></div>
 
-    <input id="answerInput" readonly>
+    <!-- مربعات الجواب -->
+    <div class="answer-boxes" id="answerBoxes"></div>
 
     <div class="keyboard" id="keyboard"></div>
 
@@ -191,6 +202,7 @@ const letters = ["ⴰ","ⴱ","ⴳ","ⴷ","ⴹ","ⴻ","ⴼ","ⴽ","ⵉ","ⵍ","�
 
 let currentLevel = 1;
 let currentIndex = 0;
+let userAnswer = "";
 
 function hideAll() {
   startScreen.classList.add("hidden");
@@ -213,10 +225,29 @@ function startLevel(level) {
 }
 
 function loadQuestion() {
+  const correct = levels[currentLevel][currentIndex].a;
   question.innerText = levels[currentLevel][currentIndex].q;
-  answerInput.value = "";
   message.innerText = "";
+  userAnswer = "";
+  buildAnswerBoxes(correct.length);
   buildKeyboard();
+}
+
+function buildAnswerBoxes(count){
+  answerBoxes.innerHTML = "";
+  for(let i=0;i<count;i++){
+    const box = document.createElement("div");
+    box.className = "answer-box";
+    box.textContent = "";
+    answerBoxes.appendChild(box);
+  }
+}
+
+function updateBoxes(){
+  const boxes = document.querySelectorAll(".answer-box");
+  boxes.forEach((box,i)=>{
+    box.textContent = userAnswer[i] || "";
+  });
 }
 
 function buildKeyboard() {
@@ -224,19 +255,28 @@ function buildKeyboard() {
   letters.forEach(l => {
     const b = document.createElement("button");
     b.textContent = l;
-    b.onclick = () => answerInput.value += l;
+    b.onclick = () => {
+      const max = levels[currentLevel][currentIndex].a.length;
+      if(userAnswer.length < max){
+        userAnswer += l;
+        updateBoxes();
+      }
+    };
     keyboard.appendChild(b);
   });
 
   const del = document.createElement("button");
   del.textContent = "⌫";
-  del.onclick = () =>
-    answerInput.value = answerInput.value.slice(0, -1);
+  del.onclick = () => {
+    userAnswer = userAnswer.slice(0,-1);
+    updateBoxes();
+  };
   keyboard.appendChild(del);
 }
 
 function checkAnswer() {
-  if (answerInput.value === levels[currentLevel][currentIndex].a) {
+  const correct = levels[currentLevel][currentIndex].a;
+  if (userAnswer === correct) {
     currentIndex++;
     currentIndex >= levels[currentLevel].length
       ? message.innerText = "✔️ أحسنت! انتهت المرحلة"
