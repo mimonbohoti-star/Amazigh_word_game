@@ -6,53 +6,34 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body {
-  margin: 0;
-  font-family: sans-serif;
-  background: linear-gradient(#0f3d3d, #1f6f6f);
-  color: #fff;
-  text-align: center;
+*{box-sizing:border-box}
+body{
+  margin:0; font-family:sans-serif;
+  background:linear-gradient(#0f3d3d,#1f6f6f);
+  color:#fff; text-align:center;
 }
-
-.hidden { display: none; }
-
-button {
-  border: none;
-  padding: 12px 20px;
-  border-radius: 20px;
-  font-size: 16px;
-  cursor: pointer;
+.hidden{display:none}
+button{
+  border:none; padding:12px 20px; border-radius:20px;
+  font-size:16px; cursor:pointer;
 }
-
-.start-btn { background:#4dd0e1; color:#000; }
-.next-btn { background:#81c784; }
-.delete-btn { background:#e57373; }
-
-.letters, .slots {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: 15px;
+.start-btn{background:#4dd0e1;color:#000}
+.next-btn{background:#81c784}
+.next-btn:disabled{opacity:.4;cursor:not-allowed}
+.delete-btn{background:#e57373}
+.top{margin-top:80px}
+.level{opacity:.85;margin-bottom:6px}
+.letters,.slots{
+  display:flex; justify-content:center; flex-wrap:wrap;
+  gap:10px; margin:15px;
 }
-
-.letter, .slot {
-  width: 55px;
-  height: 55px;
-  background:#263238;
-  border-radius: 10px;
-  font-size: 28px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+.letter,.slot{
+  width:55px;height:55px;background:#263238;
+  border-radius:10px;font-size:28px;
+  display:flex;align-items:center;justify-content:center;
 }
-
-.slot.filled {
-  border-bottom: 4px solid #6cff6c;
-}
-
-.top { margin-top: 80px; }
-.level { opacity: 0.8; margin-bottom: 10px; }
+.slot.filled{border-bottom:4px solid #6cff6c}
+.msg{margin-top:8px;min-height:22px}
 </style>
 </head>
 
@@ -74,140 +55,156 @@ button {
 
   <button class="delete-btn" onclick="removeLetter()">مسح حرف</button>
   <br><br>
-  <button class="next-btn" onclick="nextQuestion()">التالي</button>
+  <button id="nextBtn" class="next-btn" onclick="nextQuestion()" disabled>التالي</button>
+
+  <div class="msg" id="msg"></div>
 </div>
 
 <script>
 /* =============================
-   المراحل
+   المراحل + تنويع الأسئلة
 ============================= */
 const levels = [
   {
-    name: "المرحلة 1",
-    questions: [
-      { q: "حيوان أليف", a: "ⴰⵢⴷⵉ" },
-      { q: "الشمس", a: "ⵜⴰⴼⵓⵢⵜ" }
+    name:"المرحلة 1 (لغوي)",
+    questions:[
+      {q:"حيوان أليف", a:"ⴰⵢⴷⵉ"},
+      {q:"الماء", a:"ⴰⵎⴰⵏ"}
     ]
   },
   {
-    name: "المرحلة 2",
-    questions: [
-      { q: "الماء", a: "ⴰⵎⴰⵏ" },
-      { q: "القمر", a: "ⴰⵢⵓⵔ" }
+    name:"المرحلة 2 (ثقافي)",
+    questions:[
+      {q:"رمز الحرية الأمازيغية", a:"ⵣ"},
+      {q:"البيت بالأمازيغية", a:"ⴰⵅⵅⴰⵎ"}
     ]
   },
   {
-    name: "المرحلة 3",
-    questions: [
-      { q: "البيت", a: "ⴰⵅⵅⴰⵎ" },
-      { q: "النار", a: "ⵜⴰⴼⵓⴽⵜ" }
-    ]
-  },
-  {
-    name: "المرحلة 4",
-    questions: [
-      { q: "الهواء", a: "ⴰⵡⴰⵏ" },
-      { q: "اليد", a: "ⴰⴼⵓⵙ" }
-    ]
-  },
-  {
-    name: "المرحلة 5",
-    questions: [
-      { q: "الرأس", a: "ⴰⵅⵅⴰⴼ" },
-      { q: "القلب", a: "ⵓⵍ" }
+    name:"المرحلة 3 (تاريخي)",
+    questions:[
+      {q:"ملك أمازيغي قاوم الرومان", a:"ⵢⵓⴳⵓⵔⵜⴰ"},
+      {q:"اسم شمال إفريقيا قديمًا", a:"ⵜⴰⵎⴰⵣⵖⴰ"}
     ]
   }
 ];
 
-let levelIndex = 0;
-let questionIndex = 0;
-let currentAnswer = [];
-let filled = [];
+let levelIndex=0, questionIndex=0;
+let currentAnswer=[], filled=[];
+const extraLetters=["ⴰ","ⵓ","ⵉ","ⴳ","ⵣ","ⴷ","ⴼ","ⴽ","ⵔ","ⵙ"];
+
+const levelText=document.getElementById("levelText");
+const questionEl=document.getElementById("question");
+const slotsEl=document.getElementById("slots");
+const lettersEl=document.getElementById("letters");
+const msgEl=document.getElementById("msg");
+const nextBtn=document.getElementById("nextBtn");
 
 /* =============================
-   التشغيل
+   بدء اللعبة
 ============================= */
-function startGame() {
+function startGame(){
   document.getElementById("startScreen").classList.add("hidden");
   document.getElementById("gameScreen").classList.remove("hidden");
   loadQuestion();
 }
 
-function loadQuestion() {
-  const level = levels[levelIndex];
-  const qObj = level.questions[questionIndex];
+/* =============================
+   تحميل سؤال
+============================= */
+function loadQuestion(){
+  msgEl.textContent="";
+  nextBtn.disabled=true;
 
-  document.getElementById("levelText").textContent = level.name;
-  document.getElementById("question").textContent = qObj.q;
+  const lvl=levels[levelIndex];
+  const qObj=lvl.questions[questionIndex];
 
-  currentAnswer = qObj.a.split("");
-  filled = [];
+  levelText.textContent=lvl.name;
+  questionEl.textContent=qObj.q;
+
+  currentAnswer=qObj.a.split("");
+  filled=[];
 
   renderSlots();
   renderLetters();
 }
 
-function renderSlots() {
-  const slots = document.getElementById("slots");
-  slots.innerHTML = "";
-  currentAnswer.forEach((_, i) => {
-    const d = document.createElement("div");
-    d.className = "slot";
-    d.textContent = filled[i] || "";
-    if (filled[i]) d.classList.add("filled");
-    slots.appendChild(d);
+/* =============================
+   الواجهات
+============================= */
+function renderSlots(){
+  slotsEl.innerHTML="";
+  currentAnswer.forEach((_,i)=>{
+    const d=document.createElement("div");
+    d.className="slot";
+    d.textContent=filled[i]||"";
+    if(filled[i]) d.classList.add("filled");
+    slotsEl.appendChild(d);
   });
 }
 
-function renderLetters() {
-  const lettersDiv = document.getElementById("letters");
-  lettersDiv.innerHTML = "";
-
-  let letters = [...currentAnswer];
-  const extra = ["ⴰ","ⵓ","ⵉ","ⴳ","ⵣ","ⴷ","ⴼ","ⴽ"];
-
-  while (letters.length < currentAnswer.length + 4) {
-    letters.push(extra[Math.floor(Math.random()*extra.length)]);
+function renderLetters(){
+  lettersEl.innerHTML="";
+  let letters=[...currentAnswer];
+  while(letters.length<currentAnswer.length+4){
+    letters.push(extraLetters[Math.floor(Math.random()*extraLetters.length)]);
   }
+  letters.sort(()=>Math.random()-0.5);
 
-  letters.sort(() => Math.random() - 0.5);
-
-  letters.forEach(l => {
-    const b = document.createElement("div");
-    b.className = "letter";
-    b.textContent = l;
-    b.onclick = () => addLetter(l);
-    lettersDiv.appendChild(b);
+  letters.forEach(l=>{
+    const b=document.createElement("div");
+    b.className="letter";
+    b.textContent=l;
+    b.onclick=()=>addLetter(l);
+    lettersEl.appendChild(b);
   });
 }
 
-function addLetter(l) {
-  if (filled.length < currentAnswer.length) {
+/* =============================
+   إدخال/مسح
+============================= */
+function addLetter(l){
+  if(filled.length<currentAnswer.length){
     filled.push(l);
     renderSlots();
     checkAnswer();
   }
 }
-
-function removeLetter() {
+function removeLetter(){
+  if(!filled.length) return;
   filled.pop();
+  msgEl.textContent="";
+  nextBtn.disabled=true;
   renderSlots();
 }
 
-function checkAnswer() {
-  if (filled.join("") === currentAnswer.join("")) {
-    setTimeout(nextQuestion, 500);
+/* =============================
+   التحقق + فتح التالي
+============================= */
+function checkAnswer(){
+  if(filled.length===currentAnswer.length){
+    if(filled.join("")===currentAnswer.join("")){
+      msgEl.textContent="✔ جواب صحيح";
+      nextBtn.disabled=false; // 🔓 فتح الانتقال
+    }else{
+      msgEl.textContent="✖ غير صحيح";
+      nextBtn.disabled=true;
+    }
   }
 }
 
-function nextQuestion() {
+/* =============================
+   الانتقال (مقفل حتى النجاح)
+============================= */
+function nextQuestion(){
+  if(nextBtn.disabled) return; // أمان إضافي
+
   questionIndex++;
-  if (questionIndex >= levels[levelIndex].questions.length) {
+  if(questionIndex>=levels[levelIndex].questions.length){
     levelIndex++;
-    questionIndex = 0;
-    if (levelIndex >= levels.length) {
-      alert("🎉 كملتي جميع المراحل!");
-      levelIndex = 0;
+    questionIndex=0;
+    if(levelIndex>=levels.length){
+      alert("🎉 مبروك! كملتي جميع المراحل");
+      levelIndex=0;
     }
   }
   loadQuestion();
