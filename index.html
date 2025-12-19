@@ -54,6 +54,7 @@ button {
   direction: ltr;
 }
 
+/* ⭐⭐⭐ الإصلاح هنا ⭐⭐⭐ */
 input {
   padding: 10px;
   font-size: 18px;
@@ -62,6 +63,8 @@ input {
   border-radius: 6px;
   border: none;
   width: 80%;
+  color: #000;          /* ← يظهر الحروف */
+  background: #fff;     /* ← خلفية بيضاء */
 }
 
 .message {
@@ -73,13 +76,11 @@ input {
 
 <body>
 
-<!-- شاشة البداية -->
 <div class="start-screen" id="startScreen">
   <div class="flag-symbol">ⵣ</div>
   <button onclick="showMenu()">ابدأ</button>
 </div>
 
-<!-- القائمة -->
 <div class="menu hidden" id="menu">
   <h2>اختر المرحلة</h2>
   <button onclick="startLevel(1)">المرحلة 1</button><br><br>
@@ -87,7 +88,6 @@ input {
   <button onclick="startLevel(3)">المرحلة 3</button>
 </div>
 
-<!-- اللعبة -->
 <div class="game hidden" id="game">
   <div class="level-box">
     <h3 id="levelTitle"></h3>
@@ -102,9 +102,6 @@ input {
 </div>
 
 <script>
-// ===============================
-// الكلمات حسب المراحل
-// ===============================
 const levels = {
   1: [
     { q: "SUN", a: "ⵜⴰⴼⵓⵢⵜ" },
@@ -126,9 +123,6 @@ const levels = {
 let currentLevel = 1;
 let currentIndex = 0;
 
-// ===============================
-// إظهار شاشة واحدة فقط
-// ===============================
 function hideAll() {
   startScreen.classList.add("hidden");
   menu.classList.add("hidden");
@@ -143,40 +137,29 @@ function showMenu() {
 function startLevel(level) {
   currentLevel = level;
   currentIndex = 0;
-  localStorage.setItem("amazighLevel", level);
   hideAll();
   game.classList.remove("hidden");
   levelTitle.innerText = "المرحلة " + level;
   loadQuestion();
 }
 
-// ===============================
 function loadQuestion() {
-  const item = levels[currentLevel][currentIndex];
-  question.innerText = item.q;
+  question.innerText = levels[currentLevel][currentIndex].q;
   answerInput.value = "";
   message.innerText = "";
 }
 
 function checkAnswer() {
-  const input = answerInput.value.trim();
-  const correct = levels[currentLevel][currentIndex].a;
-
-  if (input === correct) {
+  if (answerInput.value.trim() === levels[currentLevel][currentIndex].a) {
     currentIndex++;
-    if (currentIndex >= levels[currentLevel].length) {
-      message.innerText = "✔️ أحسنت! انتهت المرحلة";
-    } else {
-      loadQuestion();
-    }
+    currentIndex >= levels[currentLevel].length
+      ? message.innerText = "✔️ أحسنت! انتهت المرحلة"
+      : loadQuestion();
   } else {
     message.innerText = "❌ حاول مرة أخرى";
   }
 }
 
-// ===============================
-// عند التحميل: البداية فقط
-// ===============================
 window.onload = () => {
   hideAll();
   startScreen.classList.remove("hidden");
