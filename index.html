@@ -71,15 +71,14 @@ button{
 <!-- اللعبة -->
 <div class="screen" id="gameScreen">
   <div class="question" id="question"></div>
-
   <div class="answer" id="answerSlots"></div>
-
   <div class="grid" id="grid"></div>
-
   <button id="nextBtn">سؤال آخر</button>
 </div>
 
 <script>
+const extraLetters=["ⴰ","ⵉ","ⵓ","ⴽ","ⵣ","ⵔ","ⵙ","ⵎ"];
+
 const questions=[
  {q:"حيوان أليف",a:["ⵎ","ⵓ","ⵛ"]},
  {q:"لون السماء",a:["ⴰ","ⵣ","ⵣ"]}
@@ -111,13 +110,18 @@ function loadQuestion(){
  slotsEl.innerHTML="";
  gridEl.innerHTML="";
 
- item.a.forEach(()=> {
+ item.a.forEach(()=>{
   const s=document.createElement("div");
   s.className="slot";
   slotsEl.appendChild(s);
  });
 
- shuffle([...item.a]).forEach(letter=>{
+ let letters=[...item.a];
+ while(letters.length<10){
+   letters.push(extraLetters[Math.floor(Math.random()*extraLetters.length)]);
+ }
+
+ shuffle(letters).forEach(letter=>{
   const c=document.createElement("div");
   c.className="cell";
   c.textContent=letter;
