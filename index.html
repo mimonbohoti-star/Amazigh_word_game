@@ -5,185 +5,214 @@
 <title>لعبة الكلمات الأمازيغية</title>
 
 <style>
-body {
-  font-family: Arial, sans-serif;
-  direction: rtl;
-  text-align: center;
+body{
+  margin:0;
+  font-family: sans-serif;
+  background: linear-gradient(180deg,#0f3d3a,#1f6f67);
+  color:#fff;
+  text-align:center;
 }
 
-#game {
-  max-width: 400px;
-  margin: auto;
+.container{
+  max-width:500px;
+  margin:auto;
+  padding:20px;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 5px;
-  margin: 20px 0;
+.hidden{display:none;}
+
+button{
+  border:none;
+  padding:12px 20px;
+  border-radius:25px;
+  font-size:16px;
+  cursor:pointer;
 }
 
-.cell {
-  border: 1px solid #000;
-  height: 50px;
-  line-height: 50px;
-  font-size: 24px;
+.start-btn{background:#4cafef;color:#000;}
+.next-btn{background:#7ed957;}
+.delete-btn{background:#e57373;}
+
+.answer{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin:20px 0;
 }
 
-.letters button {
-  margin: 5px;
-  font-size: 20px;
+.box{
+  width:55px;
+  height:55px;
+  background:#1c2f33;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:28px;
+  box-shadow: inset 0 -4px #6cff75;
 }
 
-button {
-  padding: 8px 12px;
+.letters{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:10px;
+  margin-top:20px;
+}
+
+.letter{
+  background:#243c40;
+  padding:15px;
+  border-radius:12px;
+  font-size:24px;
+  cursor:pointer;
+}
+
+.top-info{
+  margin-bottom:15px;
+  line-height:1.8;
 }
 </style>
 </head>
 
 <body>
 
-<div id="game">
-  <h3>المرحلة: <span id="level">1</span></h3>
-  <h4>السؤال: <span id="questionIndex">1</span> / 3</h4>
-  <h4>النقاط: <span id="score">0</span></h4>
+<div class="container">
 
-  <p id="questionText"></p>
+<!-- شاشة البداية -->
+<div id="startScreen">
+  <h2>ⴰⵣⵣⵓⵍ</h2>
+  <p>لعبة الكلمات الأمازيغية</p>
+  <button class="start-btn" onclick="startGame()">ابدأ اللعب</button>
+</div>
 
-  <div class="grid" id="answerGrid"></div>
+<!-- اللعبة -->
+<div id="gameScreen" class="hidden">
 
-  <div class="letters" id="letters"></div>
+  <div class="top-info">
+    <div>المرحلة: <span id="stageNum"></span></div>
+    <div>السؤال: <span id="questionNum"></span> / 3</div>
+    <div>النقاط: <span id="score"></span></div>
+  </div>
 
-  <button onclick="clearAnswer()">مسح</button>
+  <h3 id="questionText"></h3>
+
+  <div class="answer" id="answerBoxes"></div>
+
+  <div class="letters" id="lettersBox"></div>
+
+  <div style="margin-top:20px;">
+    <button class="next-btn" onclick="nextQuestion()">سؤال آخر</button>
+    <button class="delete-btn" onclick="deleteLetter()">مسح حرف</button>
+  </div>
+
+</div>
+
 </div>
 
 <script>
-/* ====== بيانات اللعبة ====== */
-
-const levels = [
+const stages = [
   [
-    { q: "حيوان", a: "ⴰⵢⴷⵉ" },
-    { q: "شمس", a: "ⵜⴰⴼⵓⵢⵜ" },
-    { q: "قمر", a: "ⴰⵢⵓⵔ" }
+    {q:"حيوان أليف", a:"ⴰⵢⴷⵉ"},
+    {q:"النار بالأمازيغية", a:"ⵜⵉⵙⵙ"},
+    {q:"السماء", a:"ⴰⵙⵎⴰ"}
   ],
   [
-    { q: "ماء", a: "ⴰⵎⴰⵏ" },
-    { q: "نار", a: "ⵜⴰⴼⵓⴽⵜ" },
-    { q: "أرض", a: "ⴰⴽⴰⵍ" }
+    {q:"الحرية بالأمازيغية", a:"ⵜⴰⵙⵍⴰ"},
+    {q:"رمز الأمازيغ", a:"ⵣ"},
+    {q:"الأرض", a:"ⴰⴳⴳⴰ"}
   ],
   [
-    { q: "إنسان", a: "ⴰⴷⵎⵉ" },
-    { q: "بيت", a: "ⴰⵅⵅⴰⵎ" },
-    { q: "قلب", a: "ⵓⵍ" }
+    {q:"الماء", a:"ⴰⵎⴰⵏ"},
+    {q:"الشمس", a:"ⵜⴰⴼⵓⵢⵜ"},
+    {q:"القمر", a:"ⴰⵢⵢⵓⵔ"}
   ]
-  // يمكن إضافة مراحل لاحقًا
 ];
 
-/* ====== الحالة ====== */
+let stage=0, qIndex=0, score=0;
+let currentAnswer="", userAnswer="";
 
-let currentLevel = Number(localStorage.getItem("level")) || 0;
-let currentQuestion = Number(localStorage.getItem("question")) || 0;
-let score = Number(localStorage.getItem("score")) || 0;
-let userAnswer = "";
+function startGame(){
+  document.getElementById("startScreen").classList.add("hidden");
+  document.getElementById("gameScreen").classList.remove("hidden");
+  loadQuestion();
+}
 
-/* ====== عناصر ====== */
-
-const levelSpan = document.getElementById("level");
-const questionSpan = document.getElementById("questionIndex");
-const scoreSpan = document.getElementById("score");
-const questionText = document.getElementById("questionText");
-const answerGrid = document.getElementById("answerGrid");
-const lettersDiv = document.getElementById("letters");
-
-/* ====== تحميل السؤال ====== */
-
-function loadQuestion() {
-  const data = levels[currentLevel][currentQuestion];
-
-  levelSpan.textContent = currentLevel + 1;
-  questionSpan.textContent = currentQuestion + 1;
-  scoreSpan.textContent = score;
-  questionText.textContent = data.q;
-
+function loadQuestion(){
+  const data = stages[stage][qIndex];
+  currentAnswer = data.a;
   userAnswer = "";
-  answerGrid.innerHTML = "";
-  lettersDiv.innerHTML = "";
 
-  // مربعات الجواب
-  for (let i = 0; i < data.a.length; i++) {
-    const cell = document.createElement("div");
-    cell.className = "cell";
-    answerGrid.appendChild(cell);
+  document.getElementById("stageNum").innerText = stage+1;
+  document.getElementById("questionNum").innerText = qIndex+1;
+  document.getElementById("score").innerText = score;
+  document.getElementById("questionText").innerText = data.q;
+
+  const answerBoxes = document.getElementById("answerBoxes");
+  answerBoxes.innerHTML="";
+  for(let i=0;i<currentAnswer.length;i++){
+    const d=document.createElement("div");
+    d.className="box";
+    d.innerText="";
+    answerBoxes.appendChild(d);
   }
 
-  // الحروف (الجواب + حروف زائدة)
-  let letters = data.a.split("");
-  const extra = ["ⴰ","ⵉ","ⵔ","ⵙ","ⵎ"];
-  letters = letters.concat(extra).sort(() => Math.random() - 0.5);
+  generateLetters();
+}
 
-  letters.forEach(l => {
-    const btn = document.createElement("button");
-    btn.textContent = l;
-    btn.onclick = () => addLetter(l);
-    lettersDiv.appendChild(btn);
+function generateLetters(){
+  const box=document.getElementById("lettersBox");
+  box.innerHTML="";
+  let letters=currentAnswer.split("");
+
+  const extra="ⴰⵉⵎⵔⵙⵏⴳⵍⵢⴷⵜⴼⵣ".split("");
+  while(letters.length<10){
+    letters.push(extra[Math.floor(Math.random()*extra.length)]);
+  }
+
+  letters.sort(()=>Math.random()-0.5);
+
+  letters.forEach(l=>{
+    const b=document.createElement("div");
+    b.className="letter";
+    b.innerText=l;
+    b.onclick=()=>addLetter(l);
+    box.appendChild(b);
   });
 }
 
-/* ====== إدخال ====== */
-
-function addLetter(letter) {
-  const cells = document.querySelectorAll(".cell");
-  if (userAnswer.length >= cells.length) return;
-
-  cells[userAnswer.length].textContent = letter;
-  userAnswer += letter;
-
-  checkAnswer();
+function addLetter(l){
+  if(userAnswer.length>=currentAnswer.length) return;
+  userAnswer+=l;
+  updateBoxes();
 }
 
-function clearAnswer() {
-  userAnswer = "";
-  document.querySelectorAll(".cell").forEach(c => c.textContent = "");
+function deleteLetter(){
+  userAnswer=userAnswer.slice(0,-1);
+  updateBoxes();
 }
 
-/* ====== التحقق ====== */
+function updateBoxes(){
+  const boxes=document.querySelectorAll(".box");
+  boxes.forEach((b,i)=>b.innerText=userAnswer[i]||"");
+}
 
-function checkAnswer() {
-  const correct = levels[currentLevel][currentQuestion].a;
+function nextQuestion(){
+  if(userAnswer!==currentAnswer) return;
 
-  if (userAnswer.length === correct.length) {
-    if (userAnswer === correct) {
-      score += 100;
-      currentQuestion++;
+  score+=100;
+  qIndex++;
 
-      if (currentQuestion === 3) {
-        currentLevel++;
-        currentQuestion = 0;
-      }
-
-      save();
-      if (currentLevel < levels.length) {
-        loadQuestion();
-      } else {
-        alert("مبروك! وصلت للنهاية");
-      }
-    } else {
-      clearAnswer();
+  if(qIndex===3){
+    stage++;
+    qIndex=0;
+    if(stage===stages.length){
+      alert("🎉 مبروك! وصلت للنهاية\nالنقاط: "+score);
+      location.reload();
+      return;
     }
   }
+  loadQuestion();
 }
-
-/* ====== حفظ ====== */
-
-function save() {
-  localStorage.setItem("level", currentLevel);
-  localStorage.setItem("question", currentQuestion);
-  localStorage.setItem("score", score);
-}
-
-/* ====== تشغيل ====== */
-
-loadQuestion();
 </script>
 
 </body>
