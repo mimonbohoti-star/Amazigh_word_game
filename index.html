@@ -11,14 +11,19 @@ body{
   font-family:sans-serif;
   background:#0e1624;
   color:#fff;
+}
+
+/* توسيط كامل */
+.page{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
   text-align:center;
 }
 
 .hidden{display:none;}
-
-.container{
-  padding:80px 20px;
-}
 
 button{
   background:#2ecc71;
@@ -44,6 +49,7 @@ input{
   grid-template-columns:repeat(6,1fr);
   gap:10px;
   margin:20px;
+  width:90%;
 }
 
 .letters button{
@@ -57,34 +63,31 @@ input{
 <body>
 
 <!-- صفحة الدخول -->
-<div id="start" class="container">
+<div id="start" class="page">
   <div style="font-size:90px;">ⵣ</div>
   <button onclick="showLevels()">ابدأ</button>
 </div>
 
 <!-- اختيار المرحلة -->
-<div id="levels" class="container hidden">
+<div id="levels" class="page hidden">
   <h2>اختر المرحلة</h2>
-  <button onclick="startGame(1)">المرحلة 1</button><br>
-  <button onclick="startGame(2)">المرحلة 2</button><br>
+  <button onclick="startGame(1)">المرحلة 1</button>
+  <button onclick="startGame(2)">المرحلة 2</button>
   <button onclick="startGame(3)">المرحلة 3</button>
 </div>
 
 <!-- اللعبة -->
-<div id="game" class="container hidden">
+<div id="game" class="page hidden">
   <h2 id="levelTitle"></h2>
   <div id="question" style="font-size:28px;margin:10px;"></div>
 
   <input id="answer" readonly>
 
-  <!-- زر المسح -->
-  <div>
-    <button onclick="eraseLetter()">⌫ مسح</button>
-  </div>
+  <button onclick="eraseLetter()">⌫ مسح</button>
 
   <div class="letters" id="letters"></div>
 
-  <button onclick="checkAnswer()">تحقق</button><br>
+  <button onclick="checkAnswer()">تحقق</button>
   <button onclick="backToLevels()">الرجوع للقائمة</button>
 </div>
 
@@ -100,10 +103,10 @@ const levelsData = {
 };
 
 const tifinagh = [
-  "ⴰ","ⴱ","ⵛ","ⴷ","ⴻ","ⴼ",
-  "ⴳ","ⵀ","ⵉ","ⵊ","ⴽ","ⵍ",
-  "ⵎ","ⵏ","ⵓ","ⵔ","ⵙ","ⵜ",
-  "ⵡ","ⵢ","ⵣ"
+ "ⴰ","ⴱ","ⵛ","ⴷ","ⴻ","ⴼ",
+ "ⴳ","ⵀ","ⵉ","ⵊ","ⴽ","ⵍ",
+ "ⵎ","ⵏ","ⵓ","ⵔ","ⵙ","ⵜ",
+ "ⵡ","ⵢ","ⵣ"
 ];
 
 let currentAnswer="";
@@ -141,16 +144,12 @@ function buildLetters(){
 }
 
 function eraseLetter(){
-  answer.value = answer.value.slice(0, -1);
+  answer.value = answer.value.slice(0,-1);
   playSound();
 }
 
 function checkAnswer(){
-  if(answer.value===currentAnswer){
-    alert("✔️ صحيح");
-  }else{
-    alert("❌ خطأ");
-  }
+  alert(answer.value===currentAnswer ? "✔️ صحيح" : "❌ خطأ");
 }
 
 function backToLevels(){
