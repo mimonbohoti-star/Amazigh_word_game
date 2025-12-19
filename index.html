@@ -29,7 +29,7 @@ button{
   display:flex;
   justify-content:center;
   gap:10px;
-  margin-bottom:25px;
+  margin-bottom:20px;
 }
 .slot{
   width:55px;
@@ -44,7 +44,7 @@ button{
   grid-template-columns:repeat(5,1fr);
   gap:10px;
   max-width:320px;
-  margin:auto;
+  margin:20px auto;
 }
 .cell{
   background:#24383c;
@@ -56,7 +56,14 @@ button{
   opacity:.3;
   pointer-events:none;
 }
-#nextBtn{margin-top:30px;background:#7fc97f}
+.controls{
+  display:flex;
+  justify-content:center;
+  gap:15px;
+  margin-top:20px;
+}
+#deleteBtn{background:#e07a7a}
+#nextBtn{background:#7fc97f}
 </style>
 </head>
 
@@ -72,8 +79,13 @@ button{
 <div class="screen" id="gameScreen">
   <div class="question" id="question"></div>
   <div class="answer" id="answerSlots"></div>
+
   <div class="grid" id="grid"></div>
-  <button id="nextBtn">سؤال آخر</button>
+
+  <div class="controls">
+    <button id="deleteBtn">مسح حرف</button>
+    <button id="nextBtn">سؤال آخر</button>
+  </div>
 </div>
 
 <script>
@@ -84,7 +96,9 @@ const questions=[
  {q:"لون السماء",a:["ⴰ","ⵣ","ⵣ"]}
 ];
 
-let index=0,slotIndex=0;
+let index=0;
+let slotIndex=0;
+let usedCells=[];
 
 const startScreen=document.getElementById("startScreen");
 const gameScreen=document.getElementById("gameScreen");
@@ -103,9 +117,21 @@ document.getElementById("nextBtn").onclick=()=>{
  loadQuestion();
 };
 
+document.getElementById("deleteBtn").onclick=()=>{
+ if(slotIndex>0){
+   slotIndex--;
+   slotsEl.children[slotIndex].textContent="";
+   const cell=usedCells.pop();
+   if(cell){
+     cell.classList.remove("used");
+   }
+ }
+};
+
 function loadQuestion(){
  const item=questions[index];
  slotIndex=0;
+ usedCells=[];
  questionEl.textContent=item.q;
  slotsEl.innerHTML="";
  gridEl.innerHTML="";
@@ -130,6 +156,7 @@ function loadQuestion(){
       slotsEl.children[slotIndex].textContent=letter;
       slotIndex++;
       c.classList.add("used");
+      usedCells.push(c);
     }
   };
   gridEl.appendChild(c);
