@@ -1,37 +1,39 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
 <meta charset="UTF-8">
-<title>شبكة السحب</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grid Drag Test</title>
 
 <style>
-body {
-  margin: 0;
-  background: linear-gradient(#0f3d3d, #4fa3a3);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
+  body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(#0f3d3d, #4fa3a3);
+    touch-action: none;
+  }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(7, 46px);
-  gap: 8px;
-  touch-action: none;
-}
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    width: 90vw;
+    max-width: 420px;
+  }
 
-.cell {
-  width: 46px;
-  height: 46px;
-  background: #1e2f2f;
-  border-radius: 8px;
-}
+  .cell {
+    aspect-ratio: 1 / 1;
+    background: #1e2f2f;
+    border-radius: 12px;
+    transition: background 0.15s;
+  }
 
-.cell.active {
-  background: #5ecbff;
-}
+  .cell.active {
+    background: #6fd3ff;
+  }
 </style>
 </head>
 
@@ -40,83 +42,82 @@ body {
 <div class="grid" id="grid"></div>
 
 <script>
-const grid = document.getElementById("grid");
-const size = 7;
-const cells = [];
-let isDragging = false;
-let startIndex = null;
-let direction = null;
+  const gridSize = 7;
+  const grid = document.getElementById("grid");
+  let cells = [];
+  let isDragging = false;
+  let startIndex = null;
 
-// إنشاء الشبكة
-for (let i = 0; i < size * size; i++) {
-  const cell = document.createElement("div");
-  cell.className = "cell";
-  cell.dataset.index = i;
-  grid.appendChild(cell);
-  cells.push(cell);
-}
-
-function getRow(i) { return Math.floor(i / size); }
-function getCol(i) { return i % size; }
-
-function clearSelection() {
-  cells.forEach(c => c.classList.remove("active"));
-}
-
-grid.addEventListener("pointerdown", e => {
-  const target = e.target;
-  if (!target.classList.contains("cell")) return;
-
-  clearSelection();
-  isDragging = true;
-  startIndex = +target.dataset.index;
-  direction = null;
-  target.classList.add("active");
-});
-
-grid.addEventListener("pointermove", e => {
-  if (!isDragging) return;
-
-  const el = document.elementFromPoint(e.clientX, e.clientY);
-  if (!el || !el.classList.contains("cell")) return;
-
-  const currentIndex = +el.dataset.index;
-
-  const sr = getRow(startIndex);
-  const sc = getCol(startIndex);
-  const cr = getRow(currentIndex);
-  const cc = getCol(currentIndex);
-
-  if (!direction) {
-    if (sr === cr) direction = "row";
-    else if (sc === cc) direction = "col";
-    else return;
+  // إنشاء الشبكة
+  for (let i = 0; i < gridSize * gridSize; i++) {
+    const cell = document.createElement("div");
+    cell.className = "cell";
+    cell.dataset.index = i;
+    grid.appendChild(cell);
+    cells.push(cell);
   }
 
-  clearSelection();
+  function clearActive() {
+    cells.forEach(c => c.classList.remove("active"));
+  }
 
-  if (direction === "row" && sr === cr) {
-    const min = Math.min(sc, cc);
-    const max = Math.max(sc, cc);
-    for (let c = min; c <= max; c++) {
-      cells[sr * size + c].classList.add("active");
+  function getLineIndices(start, end) {
+    const sx = start % gridSize;
+    const sy = Math.floor(start / gridSize);
+    const ex = end % gridSize;
+    const ey = Math.floor(end / gridSize);
+
+    const dx = Math.sign(ex - sx);
+    const dy = Math.sign(ey - sy);
+
+    // السماح فقط بخط مستقيم (أفقي / عمودي / قطري)
+    if (!(dx === 0 || dy === 0 || Math.abs(ex - sx) === Math.abs(ey - sy))) {
+      return [];
     }
-  }
 
-  if (direction === "col" && sc === cc) {
-    const min = Math.min(sr, cr);
-    const max = Math.max(sr, cr);
-    for (let r = min; r <= max; r++) {
-      cells[r * size + sc].classList.add("active");
+    let x = sx;
+    let y = sy;
+    let indices = [];
+
+    while (true) {
+      indices.push(y * gridSize + x);
+      if (x === ex && y === ey) break;
+      x += dx;
+      y += dy;
     }
-  }
-});
 
-window.addEventListener("pointerup", () => {
-  isDragging = false;
-  startIndex = null;
-  direction = null;
-});
+    return indices;
+  }
+
+  function handleMove(index) {
+    if (!isDragging || startIndex === null) return;
+    clearActive();
+    const line = getLineIndices(startIndex, index);
+    line.forEach(i => cells[i].classList.add("active"));
+  }
+
+  cells.forEach(cell => {
+    cell.addEventListener("pointerdown", e => {
+      isDragging = true;
+      startIndex = Number(cell.dataset.index);
+      clearActive();
+      cell.classList.add("active");
+    });
+
+    cell.addEventListener("pointerenter", e => {
+      handleMove(Number(cell.dataset.index));
+    });
+
+    cell.addEventListener("pointerup", e => {
+      isDragging = false;
+      startIndex = null;
+    });
+  });
+
+  document.addEventListener("pointerup", () => {
+    isDragging = false;
+    startIndex = null;
+  });
 </script>
 
 </body>
