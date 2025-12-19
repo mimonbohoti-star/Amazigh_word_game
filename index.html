@@ -6,46 +6,31 @@
 <title>لعبة الكلمات الأمازيغية</title>
 
 <style>
-/* ====== إعدادات عامة ====== */
 body {
   margin: 0;
   font-family: Arial, sans-serif;
   background: linear-gradient(180deg, #0b132b, #1c2541);
   color: white;
   text-align: center;
-  position: relative;
   overflow-x: hidden;
 }
 
-/* ====== ⵣ في الخلفية ====== */
-body::before {
-  content: "ⵣ";
+/* ====== خلفية ⵣ (آمنة) ====== */
+.z-bg {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 280px;
+  font-size: 300px;
   color: rgba(255, 255, 255, 0.05);
   z-index: 0;
   pointer-events: none;
 }
 
-/* ====== المحتوى فوق ⵣ ====== */
-body > * {
+/* ====== المحتوى ====== */
+.app {
   position: relative;
-  z-index: 1;
-}
-
-/* ====== العناوين ====== */
-h1, h2 {
-  margin-top: 20px;
-}
-
-/* ====== حركة تنفّس ====== */
-@keyframes breathe {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.03); }
-  100% { transform: scale(1); }
+  z-index: 2;
 }
 
 /* ====== الأزرار ====== */
@@ -56,22 +41,16 @@ button {
   padding: 12px 22px;
   font-size: 16px;
   font-weight: bold;
-  color: #ffffff;
+  color: white;
   cursor: pointer;
   box-shadow: 0 6px 12px rgba(0,0,0,0.3);
-  transition: all 0.15s ease;
-  animation: breathe 3s ease-in-out infinite;
-}
-
-button:hover {
-  transform: translateY(-2px);
+  transition: 0.15s;
 }
 
 button:active {
-  transform: translateY(2px) scale(0.97);
+  transform: scale(0.96);
 }
 
-/* ====== أزرار خاصة ====== */
 .verify-btn {
   background: linear-gradient(180deg, #f1c40f, #f39c12);
   color: #000;
@@ -81,21 +60,15 @@ button:active {
   background: linear-gradient(180deg, #1abc9c, #16a085);
 }
 
-.back-btn {
-  margin-top: 15px;
-}
-
-/* ====== الحقل ====== */
 input {
-  padding: 10px;
+  padding: 12px;
   font-size: 18px;
-  border-radius: 10px;
+  border-radius: 12px;
   border: none;
-  width: 220px;
+  width: 230px;
   text-align: center;
 }
 
-/* ====== لوحة الحروف ====== */
 .keyboard {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
@@ -106,16 +79,9 @@ input {
 .key {
   background: #2c2f4a;
   border-radius: 12px;
-  padding: 14px;
+  padding: 16px;
   font-size: 20px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-  transition: all 0.15s ease;
   cursor: pointer;
-}
-
-.key:hover {
-  background: #3a3f6b;
-  transform: translateY(-2px);
 }
 
 .key:active {
@@ -126,27 +92,35 @@ input {
 
 <body>
 
-<h2>المرحلة 3</h2>
-<h1>STAR</h1>
+<!-- ⵣ في الخلفية -->
+<div class="z-bg">ⵣ</div>
 
-<input type="text" placeholder="أدخل الجواب">
+<!-- التطبيق -->
+<div class="app">
 
-<br><br>
+  <h2>المرحلة 3</h2>
+  <h1>STAR</h1>
 
-<button class="clear-btn">مسح</button>
+  <input type="text" placeholder="أدخل الجواب">
 
-<div class="keyboard">
-  <div class="key">ⵣ</div>
-  <div class="key">ⵉ</div>
-  <div class="key">ⵔ</div>
-  <div class="key">ⴰ</div>
-  <div class="key">ⵙ</div>
-  <div class="key">ⵏ</div>
+  <br><br>
+
+  <button class="clear-btn">مسح</button>
+
+  <div class="keyboard">
+    <div class="key">ⵣ</div>
+    <div class="key">ⵉ</div>
+    <div class="key">ⵔ</div>
+    <div class="key">ⴰ</div>
+    <div class="key">ⵙ</div>
+    <div class="key">ⵏ</div>
+  </div>
+
+  <button class="verify-btn">تحقق</button>
+  <br><br>
+  <button>الرجوع للقائمة</button>
+
 </div>
-
-<button class="verify-btn">تحقق</button>
-<br>
-<button class="back-btn">الرجوع للقائمة</button>
 
 </body>
 </html>
