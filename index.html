@@ -1,125 +1,185 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Grid Drag HV</title>
+<title>لعبة الكلمات الأمازيغية</title>
 
 <style>
 body{
   margin:0;
-  min-height:100vh;
+  font-family:Tahoma, Arial, sans-serif;
+  background:linear-gradient(180deg,#0f3d3e,#2e7d7f);
+  color:#fff;
   display:flex;
   justify-content:center;
   align-items:center;
-  background: linear-gradient(#0f3d3d,#5fa3a3);
-  touch-action:none;
+  height:100vh;
 }
 
-/* شبكة مستطيلة (صفوف/أعمدة) */
-.grid{
+/* شاشة البداية */
+#startScreen{
+  text-align:center;
+}
+#startScreen h1{
+  font-size:32px;
+  margin-bottom:20px;
+}
+#startBtn{
+  padding:12px 30px;
+  font-size:18px;
+  border:none;
+  border-radius:25px;
+  background:#4dd0e1;
+  color:#00363a;
+  cursor:pointer;
+}
+
+/* اللعبة */
+#game{
+  display:none;
+  width:90%;
+  max-width:420px;
+  text-align:center;
+}
+
+#question{
+  font-size:22px;
+  margin-bottom:20px;
+}
+
+#answer{
+  font-size:26px;
+  letter-spacing:6px;
+  margin-bottom:20px;
+  direction:ltr;
+}
+
+.keyboard{
   display:grid;
-  grid-template-columns: repeat(10, 42px); /* أعمدة */
-  gap:8px;
+  grid-template-columns:repeat(5,1fr);
+  gap:10px;
 }
 
-/* مربعات */
-.cell{
-  width:42px;
-  height:42px;
-  background:#1e2f2f;
-  border-radius:8px;
+.key{
+  padding:12px 0;
+  background:#263238;
+  border-radius:10px;
+  cursor:pointer;
+  font-size:22px;
 }
 
-.cell.active{
-  background:#66cfff;
+.key:hover{
+  background:#4dd0e1;
+  color:#00363a;
+}
+
+#controls{
+  margin-top:20px;
+}
+
+#nextBtn{
+  padding:10px 25px;
+  border:none;
+  border-radius:20px;
+  background:#81c784;
+  color:#1b5e20;
+  font-size:16px;
+  cursor:pointer;
 }
 </style>
 </head>
 
 <body>
 
-<div class="grid" id="grid"></div>
+<!-- شاشة البداية -->
+<div id="startScreen">
+  <h1>ⵣ لعبة الكلمات الأمازيغية ⵣ</h1>
+  <button id="startBtn">ابدأ</button>
+</div>
+
+<!-- اللعبة -->
+<div id="game">
+  <div id="question"></div>
+  <div id="answer"></div>
+
+  <div class="keyboard" id="keyboard"></div>
+
+  <div id="controls">
+    <button id="nextBtn">سؤال آخر</button>
+  </div>
+</div>
 
 <script>
-const rows = 4;     // عدد الصفوف (أفقي)
-const cols = 10;    // عدد الأعمدة (عمودي)
-const grid = document.getElementById("grid");
+// ===== البيانات =====
+const questions = [
+  { q:"حيوان أليف", a:"ⴰⵢⴷⵉ" },   // كلب
+  { q:"الشمس", a:"ⵜⴰⴼⵓⵢⵜ" },
+  { q:"القمر", a:"ⴰⵢⵢⵓⵔ" }
+];
 
-let isDragging=false;
-let startRow=null;
-let startCol=null;
-let mode=null; // 'row' أو 'col'
+const letters = ["ⴰ","ⴱ","ⴷ","ⵉ","ⵔ","ⵜ","ⵢ","ⵓ","ⵍ","ⴼ"];
 
-// إنشاء الشبكة
-for(let r=0;r<rows;r++){
-  for(let c=0;c<cols;c++){
-    const cell=document.createElement("div");
-    cell.className="cell";
-    cell.dataset.row=r;
-    cell.dataset.col=c;
-    grid.appendChild(cell);
+let current = 0;
+let answerProgress = "";
+
+// ===== العناصر =====
+const startBtn = document.getElementById("startBtn");
+const startScreen = document.getElementById("startScreen");
+const game = document.getElementById("game");
+const questionEl = document.getElementById("question");
+const answerEl = document.getElementById("answer");
+const keyboardEl = document.getElementById("keyboard");
+const nextBtn = document.getElementById("nextBtn");
+
+// ===== بدء اللعبة =====
+startBtn.onclick = () => {
+  startScreen.style.display = "none";
+  game.style.display = "block";
+  loadQuestion();
+};
+
+// ===== تحميل السؤال =====
+function loadQuestion(){
+  answerProgress = "";
+  const item = questions[current];
+  questionEl.textContent = item.q;
+  answerEl.textContent = "_ ".repeat(item.a.length);
+  buildKeyboard();
+}
+
+// ===== لوحة المفاتيح =====
+function buildKeyboard(){
+  keyboardEl.innerHTML = "";
+  letters.forEach(l=>{
+    const div = document.createElement("div");
+    div.className = "key";
+    div.textContent = l;
+    div.onclick = ()=>addLetter(l);
+    keyboardEl.appendChild(div);
+  });
+}
+
+// ===== إضافة حرف =====
+function addLetter(l){
+  const correct = questions[current].a;
+  if(answerProgress.length < correct.length){
+    answerProgress += l;
+    answerEl.textContent = answerProgress.split("").join(" ");
+    if(answerProgress === correct){
+      setTimeout(()=>alert("✔️ صحيح"),100);
+    }
   }
 }
 
-const cells=[...document.querySelectorAll(".cell")];
-
-function clearActive(){
-  cells.forEach(c=>c.classList.remove("active"));
-}
-
-cells.forEach(cell=>{
-  cell.addEventListener("pointerdown", ()=>{
-    clearActive();
-    isDragging=true;
-    startRow=cell.dataset.row;
-    startCol=cell.dataset.col;
-    mode=null;
-    cell.classList.add("active");
-  });
-
-  cell.addEventListener("pointerenter", ()=>{
-    if(!isDragging) return;
-
-    const r=cell.dataset.row;
-    const c=cell.dataset.col;
-
-    if(!mode){
-      if(r===startRow) mode="row";
-      else if(c===startCol) mode="col";
-      else return;
-    }
-
-    clearActive();
-
-    if(mode==="row" && r===startRow){
-      const min=Math.min(startCol,c);
-      const max=Math.max(startCol,c);
-      cells.forEach(x=>{
-        if(x.dataset.row===startRow && x.dataset.col>=min && x.dataset.col<=max){
-          x.classList.add("active");
-        }
-      });
-    }
-
-    if(mode==="col" && c===startCol){
-      const min=Math.min(startRow,r);
-      const max=Math.max(startRow,r);
-      cells.forEach(x=>{
-        if(x.dataset.col===startCol && x.dataset.row>=min && x.dataset.row<=max){
-          x.classList.add("active");
-        }
-      });
-    }
-  });
-});
-
-document.addEventListener("pointerup", ()=>{
-  isDragging=false;
-  startRow=null;
-  startCol=null;
-  mode=null;
-});
+// ===== سؤال آخر =====
+nextBtn.onclick = ()=>{
+  current++;
+  if(current >= questions.length){
+    current = 0;
+  }
+  loadQuestion();
+};
 </script>
 
 </body>
