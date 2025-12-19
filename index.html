@@ -6,14 +6,15 @@
 <title>لعبة الكلمات الأمازيغية</title>
 
 <style>
+/* ====== ألوان عامة ====== */
 body{
   margin:0;
   font-family:sans-serif;
-  background:#0e1624;
-  color:#fff;
+  background: linear-gradient(180deg, #0e1624, #12263a);
+  color:#eaf2f8;
 }
 
-/* توسيط كامل */
+/* توسيط الصفحات */
 .page{
   min-height:100vh;
   display:flex;
@@ -25,16 +26,44 @@ body{
 
 .hidden{display:none;}
 
+/* ====== حرف ⵣ ====== */
+#start div{
+  font-size:96px;
+  color:#2ecc71; /* أخضر هادئ */
+  margin-bottom:20px;
+}
+
+/* ====== العناوين ====== */
+h2{
+  color:#a9d6e5; /* أزرق فاتح */
+  margin-bottom:10px;
+}
+
+/* ====== السؤال ====== */
+#question{
+  font-size:28px;
+  margin:10px;
+  color:#f6e58d; /* أصفر خفيف */
+  font-weight:bold;
+}
+
+/* ====== الأزرار ====== */
 button{
-  background:#2ecc71;
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
   border:none;
   padding:12px 22px;
   border-radius:10px;
   font-size:18px;
   cursor:pointer;
-  margin:10px;
+  margin:8px;
+  color:#fff;
 }
 
+button:active{
+  transform:scale(0.96);
+}
+
+/* ====== خانة الجواب ====== */
 input{
   font-size:22px;
   padding:10px;
@@ -42,20 +71,26 @@ input{
   border-radius:8px;
   border:none;
   text-align:center;
+  margin-top:10px;
 }
 
+/* ====== أزرار الحروف ====== */
 .letters{
-  display:grid;
-  grid-template-columns:repeat(6,1fr);
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
   gap:10px;
   margin:20px;
-  width:90%;
 }
 
 .letters button{
-  background:#1f2a3a;
-  color:#fff;
-  font-size:20px;
+  width:56px;
+  height:56px;
+  font-size:24px;
+  font-weight:bold;
+  border-radius:10px;
+  background:#1e3a5f; /* أزرق غامق */
+  color:#eaf2f8;
 }
 </style>
 </head>
@@ -64,7 +99,7 @@ input{
 
 <!-- صفحة الدخول -->
 <div id="start" class="page">
-  <div style="font-size:90px;">ⵣ</div>
+  <div>ⵣ</div>
   <button onclick="showLevels()">ابدأ</button>
 </div>
 
@@ -79,7 +114,7 @@ input{
 <!-- اللعبة -->
 <div id="game" class="page hidden">
   <h2 id="levelTitle"></h2>
-  <div id="question" style="font-size:28px;margin:10px;"></div>
+  <div id="question"></div>
 
   <input id="answer" readonly>
 
