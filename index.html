@@ -1,170 +1,164 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>لعبة الكلمات الأمازيغية</title>
-
+<title>لعبة الكلمات</title>
 <style>
 body{
   margin:0;
-  font-family:sans-serif;
-  background:linear-gradient(180deg,#0f3c3c,#2f7f7f);
+  font-family: sans-serif;
+  background:#111;
   color:#fff;
-  text-align:center;
-}
-.screen{display:none;min-height:100vh;padding:40px 15px}
-.screen.active{display:block}
-h1{margin-top:120px;font-size:26px}
-button{
-  border:none;
-  padding:12px 22px;
-  border-radius:20px;
-  font-size:16px;
-  cursor:pointer;
-}
-#startBtn{margin-top:30px;background:#5dd6e8}
-.question{font-size:22px;margin:30px 0}
-.answer{
   display:flex;
   justify-content:center;
-  gap:10px;
-  margin-bottom:20px;
+  align-items:center;
+  height:100vh;
 }
-.slot{
-  width:55px;
-  height:55px;
-  background:#1f3236;
+.game{
+  width:320px;
+  background:#1c1c1c;
+  padding:15px;
   border-radius:12px;
-  line-height:55px;
-  font-size:28px;
 }
-.grid{
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:10px;
-  max-width:320px;
-  margin:20px auto;
+.question{
+  text-align:center;
+  margin-bottom:10px;
+  font-size:18px;
 }
-.cell{
-  background:#24383c;
-  padding:18px 0;
-  border-radius:10px;
-  font-size:22px;
+.answer-box{
+  display:flex;
+  justify-content:center;
+  gap:6px;
+  margin:10px 0;
 }
-.cell.used{
-  opacity:.3;
-  pointer-events:none;
+.answer-box div{
+  width:36px;
+  height:36px;
+  border-bottom:2px solid #0f0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:20px;
+}
+.letters{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  justify-content:center;
+  margin-top:10px;
+}
+.letters button{
+  width:40px;
+  height:40px;
+  border:none;
+  border-radius:8px;
+  background:#333;
+  color:#fff;
+  font-size:18px;
+}
+.letters button:disabled{
+  opacity:.4;
 }
 .controls{
-  display:flex;
-  justify-content:center;
-  gap:15px;
-  margin-top:20px;
+  text-align:center;
+  margin-top:10px;
 }
-#deleteBtn{background:#e07a7a}
-#nextBtn{background:#7fc97f}
+.controls button{
+  padding:6px 12px;
+  border:none;
+  border-radius:6px;
+  background:#a00;
+  color:#fff;
+}
+.success{
+  color:#0f0;
+  text-align:center;
+  margin-top:8px;
+}
 </style>
 </head>
-
 <body>
 
-<!-- البداية -->
-<div class="screen active" id="startScreen">
-  <h1>ⵣ لعبة الكلمات الأمازيغية ⵣ</h1>
-  <button id="startBtn">ابدأ اللعب</button>
-</div>
+<div class="game">
+  <div class="question">حيوان أليف</div>
 
-<!-- اللعبة -->
-<div class="screen" id="gameScreen">
-  <div class="question" id="question"></div>
-  <div class="answer" id="answerSlots"></div>
+  <div class="answer-box" id="answerBox"></div>
 
-  <div class="grid" id="grid"></div>
+  <div class="letters" id="letters"></div>
 
   <div class="controls">
-    <button id="deleteBtn">مسح حرف</button>
-    <button id="nextBtn">سؤال آخر</button>
+    <button onclick="removeLetter()">مسح حرف</button>
   </div>
+
+  <div class="success" id="success"></div>
 </div>
 
 <script>
-const extraLetters=["ⴰ","ⵉ","ⵓ","ⴽ","ⵣ","ⵔ","ⵙ","ⵎ"];
-
-const questions=[
- {q:"حيوان أليف",a:["ⵎ","ⵓ","ⵛ"]},
- {q:"لون السماء",a:["ⴰ","ⵣ","ⵣ"]}
-];
-
-let index=0;
-let slotIndex=0;
-let usedCells=[];
-
-const startScreen=document.getElementById("startScreen");
-const gameScreen=document.getElementById("gameScreen");
-const questionEl=document.getElementById("question");
-const slotsEl=document.getElementById("answerSlots");
-const gridEl=document.getElementById("grid");
-
-document.getElementById("startBtn").onclick=()=>{
- startScreen.classList.remove("active");
- gameScreen.classList.add("active");
- loadQuestion();
+const question = {
+  q:"حيوان أليف",
+  answer:"ⴰⵣⴰⵔ"
 };
 
-document.getElementById("nextBtn").onclick=()=>{
- index=(index+1)%questions.length;
- loadQuestion();
-};
+// حروف زايدة (نفس العائلة)
+const extraLetters = ["ⴱ","ⴳ","ⴷ","ⵎ"];
 
-document.getElementById("deleteBtn").onclick=()=>{
- if(slotIndex>0){
-   slotIndex--;
-   slotsEl.children[slotIndex].textContent="";
-   const cell=usedCells.pop();
-   if(cell){
-     cell.classList.remove("used");
-   }
- }
-};
+let answerArr = question.answer.split("");
+let userAnswer = [];
 
-function loadQuestion(){
- const item=questions[index];
- slotIndex=0;
- usedCells=[];
- questionEl.textContent=item.q;
- slotsEl.innerHTML="";
- gridEl.innerHTML="";
+const answerBox = document.getElementById("answerBox");
+const lettersBox = document.getElementById("letters");
+const successBox = document.getElementById("success");
 
- item.a.forEach(()=>{
-  const s=document.createElement("div");
-  s.className="slot";
-  slotsEl.appendChild(s);
- });
+// إنشاء خانات الجواب
+answerArr.forEach(()=> {
+  const d = document.createElement("div");
+  answerBox.appendChild(d);
+});
 
- let letters=[...item.a];
- while(letters.length<10){
-   letters.push(extraLetters[Math.floor(Math.random()*extraLetters.length)]);
- }
+// توليد الحروف (الجواب + الزايد)
+let letters = [...answerArr, ...extraLetters];
+letters.sort(()=>Math.random()-0.5);
 
- shuffle(letters).forEach(letter=>{
-  const c=document.createElement("div");
-  c.className="cell";
-  c.textContent=letter;
-  c.onclick=()=>{
-    if(slotIndex<slotsEl.children.length){
-      slotsEl.children[slotIndex].textContent=letter;
-      slotIndex++;
-      c.classList.add("used");
-      usedCells.push(c);
+letters.forEach(l=>{
+  const b = document.createElement("button");
+  b.textContent = l;
+  b.onclick = ()=>{
+    if(userAnswer.length < answerArr.length){
+      userAnswer.push(l);
+      b.disabled = true;
+      updateAnswer();
     }
   };
-  gridEl.appendChild(c);
- });
+  lettersBox.appendChild(b);
+});
+
+function updateAnswer(){
+  [...answerBox.children].forEach((d,i)=>{
+    d.textContent = userAnswer[i] || "";
+  });
+
+  if(userAnswer.length === answerArr.length){
+    if(userAnswer.join("") === question.answer){
+      successBox.textContent = "✔ جواب صحيح";
+    }else{
+      successBox.textContent = "✖ خطأ";
+    }
+  }
 }
 
-function shuffle(arr){
- return arr.sort(()=>Math.random()-0.5);
+function removeLetter(){
+  if(userAnswer.length===0) return;
+  const last = userAnswer.pop();
+
+  [...lettersBox.children].forEach(b=>{
+    if(b.textContent===last && b.disabled){
+      b.disabled = false;
+      return;
+    }
+  });
+
+  successBox.textContent="";
+  updateAnswer();
 }
 </script>
 
