@@ -83,12 +83,10 @@ button {
 
 .correct {
   background: #22c55e !important;
-  color: #000;
 }
 
 .wrong {
   background: #ef4444 !important;
-  color: #000;
 }
 
 /* لوحة الحروف */
@@ -104,6 +102,10 @@ button {
   background: #334155;
   color: #fff;
   min-width: 42px;
+}
+
+.delete {
+  background: #ef4444 !important;
 }
 
 .message {
@@ -130,10 +132,7 @@ button {
 <div class="game hidden" id="game">
   <div class="level-box">
     <h3 id="levelTitle"></h3>
-
-    <!-- مؤشر التقدم -->
     <div class="progress" id="progress"></div>
-
     <div class="word" id="question"></div>
 
     <div class="answer-boxes" id="answerBoxes"></div>
@@ -218,6 +217,7 @@ function updateBoxes() {
   const boxes = document.querySelectorAll(".answer-box");
   boxes.forEach((b, i) => {
     b.textContent = userAnswer[i] || "";
+    b.classList.remove("correct","wrong");
   });
 }
 
@@ -238,6 +238,7 @@ function buildKeyboard() {
 
   const del = document.createElement("button");
   del.textContent = "⌫";
+  del.className = "delete";
   del.onclick = () => {
     userAnswer = userAnswer.slice(0, -1);
     updateBoxes();
@@ -261,7 +262,6 @@ function checkAnswer() {
         message.innerText = "✔️ انتهت المرحلة";
       }
     }, 600);
-
   } else {
     boxes.forEach(b => b.classList.add("wrong"));
     message.innerText = "❌ حاول مرة أخرى";
