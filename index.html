@@ -3,36 +3,38 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Simple Grid Drag</title>
+<title>لعبة السحب – الأساس</title>
 
 <style>
-  body {
-    margin: 0;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: linear-gradient(#0f3d3d, #4fa3a3);
-    touch-action: none;
-  }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(#0f3d3d, #5fa3a3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Arial, sans-serif;
+}
 
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 10px;
-    width: 90vw;
-    max-width: 420px;
-  }
+/* الشبكة */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 44px);
+  gap: 10px;
+}
 
-  .cell {
-    aspect-ratio: 1 / 1;
-    background: #1e2f2f;
-    border-radius: 12px;
-  }
+/* المربعات */
+.cell {
+  width: 44px;
+  height: 44px;
+  background: #1e2f2f;
+  border-radius: 10px;
+  touch-action: none;
+}
 
-  .cell.active {
-    background: #6fd3ff;
-  }
+.cell.active {
+  background: #66cfff;
+}
 </style>
 </head>
 
@@ -41,68 +43,56 @@
 <div class="grid" id="grid"></div>
 
 <script>
-  const size = 7;
-  const grid = document.getElementById("grid");
-  const cells = [];
+const rows = 7;
+const cols = 7;
+const grid = document.getElementById("grid");
 
-  let isDragging = false;
-  let startIndex = null;
-  let startRow = null;
+let isDragging = false;
+let startRow = null;
 
-  // إنشاء الشبكة
-  for (let i = 0; i < size * size; i++) {
-    const c = document.createElement("div");
-    c.className = "cell";
-    c.dataset.index = i;
-    grid.appendChild(c);
-    cells.push(c);
+// إنشاء الشبكة
+for (let r = 0; r < rows; r++) {
+  for (let c = 0; c < cols; c++) {
+    const cell = document.createElement("div");
+    cell.className = "cell";
+    cell.dataset.row = r;
+    cell.dataset.col = c;
+    grid.appendChild(cell);
   }
+}
 
-  function clearActive() {
-    cells.forEach(c => c.classList.remove("active"));
-  }
+const cells = document.querySelectorAll(".cell");
 
-  cells.forEach(cell => {
-
-    cell.addEventListener("pointerdown", () => {
-      clearActive();
-      isDragging = true;
-      startIndex = Number(cell.dataset.index);
-      startRow = Math.floor(startIndex / size);
-      cell.classList.add("active");
-    });
-
-    cell.addEventListener("pointerenter", () => {
-      if (!isDragging) return;
-
-      const index = Number(cell.dataset.index);
-      const row = Math.floor(index / size);
-
-      // ❗ سحب أفقي فقط
-      if (row !== startRow) return;
-
-      clearActive();
-
-      const startCol = startIndex % size;
-      const endCol = index % size;
-
-      const from = Math.min(startCol, endCol);
-      const to   = Math.max(startCol, endCol);
-
-      for (let col = from; col <= to; col++) {
-        const i = startRow * size + col;
-        cells[i].classList.add("active");
-      }
-    });
-
-    cell.addEventListener("pointerup", () => {
-      isDragging = false;
-    });
+// بداية السحب
+cells.forEach(cell => {
+  cell.addEventListener("pointerdown", e => {
+    clearActive();
+    isDragging = true;
+    startRow = cell.dataset.row;
+    activateCell(cell);
   });
 
-  document.addEventListener("pointerup", () => {
-    isDragging = false;
+  cell.addEventListener("pointerenter", e => {
+    if (!isDragging) return;
+    if (cell.dataset.row === startRow) {
+      activateCell(cell);
+    }
   });
+});
+
+// نهاية السحب
+document.addEventListener("pointerup", () => {
+  isDragging = false;
+  startRow = null;
+});
+
+function activateCell(cell) {
+  cell.classList.add("active");
+}
+
+function clearActive() {
+  cells.forEach(c => c.classList.remove("active"));
+}
 </script>
 
 </body>
