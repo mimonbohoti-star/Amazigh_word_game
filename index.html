@@ -2,221 +2,214 @@
 <html lang="ar">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>لعبة الكلمات الأمازيغية</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-*{box-sizing:border-box}
-body{
-  margin:0;
-  min-height:100vh;
-  font-family:sans-serif;
-  background:linear-gradient(#0f3d3d,#1b6b6b);
-  color:#fff;
-  display:flex;
-  justify-content:center;
-  align-items:center;
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background: linear-gradient(#0f3d3d, #1f6f6f);
+  color: #fff;
+  text-align: center;
 }
 
-/* شاشة البداية */
-#startScreen{
-  text-align:center;
-}
-#startScreen h1{
-  margin-bottom:20px;
-}
-#startScreen button{
-  padding:12px 24px;
-  font-size:18px;
-  border:none;
-  border-radius:25px;
-  background:#7acb7a;
+.hidden { display: none; }
+
+button {
+  border: none;
+  padding: 12px 20px;
+  border-radius: 20px;
+  font-size: 16px;
+  cursor: pointer;
 }
 
-/* اللعبة */
-#game{
-  display:none;
-  width:100%;
-  max-width:360px;
-  padding:16px;
-  text-align:center;
+.start-btn { background:#4dd0e1; color:#000; }
+.next-btn { background:#81c784; }
+.delete-btn { background:#e57373; }
+
+.letters, .slots {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 15px;
 }
 
-.question{
-  font-size:20px;
-  margin-bottom:16px;
-}
-
-.answer{
-  display:flex;
-  justify-content:center;
-  gap:8px;
-  margin-bottom:18px;
-}
-.answer div{
-  width:44px;
-  height:44px;
-  border-radius:10px;
-  background:#223;
+.letter, .slot {
+  width: 55px;
+  height: 55px;
+  background:#263238;
+  border-radius: 10px;
+  font-size: 28px;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:22px;
-  border-bottom:3px solid #6f6;
 }
 
-.letters{
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:10px;
-  margin-bottom:16px;
+.slot.filled {
+  border-bottom: 4px solid #6cff6c;
 }
-.letters button{
-  height:46px;
-  border:none;
-  border-radius:12px;
-  font-size:20px;
-  background:#2d3f3f;
-  color:#fff;
-}
-.letters button:disabled{opacity:.4}
 
-.controls{
-  display:flex;
-  gap:10px;
-  justify-content:center;
-}
-.controls button{
-  padding:10px 14px;
-  border:none;
-  border-radius:20px;
-  font-size:14px;
-}
-.next{background:#7acb7a}
-.clear{background:#e07a7a}
-
-.msg{
-  margin-top:10px;
-  color:#9f9;
-}
+.top { margin-top: 80px; }
+.level { opacity: 0.8; margin-bottom: 10px; }
 </style>
 </head>
 
 <body>
 
-<!-- شاشة البداية -->
-<div id="startScreen">
-  <h1>ⴰⵣⵓⵍ ⵏ ⵜⴰⵎⴰⵣⵉⵖⵜ</h1>
-  <button onclick="startGame()">ابدأ اللعب</button>
+<!-- البداية -->
+<div id="startScreen" class="top">
+  <h1>ⵣ لعبة الكلمات الأمازيغية ⵣ</h1>
+  <button class="start-btn" onclick="startGame()">ابدأ</button>
 </div>
 
 <!-- اللعبة -->
-<div id="game">
-  <div class="question" id="question"></div>
-  <div class="answer" id="answerBox"></div>
-  <div class="letters" id="lettersBox"></div>
+<div id="gameScreen" class="hidden">
+  <div class="level" id="levelText"></div>
+  <h2 id="question"></h2>
 
-  <div class="controls">
-    <button class="next" onclick="nextQuestion()">سؤال آخر</button>
-    <button class="clear" onclick="removeLetter()">مسح حرف</button>
-  </div>
+  <div class="slots" id="slots"></div>
+  <div class="letters" id="letters"></div>
 
-  <div class="msg" id="msg"></div>
+  <button class="delete-btn" onclick="removeLetter()">مسح حرف</button>
+  <br><br>
+  <button class="next-btn" onclick="nextQuestion()">التالي</button>
 </div>
 
 <script>
-const questions = [
-  {q:"حيوان أليف", a:"ⴰⵢⴷⵉ"}, // كلب
-  {q:"حيوان", a:"ⴰⴼⵓⵙ"}      // ثور
+/* =============================
+   المراحل
+============================= */
+const levels = [
+  {
+    name: "المرحلة 1",
+    questions: [
+      { q: "حيوان أليف", a: "ⴰⵢⴷⵉ" },
+      { q: "الشمس", a: "ⵜⴰⴼⵓⵢⵜ" }
+    ]
+  },
+  {
+    name: "المرحلة 2",
+    questions: [
+      { q: "الماء", a: "ⴰⵎⴰⵏ" },
+      { q: "القمر", a: "ⴰⵢⵓⵔ" }
+    ]
+  },
+  {
+    name: "المرحلة 3",
+    questions: [
+      { q: "البيت", a: "ⴰⵅⵅⴰⵎ" },
+      { q: "النار", a: "ⵜⴰⴼⵓⴽⵜ" }
+    ]
+  },
+  {
+    name: "المرحلة 4",
+    questions: [
+      { q: "الهواء", a: "ⴰⵡⴰⵏ" },
+      { q: "اليد", a: "ⴰⴼⵓⵙ" }
+    ]
+  },
+  {
+    name: "المرحلة 5",
+    questions: [
+      { q: "الرأس", a: "ⴰⵅⵅⴰⴼ" },
+      { q: "القلب", a: "ⵓⵍ" }
+    ]
+  }
 ];
 
-const extraLetters = ["ⴱ","ⴳ","ⴷ","ⵎ","ⵔ","ⵙ","ⵍ","ⵣ","ⴼ","ⵉ"];
+let levelIndex = 0;
+let questionIndex = 0;
+let currentAnswer = [];
+let filled = [];
 
-let index = 0;
-let current;
-let user = [];
-
-const questionEl = document.getElementById("question");
-const answerBox = document.getElementById("answerBox");
-const lettersBox = document.getElementById("lettersBox");
-const msg = document.getElementById("msg");
-
-function startGame(){
-  document.getElementById("startScreen").style.display="none";
-  document.getElementById("game").style.display="block";
+/* =============================
+   التشغيل
+============================= */
+function startGame() {
+  document.getElementById("startScreen").classList.add("hidden");
+  document.getElementById("gameScreen").classList.remove("hidden");
   loadQuestion();
 }
 
-function loadQuestion(){
-  msg.textContent="";
-  user=[];
-  answerBox.innerHTML="";
-  lettersBox.innerHTML="";
+function loadQuestion() {
+  const level = levels[levelIndex];
+  const qObj = level.questions[questionIndex];
 
-  current = questions[index];
-  questionEl.textContent = current.q;
+  document.getElementById("levelText").textContent = level.name;
+  document.getElementById("question").textContent = qObj.q;
 
-  const answerLetters = current.a.split("");
+  currentAnswer = qObj.a.split("");
+  filled = [];
 
-  answerLetters.forEach(()=>{
-    const d=document.createElement("div");
-    answerBox.appendChild(d);
+  renderSlots();
+  renderLetters();
+}
+
+function renderSlots() {
+  const slots = document.getElementById("slots");
+  slots.innerHTML = "";
+  currentAnswer.forEach((_, i) => {
+    const d = document.createElement("div");
+    d.className = "slot";
+    d.textContent = filled[i] || "";
+    if (filled[i]) d.classList.add("filled");
+    slots.appendChild(d);
   });
+}
 
-  // ✅ ضمان جميع حروف الجواب
-  let letters = [...answerLetters];
+function renderLetters() {
+  const lettersDiv = document.getElementById("letters");
+  lettersDiv.innerHTML = "";
 
-  while(letters.length < 10){
-    letters.push(extraLetters[Math.floor(Math.random()*extraLetters.length)]);
+  let letters = [...currentAnswer];
+  const extra = ["ⴰ","ⵓ","ⵉ","ⴳ","ⵣ","ⴷ","ⴼ","ⴽ"];
+
+  while (letters.length < currentAnswer.length + 4) {
+    letters.push(extra[Math.floor(Math.random()*extra.length)]);
   }
 
-  letters.sort(()=>Math.random()-0.5);
+  letters.sort(() => Math.random() - 0.5);
 
-  letters.forEach(l=>{
-    const b=document.createElement("button");
-    b.textContent=l;
-    b.onclick=()=>{
-      if(user.length < answerLetters.length){
-        user.push(l);
-        b.disabled=true;
-        render();
-      }
-    };
-    lettersBox.appendChild(b);
+  letters.forEach(l => {
+    const b = document.createElement("div");
+    b.className = "letter";
+    b.textContent = l;
+    b.onclick = () => addLetter(l);
+    lettersDiv.appendChild(b);
   });
 }
 
-function render(){
-  [...answerBox.children].forEach((d,i)=>{
-    d.textContent = user[i] || "";
-  });
-
-  if(user.length === current.a.length){
-    if(user.join("") === current.a){
-      msg.textContent = "✔ جواب صحيح";
-    }else{
-      msg.textContent = "✖ غير صحيح";
-    }
+function addLetter(l) {
+  if (filled.length < currentAnswer.length) {
+    filled.push(l);
+    renderSlots();
+    checkAnswer();
   }
 }
 
-function removeLetter(){
-  if(!user.length) return;
-  const last = user.pop();
-
-  [...lettersBox.children].forEach(b=>{
-    if(b.textContent===last && b.disabled){
-      b.disabled=false;
-      return;
-    }
-  });
-
-  msg.textContent="";
-  render();
+function removeLetter() {
+  filled.pop();
+  renderSlots();
 }
 
-function nextQuestion(){
-  index = (index + 1) % questions.length;
+function checkAnswer() {
+  if (filled.join("") === currentAnswer.join("")) {
+    setTimeout(nextQuestion, 500);
+  }
+}
+
+function nextQuestion() {
+  questionIndex++;
+  if (questionIndex >= levels[levelIndex].questions.length) {
+    levelIndex++;
+    questionIndex = 0;
+    if (levelIndex >= levels.length) {
+      alert("🎉 كملتي جميع المراحل!");
+      levelIndex = 0;
+    }
+  }
   loadQuestion();
 }
 </script>
