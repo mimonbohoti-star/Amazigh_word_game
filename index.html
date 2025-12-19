@@ -23,13 +23,19 @@ body {
   font-size: 14px;
 }
 
-/* العنوان */
+/* العناوين */
 h1 {
   margin: 25px 0;
   font-size: 28px;
 }
 
+/* ===================== */
 /* قائمة المراحل */
+/* ===================== */
+#menu {
+  display: block;
+}
+
 .levels {
   display: flex;
   flex-direction: column;
@@ -38,7 +44,6 @@ h1 {
   margin: auto;
 }
 
-/* زر المرحلة */
 .level-btn {
   padding: 18px;
   border-radius: 14px;
@@ -48,7 +53,6 @@ h1 {
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-/* مرحلة مفتوحة */
 .level-btn.open {
   background: linear-gradient(135deg, #1fa84f, #28d66f);
   color: #fff;
@@ -59,7 +63,6 @@ h1 {
   transform: scale(0.96);
 }
 
-/* مرحلة مقفولة */
 .level-btn.locked {
   background: #555;
   color: #ccc;
@@ -67,7 +70,6 @@ h1 {
   filter: blur(0.3px);
 }
 
-/* زر إعادة التصفير */
 .reset-btn {
   margin-top: 30px;
   padding: 15px;
@@ -77,6 +79,73 @@ h1 {
   border: none;
   font-size: 18px;
   background: #eee;
+  cursor: pointer;
+}
+
+/* ===================== */
+/* شاشة السؤال */
+/* ===================== */
+#game {
+  display: none;
+  padding: 20px;
+}
+
+.question-card {
+  background: #111;
+  border-radius: 16px;
+  padding: 25px;
+  max-width: 360px;
+  margin: 30px auto;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+}
+
+.question-number {
+  font-size: 14px;
+  opacity: 0.7;
+  margin-bottom: 10px;
+}
+
+.question-text {
+  font-size: 22px;
+  margin-bottom: 25px;
+}
+
+.answers {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.answer-btn {
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  background: #222;
+  color: #fff;
+  transition: transform 0.1s ease, background 0.1s ease;
+}
+
+.answer-btn:active {
+  transform: scale(0.96);
+}
+
+.answer-btn.correct {
+  background: #1fa84f;
+}
+
+.answer-btn.wrong {
+  background: #b52b2b;
+}
+
+/* زر الرجوع */
+.back-btn {
+  margin-top: 20px;
+  background: transparent;
+  color: #aaa;
+  border: none;
+  font-size: 16px;
   cursor: pointer;
 }
 </style>
@@ -92,13 +161,34 @@ h1 {
 
 <h1>🎮 لعبة الأسئلة</h1>
 
-<div class="levels">
-  <button class="level-btn open" onclick="startLevel(1)">المرحلة 1 ✔️</button>
-  <button class="level-btn open" onclick="startLevel(2)">المرحلة 2 ✔️</button>
-  <button class="level-btn locked">المرحلة 3 🔒</button>
+<!-- القائمة -->
+<div id="menu">
+  <div class="levels">
+    <button class="level-btn open" onclick="startLevel(1)">المرحلة 1 ✔️</button>
+    <button class="level-btn open" onclick="startLevel(2)">المرحلة 2 ✔️</button>
+    <button class="level-btn locked">المرحلة 3 🔒</button>
+  </div>
+
+  <button class="reset-btn" onclick="resetGame()">إعادة التصفير</button>
 </div>
 
-<button class="reset-btn" onclick="resetGame()">إعادة التصفير</button>
+<!-- اللعبة -->
+<div id="game">
+  <div class="question-card">
+    <div class="question-number">سؤال 1</div>
+    <div class="question-text" id="questionText">
+      ما هو لون السماء؟
+    </div>
+
+    <div class="answers">
+      <button class="answer-btn" onclick="checkAnswer(this, false)">أخضر</button>
+      <button class="answer-btn" onclick="checkAnswer(this, true)">أزرق</button>
+      <button class="answer-btn" onclick="checkAnswer(this, false)">أحمر</button>
+    </div>
+  </div>
+
+  <button class="back-btn" onclick="backToMenu()">⬅️ الرجوع للقائمة</button>
+</div>
 
 <script>
 let unlockedLevel = localStorage.getItem("unlockedLevel");
@@ -119,7 +209,23 @@ levelButtons.forEach((btn, index) => {
 });
 
 function startLevel(level) {
-  alert("بدأت المرحلة " + level + " (سؤال واحد مؤقتًا)");
+  document.getElementById("menu").style.display = "none";
+  document.getElementById("game").style.display = "block";
+}
+
+function backToMenu() {
+  document.getElementById("game").style.display = "none";
+  document.getElementById("menu").style.display = "block";
+}
+
+function checkAnswer(button, correct) {
+  if (correct) {
+    button.classList.add("correct");
+  } else {
+    button.classList.add("wrong");
+  }
+
+  setTimeout(backToMenu, 800);
 }
 
 function resetGame() {
