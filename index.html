@@ -14,7 +14,7 @@ body {
   text-align: center;
 }
 
-.hidden { display: none; }
+.hidden { display: none !important; }
 
 button {
   padding: 10px 18px;
@@ -24,11 +24,6 @@ button {
   background: #22c55e;
   color: #000;
   cursor: pointer;
-}
-
-button:disabled {
-  background: #555;
-  color: #aaa;
 }
 
 .start-screen, .menu, .game {
@@ -81,7 +76,7 @@ input {
 <!-- شاشة البداية -->
 <div class="start-screen" id="startScreen">
   <div class="flag-symbol">ⵣ</div>
-  <button onclick="goToMenu()">ابدأ</button>
+  <button onclick="showMenu()">ابدأ</button>
 </div>
 
 <!-- القائمة -->
@@ -102,13 +97,13 @@ input {
     <button onclick="checkAnswer()">تحقق</button>
     <div class="message" id="message"></div>
     <br>
-    <button onclick="goToMenu()">الرجوع للقائمة</button>
+    <button onclick="showMenu()">الرجوع للقائمة</button>
   </div>
 </div>
 
 <script>
 // ===============================
-// تنظيم الكلمات حسب المراحل
+// الكلمات حسب المراحل
 // ===============================
 const levels = {
   1: [
@@ -128,61 +123,63 @@ const levels = {
   ]
 };
 
-// ===============================
 let currentLevel = 1;
 let currentIndex = 0;
 
 // ===============================
-// التنقل (الإصلاح هنا)
+// إظهار شاشة واحدة فقط
 // ===============================
-function goToMenu() {
-  document.getElementById("startScreen").classList.add("hidden"); // ✅ الإصلاح
-  document.getElementById("game").classList.add("hidden");
-  document.getElementById("menu").classList.remove("hidden");
+function hideAll() {
+  startScreen.classList.add("hidden");
+  menu.classList.add("hidden");
+  game.classList.add("hidden");
+}
+
+function showMenu() {
+  hideAll();
+  menu.classList.remove("hidden");
 }
 
 function startLevel(level) {
   currentLevel = level;
   currentIndex = 0;
   localStorage.setItem("amazighLevel", level);
-  showGame();
-}
-
-function showGame() {
-  document.getElementById("menu").classList.add("hidden");
-  document.getElementById("game").classList.remove("hidden");
-  document.getElementById("levelTitle").innerText = "المرحلة " + currentLevel;
+  hideAll();
+  game.classList.remove("hidden");
+  levelTitle.innerText = "المرحلة " + level;
   loadQuestion();
 }
 
 // ===============================
 function loadQuestion() {
   const item = levels[currentLevel][currentIndex];
-  document.getElementById("question").innerText = item.q;
-  document.getElementById("answerInput").value = "";
-  document.getElementById("message").innerText = "";
+  question.innerText = item.q;
+  answerInput.value = "";
+  message.innerText = "";
 }
 
 function checkAnswer() {
-  const input = document.getElementById("answerInput").value.trim();
+  const input = answerInput.value.trim();
   const correct = levels[currentLevel][currentIndex].a;
 
   if (input === correct) {
     currentIndex++;
     if (currentIndex >= levels[currentLevel].length) {
-      document.getElementById("message").innerText = "✔️ أحسنت! انتهت المرحلة";
+      message.innerText = "✔️ أحسنت! انتهت المرحلة";
     } else {
       loadQuestion();
     }
   } else {
-    document.getElementById("message").innerText = "❌ حاول مرة أخرى";
+    message.innerText = "❌ حاول مرة أخرى";
   }
 }
 
 // ===============================
+// عند التحميل: البداية فقط
+// ===============================
 window.onload = () => {
-  const saved = localStorage.getItem("amazighLevel");
-  if (saved) currentLevel = parseInt(saved);
+  hideAll();
+  startScreen.classList.remove("hidden");
 };
 </script>
 
