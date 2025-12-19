@@ -2,24 +2,22 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>لعبة الأسئلة</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body {
   margin: 0;
-  font-family: Tahoma, Arial;
+  font-family: sans-serif;
   background: linear-gradient(#000, #111);
-  color: white;
+  color: #fff;
   text-align: center;
 }
 
-/* الشريط العلوي */
 .top-bar {
   display: flex;
   justify-content: space-between;
   padding: 10px 15px;
-  background: black;
   font-size: 16px;
 }
 
@@ -29,172 +27,121 @@ body {
   gap: 5px;
 }
 
-/* العنوان */
 h1 {
   margin: 20px 0;
 }
 
-/* الأزرار */
+.container {
+  max-width: 500px;
+  margin: auto;
+  padding: 10px;
+}
+
 .btn {
-  width: 90%;
-  max-width: 400px;
-  padding: 18px;
-  margin: 12px auto;
+  width: 100%;
+  padding: 15px;
+  margin: 10px 0;
   font-size: 18px;
   border: none;
-  border-radius: 15px;
+  border-radius: 14px;
   cursor: pointer;
 }
 
-.btn-stage {
-  background: #eee;
+.btn-open {
+  background: #f2f2f2;
   color: #000;
 }
 
 .btn-done {
-  background: #22c55e;
-  color: white;
+  background: #1fbf5b;
+  color: #fff;
 }
 
-.btn-locked {
+.btn-lock {
   background: #555;
-  color: #aaa;
+  color: #bbb;
   cursor: not-allowed;
 }
 
-.btn-reset {
-  background: white;
-  color: black;
-}
-
-/* الأسئلة */
-#game {
+#message {
+  margin: 15px 0;
+  padding: 12px;
+  border-radius: 12px;
   display: none;
+  font-size: 16px;
 }
 
-.answer {
-  background: #444;
-  color: white;
+.success {
+  background: #1fbf5b;
+  color: #fff;
 }
 
-.answer:hover {
-  background: #666;
+.info {
+  background: #333;
+}
+
+.fade {
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from {opacity: 0; transform: translateY(10px);}
+  to {opacity: 1; transform: translateY(0);}
+}
+
+.reset {
+  background: #f2f2f2;
+  color: #000;
 }
 </style>
 </head>
 
 <body>
 
-<!-- الشريط -->
 <div class="top-bar">
-  <span>❤️ <b id="lives">3</b></span>
-  <span>⏱️ <b id="time">10</b> ث</span>
-  <span>⭐ <b id="points">0</b></span>
+  <span>⭐ <b id="points">10</b></span>
+  <span>⏱️ <b id="time">9</b> ث</span>
+  <span>❤️ <b id="hearts">3</b></span>
 </div>
 
 <h1>🎮 لعبة الأسئلة</h1>
 
-<!-- القائمة -->
-<div id="menu">
-  <button class="btn btn-stage" onclick="startStage(1)">المرحلة 1</button>
-  <button class="btn btn-stage" id="stage2" disabled>المرحلة 2</button>
-  <button class="btn btn-locked">المرحلة 3 🔒</button>
-  <button class="btn btn-reset" onclick="resetGame()">إعادة التصفير</button>
-</div>
+<div class="container">
 
-<!-- اللعبة -->
-<div id="game">
-  <h2 id="stageTitle"></h2>
-  <p id="question"></p>
+  <div id="message"></div>
 
-  <button class="btn answer" onclick="checkAnswer('أزرق')">أزرق</button>
-  <button class="btn answer" onclick="checkAnswer('أخضر')">أخضر</button>
+  <button id="stage1" class="btn btn-done">✔️ المرحلة 1</button>
+  <button id="stage2" class="btn btn-done">✔️ المرحلة 2</button>
+  <button id="stage3" class="btn btn-lock">🔒 المرحلة 3</button>
+
+  <button class="btn reset" onclick="resetGame()">إعادة التصفير</button>
 </div>
 
 <script>
-let timer;
-let timeLeft = 10;
-let points = 0;
-let lives = 3;
-let currentStage = 0;
-let correctAnswer = "أخضر";
-
-/* بدء المرحلة */
-function startStage(stage) {
-  currentStage = stage;
-  document.getElementById("menu").style.display = "none";
-  document.getElementById("game").style.display = "block";
-
-  document.getElementById("stageTitle").innerText = "المرحلة " + stage;
-  document.getElementById("question").innerText = "ما لون العشب؟";
-
-  startTimer();
+function showMessage(text, type="info") {
+  const msg = document.getElementById("message");
+  msg.className = type + " fade";
+  msg.innerText = text;
+  msg.style.display = "block";
 }
 
-/* العداد */
-function startTimer() {
-  clearInterval(timer);
-  timeLeft = 10;
-  document.getElementById("time").innerText = timeLeft;
+document.getElementById("stage1").onclick = () => {
+  showMessage("أحسنت! المرحلة 1 مكتملة ✅", "success");
+};
 
-  timer = setInterval(() => {
-    timeLeft--;
-    document.getElementById("time").innerText = timeLeft;
+document.getElementById("stage2").onclick = () => {
+  showMessage("تم اجتياز المرحلة 2 بنجاح 🎉", "success");
+};
 
-    if (timeLeft <= 0) {
-      clearInterval(timer);
-      loseLife();
-    }
-  }, 1000);
-}
+document.getElementById("stage3").onclick = () => {
+  showMessage("المرحلة 3 مازال مقفلة 🔒", "info");
+};
 
-/* التحقق */
-function checkAnswer(answer) {
-  clearInterval(timer);
-
-  if (answer === correctAnswer) {
-    points += 10;
-    document.getElementById("points").innerText = points;
-
-    if (currentStage === 1) {
-      document.getElementById("stage2").disabled = false;
-      document.getElementById("stage2").className = "btn btn-stage";
-    }
-
-    backToMenu();
-  } else {
-    loseLife();
-  }
-}
-
-/* خسارة قلب */
-function loseLife() {
-  lives--;
-  document.getElementById("lives").innerText = lives;
-
-  if (lives <= 0) {
-    alert("انتهت المحاولة ❤️");
-    resetGame();
-  } else {
-    backToMenu();
-  }
-}
-
-/* رجوع */
-function backToMenu() {
-  document.getElementById("game").style.display = "none";
-  document.getElementById("menu").style.display = "block";
-}
-
-/* إعادة */
 function resetGame() {
-  points = 0;
-  lives = 3;
+  showMessage("تمت إعادة التصفير 🔄", "info");
   document.getElementById("points").innerText = 0;
-  document.getElementById("lives").innerText = 3;
-  document.getElementById("stage2").disabled = true;
-  document.getElementById("stage2").className = "btn btn-stage";
-  backToMenu();
+  document.getElementById("time").innerText = 10;
+  document.getElementById("hearts").innerText = 3;
 }
 </script>
 
