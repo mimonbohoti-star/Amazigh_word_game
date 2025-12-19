@@ -2,209 +2,212 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>لعبة الأسئلة – نقاط ومؤقّت</title>
+<title>لعبة الأسئلة</title>
+
 <style>
 body{
+  margin:0;
   font-family: Arial, sans-serif;
   background:#111;
   color:#fff;
-  margin:0;
-  padding:0;
   text-align:center;
 }
+
 .top-bar{
-  background:#000;
-  padding:10px;
-  font-size:18px;
   display:flex;
-  justify-content:space-around;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 15px;
+  background:#000;
+  font-size:16px;
 }
-.screen{ display:none; padding:20px; }
-.screen.active{ display:block; }
+
+.screen{
+  display:none;
+  padding:20px;
+}
+.screen.active{
+  display:block;
+}
 
 button{
-  padding:12px 20px;
-  margin:10px;
+  padding:12px;
+  margin:10px auto;
+  width:80%;
   font-size:16px;
   cursor:pointer;
 }
-.options button{
-  display:block;
-  width:80%;
-  margin:10px auto;
-}
+
 .success{ color:#4caf50; }
 .error{ color:#f44336; }
 .timer{ color:#ff9800; }
+.hearts{ color:#e91e63; }
 </style>
 </head>
 
 <body>
 
+<!-- الشريط العلوي -->
 <div class="top-bar">
-  ⭐ النقاط: <span id="score">0</span>
-  ⏱ الوقت: <span id="timer">0</span>
+  <div class="hearts">❤️ <span id="hearts">3</span></div>
+  <div>⏱ <span id="timer">0</span></div>
+  <div>⭐ <span id="score">0</span></div>
 </div>
 
 <!-- القائمة -->
 <div id="menu" class="screen active">
   <h1>🎮 لعبة الأسئلة</h1>
-  <button id="stage1Btn">المرحلة 1</button>
-  <button id="stage2Btn">المرحلة 2 🔒</button>
-  <button id="stage3Btn">المرحلة 3 🔒</button>
+  <button onclick="startStage(1)">المرحلة 1</button>
+  <button onclick="startStage(2)">المرحلة 2</button>
+  <button onclick="startStage(3)">المرحلة 3</button>
 </div>
 
 <!-- اللعبة -->
 <div id="game" class="screen">
   <h2 id="stageTitle"></h2>
   <p id="question"></p>
-  <div class="options" id="options"></div>
+  <div id="options"></div>
   <p id="result"></p>
 </div>
 
 <script>
-// ========= البيانات =========
+// ================= البيانات =================
 const stages = {
   1: [
-    { q: "2 + 2 = ؟", options: ["3","4","5"], answer: 1 },
-    { q: "لون السماء؟", options: ["أزرق","أخضر","أحمر"], answer: 0 }
+    { q:"2 + 2 = ؟", options:["3","4","5"], answer:1 },
+    { q:"لون السماء؟", options:["أزرق","أخضر","أحمر"], answer:0 }
   ],
   2: [
-    { q: "عاصمة المغرب؟", options: ["الرباط","فاس","مراكش"], answer: 0 },
-    { q: "عدد أيام الأسبوع؟", options: ["6","7","8"], answer: 1 }
+    { q:"عاصمة المغرب؟", options:["الرباط","فاس","مراكش"], answer:0 },
+    { q:"عدد أيام الأسبوع؟", options:["6","7","8"], answer:1 }
   ],
   3: [
-    { q: "√16 = ؟", options: ["3","4","5"], answer: 1 },
-    { q: "أكبر قارة؟", options: ["إفريقيا","آسيا","أوروبا"], answer: 1 }
+    { q:"√16 = ؟", options:["3","4","5"], answer:1 },
+    { q:"أكبر قارة؟", options:["إفريقيا","آسيا","أوروبا"], answer:1 }
   ]
 };
 
-const stageTime = { 1:10, 2:8, 3:6 };
+const timePerStage = {1:10, 2:8, 3:6};
 
+// ================= المتغيرات =================
 let currentStage = 1;
 let currentQuestion = 0;
+let timer = null;
 let timeLeft = 0;
-let timerInterval = null;
+let hearts = 3;
 
-// ========= التقدم =========
-let unlockedStage = parseInt(localStorage.getItem("unlockedStage")) || 1;
-let score = parseInt(localStorage.getItem("score")) || 0;
+let score = Number(localStorage.getItem("score")) || 0;
 
-const scoreEl = document.getElementById("score");
-const timerEl = document.getElementById("timer");
-scoreEl.innerText = score;
-
-// ========= عناصر =========
+// ================= العناصر =================
 const menu = document.getElementById("menu");
 const game = document.getElementById("game");
-const stageTitle = document.getElementById("stageTitle");
 const questionEl = document.getElementById("question");
 const optionsEl = document.getElementById("options");
 const resultEl = document.getElementById("result");
+const scoreEl = document.getElementById("score");
+const timerEl = document.getElementById("timer");
+const heartsEl = document.getElementById("hearts");
+const stageTitle = document.getElementById("stageTitle");
 
-const stage1Btn = document.getElementById("stage1Btn");
-const stage2Btn = document.getElementById("stage2Btn");
-const stage3Btn = document.getElementById("stage3Btn");
+scoreEl.textContent = score;
 
-// ========= تفعيل المراحل =========
-function updateMenu(){
-  if(unlockedStage >= 2) stage2Btn.innerText = "المرحلة 2";
-  if(unlockedStage >= 3) stage3Btn.innerText = "المرحلة 3";
-}
-updateMenu();
-
-// ========= بدء مرحلة =========
+// ================= بدء مرحلة =================
 function startStage(stage){
-  if(stage > unlockedStage) return;
   currentStage = stage;
   currentQuestion = 0;
+  hearts = 3;
+  heartsEl.textContent = hearts;
+
   menu.classList.remove("active");
   game.classList.add("active");
-  stageTitle.innerText = "المرحلة " + stage;
+  stageTitle.textContent = "المرحلة " + stage;
   showQuestion();
 }
 
-// ========= المؤقّت =========
-function startTimer(){
-  clearInterval(timerInterval);
-  timeLeft = stageTime[currentStage];
-  timerEl.innerText = timeLeft;
+// ================= عرض سؤال =================
+function showQuestion(){
+  clearInterval(timer);
 
-  timerInterval = setInterval(()=>{
+  const q = stages[currentStage][currentQuestion];
+  questionEl.textContent = q.q;
+  optionsEl.innerHTML = "";
+  resultEl.textContent = "";
+
+  timeLeft = timePerStage[currentStage];
+  timerEl.textContent = timeLeft;
+
+  timer = setInterval(()=>{
     timeLeft--;
-    timerEl.innerText = timeLeft;
-    if(timeLeft <= 0){
-      clearInterval(timerInterval);
-      resultEl.innerText = "⏱ انتهى الوقت";
-      resultEl.className = "error";
-      currentQuestion++;
-      setTimeout(nextStep,700);
+    timerEl.textContent = timeLeft;
+    if(timeLeft === 0){
+      clearInterval(timer);
+      loseHeart("⏱ انتهى الوقت");
     }
   },1000);
-}
-
-// ========= عرض سؤال =========
-function showQuestion(){
-  const q = stages[currentStage][currentQuestion];
-  questionEl.innerText = q.q;
-  optionsEl.innerHTML = "";
-  resultEl.innerText = "";
-  startTimer();
 
   q.options.forEach((opt,i)=>{
     const btn = document.createElement("button");
-    btn.innerText = opt;
+    btn.textContent = opt;
     btn.onclick = ()=>checkAnswer(i);
     optionsEl.appendChild(btn);
   });
 }
 
-// ========= تحقق =========
+// ================= تحقق =================
 function checkAnswer(i){
-  clearInterval(timerInterval);
+  clearInterval(timer);
   const q = stages[currentStage][currentQuestion];
 
   if(i === q.answer){
-    let add = currentStage === 1 ? 10 : currentStage === 2 ? 15 : 20;
+    const add = currentStage === 1 ? 10 : currentStage === 2 ? 15 : 20;
     score += add;
-    localStorage.setItem("score", score);
-    scoreEl.innerText = score;
-    resultEl.innerText = "✔ صحيح (+"+add+")";
+    localStorage.setItem("score",score);
+    scoreEl.textContent = score;
+    resultEl.textContent = "✔ صحيح (+"+add+")";
     resultEl.className = "success";
+    setTimeout(nextQuestion,700);
   }else{
-    resultEl.innerText = "✖ خطأ";
-    resultEl.className = "error";
+    loseHeart("✖ خطأ");
   }
-  currentQuestion++;
-  setTimeout(nextStep,700);
 }
 
-// ========= الانتقال =========
-function nextStep(){
+// ================= خسارة قلب =================
+function loseHeart(msg){
+  hearts--;
+  heartsEl.textContent = hearts;
+  resultEl.textContent = msg;
+  resultEl.className = "error";
+
+  if(hearts <= 0){
+    setTimeout(gameOver,700);
+  }else{
+    setTimeout(nextQuestion,700);
+  }
+}
+
+// ================= التالي =================
+function nextQuestion(){
+  currentQuestion++;
   if(currentQuestion < stages[currentStage].length){
     showQuestion();
   }else{
-    finishStage();
+    endStage();
   }
 }
 
-// ========= نهاية مرحلة =========
-function finishStage(){
-  clearInterval(timerInterval);
-  if(unlockedStage === currentStage && currentStage < 3){
-    unlockedStage++;
-    localStorage.setItem("unlockedStage", unlockedStage);
-  }
+// ================= نهاية المرحلة =================
+function endStage(){
   alert("🎉 أنهيت المرحلة " + currentStage);
   game.classList.remove("active");
   menu.classList.add("active");
-  updateMenu();
 }
 
-// ========= أزرار =========
-stage1Btn.onclick = ()=>startStage(1);
-stage2Btn.onclick = ()=>startStage(2);
-stage3Btn.onclick = ()=>startStage(3);
+// ================= خسرت =================
+function gameOver(){
+  alert("💀 انتهت المحاولات");
+  game.classList.remove("active");
+  menu.classList.add("active");
+}
 </script>
 
 </body>
