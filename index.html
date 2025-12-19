@@ -9,32 +9,58 @@
 *{box-sizing:border-box;font-family:Arial}
 body{
   margin:0;
-  background:#000;
+  background:linear-gradient(180deg,#020617,#022c22);
   color:#fff;
   text-align:center;
 }
+
 .top{
   display:flex;
   justify-content:space-between;
-  padding:10px 15px;
+  padding:12px 18px;
   font-size:18px;
+  border-bottom:1px solid #134e4a;
 }
-.container{margin-top:30px}
+
+.container{margin-top:25px}
+
+h2{margin-bottom:20px;color:#d1fae5}
+
 button{
   width:90%;
-  max-width:400px;
-  padding:15px;
-  margin:10px auto;
+  max-width:420px;
+  padding:16px;
+  margin:12px auto;
   font-size:18px;
   border:none;
-  border-radius:12px;
+  border-radius:16px;
   cursor:pointer;
 }
-.stage{background:#f2f2f2;color:#000}
-.locked{background:#444;color:#aaa;cursor:not-allowed}
-.reset{background:#fff}
+
+.stage{
+  background:linear-gradient(135deg,#22c55e,#16a34a);
+  color:#022c22;
+  font-weight:bold;
+}
+
+.locked{
+  background:#334155;
+  color:#94a3b8;
+  cursor:not-allowed;
+}
+
+.reset{
+  background:#f1f5f9;
+  color:#020617;
+}
+
 #game{display:none}
-.answers button{background:#22c55e;color:#fff}
+
+.answers button{
+  background:#020617;
+  color:#e5e7eb;
+  border:1px solid #134e4a;
+}
 </style>
 </head>
 
@@ -60,7 +86,7 @@ button{
 </div>
 
 <script>
-let stars=0,lives=3,time=10,timer;
+let stars=0,lives=3,time=10,timer,current;
 let unlocked3=false;
 
 const data={
@@ -72,20 +98,16 @@ const data={
 function startStage(n){
   if(n===3 && !unlocked3) return;
   current=n;
-  showGame();
-  loadQ(n);
+  menu.style.display="none";
+  game.style.display="block";
+  loadQ();
   startTimer();
 }
 
-function showGame(){
-  menu.style.display="none";
-  game.style.display="block";
-}
-
-function loadQ(n){
-  question.textContent=data[n].q;
+function loadQ(){
+  question.textContent=data[current].q;
   answers.innerHTML="";
-  data[n].a.forEach((x,i)=>{
+  data[current].a.forEach((x,i)=>{
     let b=document.createElement("button");
     b.textContent=x;
     b.onclick=()=>check(i);
@@ -100,43 +122,34 @@ function check(i){
     if(current===2){
       unlocked3=true;
       stage3.className="stage";
-      stage3.onclick=()=>startStage(3);
       stage3.textContent="المرحلة 3";
+      stage3.onclick=()=>startStage(3);
     }
-    alert("✔️ صحيح");
-  }else{
-    loseLife();
-    return;
-  }
-  back();
+    back();
+  }else loseLife();
 }
 
 function startTimer(){
   time=10;
-  timeSpan();
+  update();
   timer=setInterval(()=>{
     time--;
-    timeSpan();
-    if(time===0){
-      clearInterval(timer);
-      loseLife();
-    }
+    update();
+    if(time===0){clearInterval(timer);loseLife();}
   },1000);
 }
 
 function loseLife(){
   lives--;
-  document.getElementById("lives").textContent=lives;
-  alert("❌ خطأ");
-  if(lives<=0){
-    alert("انتهت المحاولات");
-    resetGame();
-  }else back();
+  update();
+  if(lives<=0) resetGame();
+  else back();
 }
 
-function timeSpan(){
-  document.getElementById("time").textContent=time;
-  document.getElementById("stars").textContent=stars;
+function update(){
+  timeSpan.textContent=time;
+  starsSpan.textContent=stars;
+  livesSpan.textContent=lives;
 }
 
 function back(){
@@ -144,9 +157,11 @@ function back(){
   menu.style.display="block";
 }
 
-function resetGame(){
-  location.reload();
-}
+function resetGame(){location.reload();}
+
+const timeSpan=document.getElementById("time");
+const starsSpan=document.getElementById("stars");
+const livesSpan=document.getElementById("lives");
 </script>
 
 </body>
