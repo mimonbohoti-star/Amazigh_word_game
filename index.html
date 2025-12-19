@@ -6,148 +6,138 @@
 <title>لعبة الأسئلة</title>
 
 <style>
-/* ====== RESET ====== */
-* {
-  box-sizing: border-box;
-  font-family: "Tajawal", sans-serif;
+*{
+  box-sizing:border-box;
+  font-family:Tahoma, Arial;
 }
-
-/* ====== BODY ====== */
-body {
-  margin: 0;
-  background: linear-gradient(180deg, #020b0a, #062b22);
-  color: #fff;
-  min-height: 100vh;
+body{
+  margin:0;
+  background:linear-gradient(180deg,#020b0a,#063b2e);
+  color:#fff;
+  min-height:100vh;
 }
-
-/* ====== TOP BAR ====== */
-.top-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 18px;
-  background: rgba(0,0,0,0.4);
-  border-bottom: 1px solid rgba(0,255,180,0.2);
+.top-bar{
+  display:flex;
+  justify-content:space-between;
+  padding:12px 16px;
+  background:rgba(0,0,0,.5);
+  border-bottom:1px solid rgba(0,255,180,.2);
 }
-
-.top-bar span {
-  font-size: 16px;
+.title{
+  text-align:center;
+  margin:20px 0;
+  font-size:26px;
+  color:#8dffcc;
 }
-
-/* ====== TITLE ====== */
-.title {
-  text-align: center;
-  margin: 25px 0 30px;
-  font-size: 26px;
-  font-weight: bold;
-  color: #8dffcc;
+.container{
+  width:90%;
+  max-width:500px;
+  margin:auto;
 }
-
-/* ====== CONTAINER ====== */
-.container {
-  width: 90%;
-  max-width: 500px;
-  margin: auto;
+.btn{
+  width:100%;
+  padding:16px;
+  margin:12px 0;
+  font-size:20px;
+  border:none;
+  border-radius:16px;
+  cursor:pointer;
 }
-
-/* ====== BUTTONS ====== */
-.btn {
-  width: 100%;
-  padding: 16px;
-  margin: 12px 0;
-  font-size: 20px;
-  border: none;
-  border-radius: 16px;
-  cursor: pointer;
-  transition: 0.2s;
+.btn-stage{
+  background:linear-gradient(135deg,#1fbf75,#0e8f55);
+  color:#fff;
 }
-
-/* Stage buttons */
-.btn-stage {
-  background: linear-gradient(135deg, #1fbf75, #0e8f55);
-  color: #fff;
-  box-shadow: 0 6px 0 #0a5e3a;
+.btn-reset{
+  background:#eee;
+  color:#000;
 }
-
-.btn-stage:active {
-  transform: translateY(4px);
-  box-shadow: 0 2px 0 #0a5e3a;
+.question-box{
+  background:rgba(0,0,0,.45);
+  padding:20px;
+  border-radius:16px;
 }
-
-/* Reset button */
-.btn-reset {
-  background: #f2f2f2;
-  color: #111;
+.question{
+  text-align:center;
+  font-size:22px;
+  margin-bottom:20px;
 }
-
-/* ====== QUESTION BOX ====== */
-.question-box {
-  background: rgba(0,0,0,0.45);
-  padding: 20px;
-  border-radius: 16px;
-  margin-top: 30px;
-  box-shadow: 0 0 15px rgba(0,255,180,0.15);
+.answer{
+  background:#031714;
+  border:1px solid rgba(0,255,180,.3);
+  color:#fff;
 }
-
-.question {
-  font-size: 22px;
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-/* ====== ANSWERS ====== */
-.answer {
-  background: #031714;
-  border: 1px solid rgba(0,255,180,0.25);
-  color: #fff;
-  margin: 10px 0;
-}
-
-.answer:hover {
-  background: rgba(0,255,180,0.15);
+.answer:active{
+  background:#0e8f55;
 }
 </style>
 </head>
 
 <body>
 
-<!-- TOP BAR -->
 <div class="top-bar">
-  <span>⭐ 10</span>
-  <span>⏱ 6</span>
-  <span>❤️ 2</span>
+  <span id="hearts">❤️ 2</span>
+  <span id="timer">⏱ 6</span>
+  <span id="stars">⭐ 10</span>
 </div>
 
-<!-- TITLE -->
 <div class="title">🎮 لعبة الأسئلة</div>
 
 <!-- MENU -->
 <div class="container" id="menu">
-  <button class="btn btn-stage" onclick="startStage(1)">المرحلة 1</button>
-  <button class="btn btn-stage" onclick="startStage(2)">المرحلة 2</button>
-  <button class="btn btn-stage" onclick="startStage(3)">المرحلة 3</button>
+  <button class="btn btn-stage" onclick="startGame()">المرحلة 1</button>
   <button class="btn btn-reset" onclick="resetGame()">إعادة التصفير</button>
 </div>
 
-<!-- QUESTION -->
+<!-- GAME -->
 <div class="container" id="game" style="display:none;">
   <div class="question-box">
     <div class="question">تعني HTML ؟</div>
-    <button class="btn answer">لغة برمجة</button>
-    <button class="btn answer">لغة ترميز</button>
-    <button class="btn answer">نظام</button>
+
+    <button class="btn answer" onclick="checkAnswer(false)">لغة برمجة</button>
+    <button class="btn answer" onclick="checkAnswer(true)">لغة ترميز</button>
+    <button class="btn answer" onclick="checkAnswer(false)">نظام</button>
   </div>
 </div>
 
 <script>
-function startStage(n) {
-  document.getElementById("menu").style.display = "none";
-  document.getElementById("game").style.display = "block";
+let hearts = 2;
+let stars = 10;
+
+/* تشغيل اللعبة */
+function startGame(){
+  document.getElementById("menu").style.display="none";
+  document.getElementById("game").style.display="block";
+  history.pushState({page:"game"},"");
 }
 
-function resetGame() {
+/* فحص الجواب */
+function checkAnswer(correct){
+  if(correct){
+    stars += 1;
+    alert("✔ جواب صحيح");
+  }else{
+    hearts -= 1;
+    alert("✖ جواب خاطئ");
+  }
+  updateBar();
+}
+
+/* تحديث الشريط */
+function updateBar(){
+  document.getElementById("hearts").innerText="❤️ "+hearts;
+  document.getElementById("stars").innerText="⭐ "+stars;
+}
+
+/* إعادة التصفير */
+function resetGame(){
   location.reload();
 }
+
+/* التحكم في زر الرجوع */
+window.onpopstate = function(){
+  document.getElementById("game").style.display="none";
+  document.getElementById("menu").style.display="block";
+};
 </script>
 
 </body>
