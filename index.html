@@ -80,6 +80,18 @@ input {
   min-width: 42px;
 }
 
+/* أزرار إضافية */
+.tools {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.tools button {
+  background: #ef4444;
+  color: #fff;
+}
+
 .message {
   margin-top: 12px;
   min-height: 24px;
@@ -108,8 +120,12 @@ input {
 
     <input id="answerInput" readonly>
 
-    <!-- ⭐ لوحة الحروف الأمازيغية ⭐ -->
     <div class="keyboard" id="keyboard"></div>
+
+    <!-- أدوات -->
+    <div class="tools">
+      <button onclick="clearAnswer()">مسح</button>
+    </div>
 
     <br>
     <button onclick="checkAnswer()">تحقق</button>
@@ -120,6 +136,12 @@ input {
 </div>
 
 <script>
+// ================== الأصوات ==================
+const clickSound = new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
+const okSound    = new Audio("https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg");
+const badSound   = new Audio("https://actions.google.com/sounds/v1/cartoon/boing.ogg");
+
+// ================== البيانات ==================
 const levels = {
   1: [
     { q: "SUN", a: "ⵜⴰⴼⵓⵢⵜ" },
@@ -143,6 +165,7 @@ const letters = ["ⴰ","ⴱ","ⴳ","ⴷ","ⴹ","ⴻ","ⴼ","ⴽ","ⵉ","ⵍ","�
 let currentLevel = 1;
 let currentIndex = 0;
 
+// ================== الشاشات ==================
 function hideAll() {
   startScreen.classList.add("hidden");
   menu.classList.add("hidden");
@@ -163,6 +186,7 @@ function startLevel(level) {
   loadQuestion();
 }
 
+// ================== اللعبة ==================
 function loadQuestion() {
   question.innerText = levels[currentLevel][currentIndex].q;
   answerInput.value = "";
@@ -175,24 +199,28 @@ function buildKeyboard() {
   letters.forEach(l => {
     const b = document.createElement("button");
     b.textContent = l;
-    b.onclick = () => answerInput.value += l;
+    b.onclick = () => {
+      clickSound.play();
+      answerInput.value += l;
+    };
     keyboard.appendChild(b);
   });
+}
 
-  const del = document.createElement("button");
-  del.textContent = "⌫";
-  del.onclick = () =>
-    answerInput.value = answerInput.value.slice(0, -1);
-  keyboard.appendChild(del);
+function clearAnswer() {
+  answerInput.value = "";
+  clickSound.play();
 }
 
 function checkAnswer() {
   if (answerInput.value === levels[currentLevel][currentIndex].a) {
+    okSound.play();
     currentIndex++;
     currentIndex >= levels[currentLevel].length
       ? message.innerText = "✔️ أحسنت! انتهت المرحلة"
       : loadQuestion();
   } else {
+    badSound.play();
     message.innerText = "❌ حاول مرة أخرى";
   }
 }
