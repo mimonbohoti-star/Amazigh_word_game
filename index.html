@@ -8,14 +8,13 @@
 <style>
 body{
   margin:0;
-  font-family: sans-serif;
+  font-family:sans-serif;
   background:#0e1624;
   color:#fff;
   text-align:center;
 }
-
 .hidden{display:none;}
-
+.container{padding:80px 20px;}
 button{
   background:#2ecc71;
   border:none;
@@ -25,19 +24,6 @@ button{
   cursor:pointer;
   margin:10px;
 }
-
-#settingsBtn{
-  position:fixed;
-  top:10px;
-  left:10px;
-  font-size:22px;
-  padding:8px 12px;
-}
-
-.container{
-  padding:80px 20px;
-}
-
 input{
   font-size:22px;
   padding:10px;
@@ -46,60 +32,29 @@ input{
   border:none;
   text-align:center;
 }
-
 .letters{
   display:grid;
   grid-template-columns:repeat(6,1fr);
   gap:10px;
   margin:20px;
 }
-
 .letters button{
   background:#1f2a3a;
   color:#fff;
   font-size:20px;
-}
-
-#overlay{
-  position:fixed;
-  top:0;left:0;right:0;bottom:0;
-  background:rgba(0,0,0,.7);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-#settingsBox{
-  background:#1f2a3a;
-  padding:20px;
-  border-radius:12px;
-  width:80%;
-  max-width:300px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- زر الإعدادات -->
-<button id="settingsBtn">⚙️</button>
-
-<!-- الإعدادات -->
-<div id="overlay" class="hidden">
-  <div id="settingsBox">
-    <h3>الإعدادات</h3>
-    <button id="soundToggle">🔊 الصوت: مفعّل</button><br>
-    <button onclick="closeSettings()">إغلاق</button>
-  </div>
-</div>
-
-<!-- البداية -->
+<!-- صفحة الدخول -->
 <div id="start" class="container">
-  <div style="font-size:80px;">ⵣ</div>
+  <div style="font-size:90px;">ⵣ</div>
   <button onclick="showLevels()">ابدأ</button>
 </div>
 
-<!-- المراحل -->
+<!-- اختيار المرحلة -->
 <div id="levels" class="container hidden">
   <h2>اختر المرحلة</h2>
   <button onclick="startGame(1)">المرحلة 1</button><br>
@@ -122,36 +77,32 @@ input{
 </audio>
 
 <script>
-let soundOn = true;
-
-const levels = {
+const levelsData = {
   1:[{q:"SUN",a:"ⵜⵉⵎⵉ"}],
   2:[{q:"MOON",a:"ⴰⵢⵓⵔ"}],
   3:[{q:"STAR",a:"ⵉⵜⵔⵉ"}]
 };
 
-const tifinagh = ["ⴰ","ⴱ","ⵛ","ⴷ","ⴻ","ⴼ","ⴳ","ⵀ","ⵉ","ⵊ","ⴽ","ⵍ","ⵎ","ⵏ","ⵓ","ⵔ","ⵙ","ⵜ","ⵡ","ⵢ","ⵣ","ⵉ","ⵔ"];
+const tifinagh = ["ⴰ","ⴱ","ⵛ","ⴷ","ⴻ","ⴼ","ⴳ","ⵀ","ⵉ","ⵊ","ⴽ","ⵍ","ⵎ","ⵏ","ⵓ","ⵔ","ⵙ","ⵜ","ⵡ","ⵢ","ⵣ"];
 
-let currentAnswer = "";
+let currentAnswer="";
 
 function playSound(){
-  if(soundOn){
-    document.getElementById("clickSound").play();
-  }
+  document.getElementById("clickSound").play();
 }
 
 function showLevels(){
   start.classList.add("hidden");
-  levelsDiv.classList.remove("hidden");
+  levels.classList.remove("hidden");
 }
 
 function startGame(lv){
-  levelsDiv.classList.add("hidden");
+  levels.classList.add("hidden");
   game.classList.remove("hidden");
-  levelTitle.innerText = "المرحلة " + lv;
-  question.innerText = levels[lv][0].q;
-  currentAnswer = levels[lv][0].a;
-  answer.value = "";
+  levelTitle.innerText="المرحلة "+lv;
+  question.innerText=levelsData[lv][0].q;
+  currentAnswer=levelsData[lv][0].a;
+  answer.value="";
   buildLetters();
 }
 
@@ -178,21 +129,8 @@ function checkAnswer(){
 
 function backToLevels(){
   game.classList.add("hidden");
-  levelsDiv.classList.remove("hidden");
+  levels.classList.remove("hidden");
 }
-
-settingsBtn.onclick=()=>{
-  overlay.classList.remove("hidden");
-};
-
-function closeSettings(){
-  overlay.classList.add("hidden");
-}
-
-soundToggle.onclick=()=>{
-  soundOn=!soundOn;
-  soundToggle.innerText = soundOn ? "🔊 الصوت: مفعّل" : "🔇 الصوت: متوقف";
-};
 </script>
 
 </body>
