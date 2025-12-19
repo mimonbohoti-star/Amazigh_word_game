@@ -3,30 +3,50 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>لعبة الحروف</title>
+<title>لعبة الكلمات الأمازيغية</title>
 
 <style>
 *{box-sizing:border-box}
 body{
   margin:0;
   min-height:100vh;
+  font-family:sans-serif;
+  background:linear-gradient(#0f3d3d,#1b6b6b);
+  color:#fff;
   display:flex;
   justify-content:center;
   align-items:center;
-  background:linear-gradient(#0f3d3d,#1b6b6b);
-  font-family:sans-serif;
-  color:#fff;
 }
-.game{
+
+/* شاشة البداية */
+#startScreen{
+  text-align:center;
+}
+#startScreen h1{
+  margin-bottom:20px;
+}
+#startScreen button{
+  padding:12px 24px;
+  font-size:18px;
+  border:none;
+  border-radius:25px;
+  background:#7acb7a;
+}
+
+/* اللعبة */
+#game{
+  display:none;
   width:100%;
   max-width:360px;
   padding:16px;
   text-align:center;
 }
+
 .question{
   font-size:20px;
   margin-bottom:16px;
 }
+
 .answer{
   display:flex;
   justify-content:center;
@@ -34,8 +54,8 @@ body{
   margin-bottom:18px;
 }
 .answer div{
-  width:42px;
-  height:42px;
+  width:44px;
+  height:44px;
   border-radius:10px;
   background:#223;
   display:flex;
@@ -44,6 +64,7 @@ body{
   font-size:22px;
   border-bottom:3px solid #6f6;
 }
+
 .letters{
   display:grid;
   grid-template-columns:repeat(5,1fr);
@@ -59,6 +80,7 @@ body{
   color:#fff;
 }
 .letters button:disabled{opacity:.4}
+
 .controls{
   display:flex;
   gap:10px;
@@ -72,21 +94,30 @@ body{
 }
 .next{background:#7acb7a}
 .clear{background:#e07a7a}
-.msg{margin-top:10px;color:#9f9}
+
+.msg{
+  margin-top:10px;
+  color:#9f9;
+}
 </style>
 </head>
 
 <body>
 
-<div class="game">
-  <div class="question">حيوان أليف</div>
+<!-- شاشة البداية -->
+<div id="startScreen">
+  <h1>ⴰⵣⵓⵍ ⵏ ⵜⴰⵎⴰⵣⵉⵖⵜ</h1>
+  <button onclick="startGame()">ابدأ اللعب</button>
+</div>
 
+<!-- اللعبة -->
+<div id="game">
+  <div class="question" id="question"></div>
   <div class="answer" id="answerBox"></div>
-
   <div class="letters" id="lettersBox"></div>
 
   <div class="controls">
-    <button class="next" onclick="loadQuestion()">سؤال آخر</button>
+    <button class="next" onclick="nextQuestion()">سؤال آخر</button>
     <button class="clear" onclick="removeLetter()">مسح حرف</button>
   </div>
 
@@ -95,24 +126,36 @@ body{
 
 <script>
 const questions = [
-  {q:"حيوان أليف", a:"ⴰⵣⴰⵔ"}
+  {q:"حيوان أليف", a:"ⴰⵢⴷⵉ"}, // كلب
+  {q:"حيوان", a:"ⴰⴼⵓⵙ"}      // ثور
 ];
 
-const extra = ["ⴱ","ⴳ","ⴷ","ⵎ","ⵔ","ⵙ","ⵍ"];
+const extraLetters = ["ⴱ","ⴳ","ⴷ","ⵎ","ⵔ","ⵙ","ⵍ","ⵣ","ⴼ","ⵉ"];
 
-let current, user=[];
+let index = 0;
+let current;
+let user = [];
 
+const questionEl = document.getElementById("question");
 const answerBox = document.getElementById("answerBox");
 const lettersBox = document.getElementById("lettersBox");
 const msg = document.getElementById("msg");
 
+function startGame(){
+  document.getElementById("startScreen").style.display="none";
+  document.getElementById("game").style.display="block";
+  loadQuestion();
+}
+
 function loadQuestion(){
   msg.textContent="";
   user=[];
-  lettersBox.innerHTML="";
   answerBox.innerHTML="";
+  lettersBox.innerHTML="";
 
-  current = questions[0];
+  current = questions[index];
+  questionEl.textContent = current.q;
+
   const answerLetters = current.a.split("");
 
   answerLetters.forEach(()=>{
@@ -120,18 +163,20 @@ function loadQuestion(){
     answerBox.appendChild(d);
   });
 
-  // توليد الحروف: الجواب كامل + تشويش
-  let letters=[...answerLetters];
-  while(letters.length<10){
-    letters.push(extra[Math.floor(Math.random()*extra.length)]);
+  // ✅ ضمان جميع حروف الجواب
+  let letters = [...answerLetters];
+
+  while(letters.length < 10){
+    letters.push(extraLetters[Math.floor(Math.random()*extraLetters.length)]);
   }
+
   letters.sort(()=>Math.random()-0.5);
 
   letters.forEach(l=>{
     const b=document.createElement("button");
     b.textContent=l;
     b.onclick=()=>{
-      if(user.length<answerLetters.length){
+      if(user.length < answerLetters.length){
         user.push(l);
         b.disabled=true;
         render();
@@ -143,32 +188,37 @@ function loadQuestion(){
 
 function render(){
   [...answerBox.children].forEach((d,i)=>{
-    d.textContent=user[i]||"";
+    d.textContent = user[i] || "";
   });
 
-  if(user.length===current.a.length){
-    if(user.join("")===current.a){
-      msg.textContent="✔ جواب صحيح";
+  if(user.length === current.a.length){
+    if(user.join("") === current.a){
+      msg.textContent = "✔ جواب صحيح";
     }else{
-      msg.textContent="✖ حاول مرة أخرى";
+      msg.textContent = "✖ غير صحيح";
     }
   }
 }
 
 function removeLetter(){
   if(!user.length) return;
-  const last=user.pop();
+  const last = user.pop();
+
   [...lettersBox.children].forEach(b=>{
     if(b.textContent===last && b.disabled){
       b.disabled=false;
       return;
     }
   });
+
   msg.textContent="";
   render();
 }
 
-loadQuestion();
+function nextQuestion(){
+  index = (index + 1) % questions.length;
+  loadQuestion();
+}
 </script>
 
 </body>
