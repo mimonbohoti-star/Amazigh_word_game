@@ -3,212 +3,187 @@
 <head>
 <meta charset="UTF-8">
 <title>لعبة الكلمات الأمازيغية</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-*{box-sizing:border-box}
-body{
-  margin:0; font-family:sans-serif;
-  background:linear-gradient(#0f3d3d,#1f6f6f);
-  color:#fff; text-align:center;
+body {
+  font-family: Arial, sans-serif;
+  direction: rtl;
+  text-align: center;
 }
-.hidden{display:none}
-button{
-  border:none; padding:12px 20px; border-radius:20px;
-  font-size:16px; cursor:pointer;
+
+#game {
+  max-width: 400px;
+  margin: auto;
 }
-.start-btn{background:#4dd0e1;color:#000}
-.next-btn{background:#81c784}
-.next-btn:disabled{opacity:.4;cursor:not-allowed}
-.delete-btn{background:#e57373}
-.top{margin-top:80px}
-.level{opacity:.85;margin-bottom:6px}
-.letters,.slots{
-  display:flex; justify-content:center; flex-wrap:wrap;
-  gap:10px; margin:15px;
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+  margin: 20px 0;
 }
-.letter,.slot{
-  width:55px;height:55px;background:#263238;
-  border-radius:10px;font-size:28px;
-  display:flex;align-items:center;justify-content:center;
+
+.cell {
+  border: 1px solid #000;
+  height: 50px;
+  line-height: 50px;
+  font-size: 24px;
 }
-.slot.filled{border-bottom:4px solid #6cff6c}
-.msg{margin-top:8px;min-height:22px}
+
+.letters button {
+  margin: 5px;
+  font-size: 20px;
+}
+
+button {
+  padding: 8px 12px;
+}
 </style>
 </head>
 
 <body>
 
-<!-- البداية -->
-<div id="startScreen" class="top">
-  <h1>ⵣ لعبة الكلمات الأمازيغية ⵣ</h1>
-  <button class="start-btn" onclick="startGame()">ابدأ</button>
-</div>
+<div id="game">
+  <h3>المرحلة: <span id="level">1</span></h3>
+  <h4>السؤال: <span id="questionIndex">1</span> / 3</h4>
+  <h4>النقاط: <span id="score">0</span></h4>
 
-<!-- اللعبة -->
-<div id="gameScreen" class="hidden">
-  <div class="level" id="levelText"></div>
-  <h2 id="question"></h2>
+  <p id="questionText"></p>
 
-  <div class="slots" id="slots"></div>
+  <div class="grid" id="answerGrid"></div>
+
   <div class="letters" id="letters"></div>
 
-  <button class="delete-btn" onclick="removeLetter()">مسح حرف</button>
-  <br><br>
-  <button id="nextBtn" class="next-btn" onclick="nextQuestion()" disabled>التالي</button>
-
-  <div class="msg" id="msg"></div>
+  <button onclick="clearAnswer()">مسح</button>
 </div>
 
 <script>
-/* =============================
-   المراحل + تنويع الأسئلة
-============================= */
+/* ====== بيانات اللعبة ====== */
+
 const levels = [
-  {
-    name:"المرحلة 1 (لغوي)",
-    questions:[
-      {q:"حيوان أليف", a:"ⴰⵢⴷⵉ"},
-      {q:"الماء", a:"ⴰⵎⴰⵏ"}
-    ]
-  },
-  {
-    name:"المرحلة 2 (ثقافي)",
-    questions:[
-      {q:"رمز الحرية الأمازيغية", a:"ⵣ"},
-      {q:"البيت بالأمازيغية", a:"ⴰⵅⵅⴰⵎ"}
-    ]
-  },
-  {
-    name:"المرحلة 3 (تاريخي)",
-    questions:[
-      {q:"ملك أمازيغي قاوم الرومان", a:"ⵢⵓⴳⵓⵔⵜⴰ"},
-      {q:"اسم شمال إفريقيا قديمًا", a:"ⵜⴰⵎⴰⵣⵖⴰ"}
-    ]
-  }
+  [
+    { q: "حيوان", a: "ⴰⵢⴷⵉ" },
+    { q: "شمس", a: "ⵜⴰⴼⵓⵢⵜ" },
+    { q: "قمر", a: "ⴰⵢⵓⵔ" }
+  ],
+  [
+    { q: "ماء", a: "ⴰⵎⴰⵏ" },
+    { q: "نار", a: "ⵜⴰⴼⵓⴽⵜ" },
+    { q: "أرض", a: "ⴰⴽⴰⵍ" }
+  ],
+  [
+    { q: "إنسان", a: "ⴰⴷⵎⵉ" },
+    { q: "بيت", a: "ⴰⵅⵅⴰⵎ" },
+    { q: "قلب", a: "ⵓⵍ" }
+  ]
+  // يمكن إضافة مراحل لاحقًا
 ];
 
-let levelIndex=0, questionIndex=0;
-let currentAnswer=[], filled=[];
-const extraLetters=["ⴰ","ⵓ","ⵉ","ⴳ","ⵣ","ⴷ","ⴼ","ⴽ","ⵔ","ⵙ"];
+/* ====== الحالة ====== */
 
-const levelText=document.getElementById("levelText");
-const questionEl=document.getElementById("question");
-const slotsEl=document.getElementById("slots");
-const lettersEl=document.getElementById("letters");
-const msgEl=document.getElementById("msg");
-const nextBtn=document.getElementById("nextBtn");
+let currentLevel = Number(localStorage.getItem("level")) || 0;
+let currentQuestion = Number(localStorage.getItem("question")) || 0;
+let score = Number(localStorage.getItem("score")) || 0;
+let userAnswer = "";
 
-/* =============================
-   بدء اللعبة
-============================= */
-function startGame(){
-  document.getElementById("startScreen").classList.add("hidden");
-  document.getElementById("gameScreen").classList.remove("hidden");
-  loadQuestion();
-}
+/* ====== عناصر ====== */
 
-/* =============================
-   تحميل سؤال
-============================= */
-function loadQuestion(){
-  msgEl.textContent="";
-  nextBtn.disabled=true;
+const levelSpan = document.getElementById("level");
+const questionSpan = document.getElementById("questionIndex");
+const scoreSpan = document.getElementById("score");
+const questionText = document.getElementById("questionText");
+const answerGrid = document.getElementById("answerGrid");
+const lettersDiv = document.getElementById("letters");
 
-  const lvl=levels[levelIndex];
-  const qObj=lvl.questions[questionIndex];
+/* ====== تحميل السؤال ====== */
 
-  levelText.textContent=lvl.name;
-  questionEl.textContent=qObj.q;
+function loadQuestion() {
+  const data = levels[currentLevel][currentQuestion];
 
-  currentAnswer=qObj.a.split("");
-  filled=[];
+  levelSpan.textContent = currentLevel + 1;
+  questionSpan.textContent = currentQuestion + 1;
+  scoreSpan.textContent = score;
+  questionText.textContent = data.q;
 
-  renderSlots();
-  renderLetters();
-}
+  userAnswer = "";
+  answerGrid.innerHTML = "";
+  lettersDiv.innerHTML = "";
 
-/* =============================
-   الواجهات
-============================= */
-function renderSlots(){
-  slotsEl.innerHTML="";
-  currentAnswer.forEach((_,i)=>{
-    const d=document.createElement("div");
-    d.className="slot";
-    d.textContent=filled[i]||"";
-    if(filled[i]) d.classList.add("filled");
-    slotsEl.appendChild(d);
+  // مربعات الجواب
+  for (let i = 0; i < data.a.length; i++) {
+    const cell = document.createElement("div");
+    cell.className = "cell";
+    answerGrid.appendChild(cell);
+  }
+
+  // الحروف (الجواب + حروف زائدة)
+  let letters = data.a.split("");
+  const extra = ["ⴰ","ⵉ","ⵔ","ⵙ","ⵎ"];
+  letters = letters.concat(extra).sort(() => Math.random() - 0.5);
+
+  letters.forEach(l => {
+    const btn = document.createElement("button");
+    btn.textContent = l;
+    btn.onclick = () => addLetter(l);
+    lettersDiv.appendChild(btn);
   });
 }
 
-function renderLetters(){
-  lettersEl.innerHTML="";
-  let letters=[...currentAnswer];
-  while(letters.length<currentAnswer.length+4){
-    letters.push(extraLetters[Math.floor(Math.random()*extraLetters.length)]);
-  }
-  letters.sort(()=>Math.random()-0.5);
+/* ====== إدخال ====== */
 
-  letters.forEach(l=>{
-    const b=document.createElement("div");
-    b.className="letter";
-    b.textContent=l;
-    b.onclick=()=>addLetter(l);
-    lettersEl.appendChild(b);
-  });
+function addLetter(letter) {
+  const cells = document.querySelectorAll(".cell");
+  if (userAnswer.length >= cells.length) return;
+
+  cells[userAnswer.length].textContent = letter;
+  userAnswer += letter;
+
+  checkAnswer();
 }
 
-/* =============================
-   إدخال/مسح
-============================= */
-function addLetter(l){
-  if(filled.length<currentAnswer.length){
-    filled.push(l);
-    renderSlots();
-    checkAnswer();
-  }
-}
-function removeLetter(){
-  if(!filled.length) return;
-  filled.pop();
-  msgEl.textContent="";
-  nextBtn.disabled=true;
-  renderSlots();
+function clearAnswer() {
+  userAnswer = "";
+  document.querySelectorAll(".cell").forEach(c => c.textContent = "");
 }
 
-/* =============================
-   التحقق + فتح التالي
-============================= */
-function checkAnswer(){
-  if(filled.length===currentAnswer.length){
-    if(filled.join("")===currentAnswer.join("")){
-      msgEl.textContent="✔ جواب صحيح";
-      nextBtn.disabled=false; // 🔓 فتح الانتقال
-    }else{
-      msgEl.textContent="✖ غير صحيح";
-      nextBtn.disabled=true;
+/* ====== التحقق ====== */
+
+function checkAnswer() {
+  const correct = levels[currentLevel][currentQuestion].a;
+
+  if (userAnswer.length === correct.length) {
+    if (userAnswer === correct) {
+      score += 100;
+      currentQuestion++;
+
+      if (currentQuestion === 3) {
+        currentLevel++;
+        currentQuestion = 0;
+      }
+
+      save();
+      if (currentLevel < levels.length) {
+        loadQuestion();
+      } else {
+        alert("مبروك! وصلت للنهاية");
+      }
+    } else {
+      clearAnswer();
     }
   }
 }
 
-/* =============================
-   الانتقال (مقفل حتى النجاح)
-============================= */
-function nextQuestion(){
-  if(nextBtn.disabled) return; // أمان إضافي
+/* ====== حفظ ====== */
 
-  questionIndex++;
-  if(questionIndex>=levels[levelIndex].questions.length){
-    levelIndex++;
-    questionIndex=0;
-    if(levelIndex>=levels.length){
-      alert("🎉 مبروك! كملتي جميع المراحل");
-      levelIndex=0;
-    }
-  }
-  loadQuestion();
+function save() {
+  localStorage.setItem("level", currentLevel);
+  localStorage.setItem("question", currentQuestion);
+  localStorage.setItem("score", score);
 }
+
+/* ====== تشغيل ====== */
+
+loadQuestion();
 </script>
 
 </body>
