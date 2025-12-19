@@ -13,8 +13,13 @@ body{
   color:#fff;
   text-align:center;
 }
+
 .hidden{display:none;}
-.container{padding:80px 20px;}
+
+.container{
+  padding:80px 20px;
+}
+
 button{
   background:#2ecc71;
   border:none;
@@ -24,6 +29,7 @@ button{
   cursor:pointer;
   margin:10px;
 }
+
 input{
   font-size:22px;
   padding:10px;
@@ -32,12 +38,14 @@ input{
   border:none;
   text-align:center;
 }
+
 .letters{
   display:grid;
   grid-template-columns:repeat(6,1fr);
   gap:10px;
   margin:20px;
 }
+
 .letters button{
   background:#1f2a3a;
   color:#fff;
@@ -66,8 +74,16 @@ input{
 <div id="game" class="container hidden">
   <h2 id="levelTitle"></h2>
   <div id="question" style="font-size:28px;margin:10px;"></div>
+
   <input id="answer" readonly>
+
+  <!-- زر المسح -->
+  <div>
+    <button onclick="eraseLetter()">⌫ مسح</button>
+  </div>
+
   <div class="letters" id="letters"></div>
+
   <button onclick="checkAnswer()">تحقق</button><br>
   <button onclick="backToLevels()">الرجوع للقائمة</button>
 </div>
@@ -83,7 +99,12 @@ const levelsData = {
   3:[{q:"STAR",a:"ⵉⵜⵔⵉ"}]
 };
 
-const tifinagh = ["ⴰ","ⴱ","ⵛ","ⴷ","ⴻ","ⴼ","ⴳ","ⵀ","ⵉ","ⵊ","ⴽ","ⵍ","ⵎ","ⵏ","ⵓ","ⵔ","ⵙ","ⵜ","ⵡ","ⵢ","ⵣ"];
+const tifinagh = [
+  "ⴰ","ⴱ","ⵛ","ⴷ","ⴻ","ⴼ",
+  "ⴳ","ⵀ","ⵉ","ⵊ","ⴽ","ⵍ",
+  "ⵎ","ⵏ","ⵓ","ⵔ","ⵙ","ⵜ",
+  "ⵡ","ⵢ","ⵣ"
+];
 
 let currentAnswer="";
 
@@ -117,6 +138,11 @@ function buildLetters(){
     };
     letters.appendChild(b);
   });
+}
+
+function eraseLetter(){
+  answer.value = answer.value.slice(0, -1);
+  playSound();
 }
 
 function checkAnswer(){
