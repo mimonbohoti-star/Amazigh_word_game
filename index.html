@@ -9,7 +9,7 @@
 body {
   margin: 0;
   font-family: Tahoma, Arial, sans-serif;
-  background: #0f0f0f;
+  background: #111;
   color: #fff;
   text-align: center;
 }
@@ -35,12 +35,6 @@ body {
   border: 2px solid #444;
   background: #1c1c1c;
   color: #fff;
-  caret-color: transparent; /* ⬅️ حل المؤشر */
-}
-
-.letter:focus {
-  outline: none;
-  border-color: #fff;
 }
 
 .correct {
@@ -53,18 +47,6 @@ body {
   background: #922b21;
 }
 
-.word-box.shake {
-  animation: shake 0.4s;
-}
-
-@keyframes shake {
-  0% { transform: translateX(0); }
-  25% { transform: translateX(-6px); }
-  50% { transform: translateX(6px); }
-  75% { transform: translateX(-6px); }
-  100% { transform: translateX(0); }
-}
-
 button {
   margin-top: 20px;
   padding: 12px 28px;
@@ -74,15 +56,6 @@ button {
   background: #3498db;
   color: #fff;
   cursor: pointer;
-  opacity: 0.5;
-}
-
-button.enabled {
-  opacity: 1;
-}
-
-button:disabled {
-  cursor: not-allowed;
 }
 </style>
 </head>
@@ -96,9 +69,7 @@ button:disabled {
 
   <div id="message">أدخل الكلمة</div>
 
-  <button id="nextBtn" onclick="nextLevel()" disabled>
-    المرحلة التالية
-  </button>
+  <button onclick="nextLevel()">المرحلة التالية</button>
 </div>
 
 <script>
@@ -108,34 +79,29 @@ const levels = [
   { answer: "TAFSUT" }
 ];
 
-let currentLevel = Number(localStorage.getItem("amazighLevel")) || 0;
+let currentLevel = 0;
 let inputs = [];
-const nextBtn = document.getElementById("nextBtn");
 
 function loadLevel() {
   const wordBox = document.getElementById("wordBox");
   wordBox.innerHTML = "";
   inputs = [];
 
-  nextBtn.disabled = true;
-  nextBtn.classList.remove("enabled");
-
-  document.getElementById("message").textContent = "أدخل الكلمة";
   document.getElementById("levelInfo").textContent =
     "المرحلة " + (currentLevel + 1);
+  document.getElementById("message").textContent = "أدخل الكلمة";
 
   const answer = levels[currentLevel].answer;
 
   for (let i = 0; i < answer.length; i++) {
     const input = document.createElement("input");
-    input.type = "text";
-    input.inputMode = "latin";
-    input.autocomplete = "off";
     input.maxLength = 1;
     input.className = "letter";
 
-    input.addEventListener("input", () => handleInput(i));
-    input.addEventListener("keydown", e => handleBackspace(e, i));
+    input.addEventListener("input", () => {
+      input.value = input.value.toUpperCase();
+      checkWord();
+    });
 
     inputs.push(input);
     wordBox.appendChild(input);
@@ -144,49 +110,20 @@ function loadLevel() {
   inputs[0].focus();
 }
 
-function handleInput(index) {
-  inputs[index].value = inputs[index].value.toUpperCase();
-
-  if (inputs[index].value && index < inputs.length - 1) {
-    inputs[index + 1].focus();
-  }
-
-  checkWord();
-}
-
-function handleBackspace(e, index) {
-  if (e.key === "Backspace" && !inputs[index].value && index > 0) {
-    inputs[index - 1].focus();
-  }
-}
-
-function resetStyles() {
-  inputs.forEach(i => i.classList.remove("correct", "wrong"));
-}
-
 function checkWord() {
   const answer = levels[currentLevel].answer;
   const userWord = inputs.map(i => i.value).join("");
 
   if (userWord.length < answer.length) return;
 
-  resetStyles();
+  inputs.forEach(i => i.classList.remove("correct", "wrong"));
 
   if (userWord === answer) {
     inputs.forEach(i => i.classList.add("correct"));
-    document.getElementById("message").textContent = "✔ جواب صحيح";
-
-    nextBtn.disabled = false;
-    nextBtn.classList.add("enabled");
-
-    localStorage.setItem("amazighLevel", currentLevel + 1);
+    document.getElementById("message").textContent = "✔ صحيح";
   } else {
     inputs.forEach(i => i.classList.add("wrong"));
-    const box = document.getElementById("wordBox");
-    box.classList.add("shake");
-    setTimeout(() => box.classList.remove("shake"), 400);
-
-    document.getElementById("message").textContent = "✖ حاول مرة أخرى";
+    document.getElementById("message").textContent = "✖ خطأ";
   }
 }
 
@@ -195,8 +132,8 @@ function nextLevel() {
     currentLevel++;
     loadLevel();
   } else {
-    document.getElementById("message").textContent = "🎉 أكملت جميع المراحل";
-    nextBtn.disabled = true;
+    document.getElementById("message").textContent =
+      "🎉 أكملت جميع المراحل";
   }
 }
 
