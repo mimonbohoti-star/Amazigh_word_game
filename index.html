@@ -2,142 +2,195 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>لعبة الكلمات الأمازيغية</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لعبة الكلمات الأمازيغية</title>
 
 <style>
-body {
-  margin: 0;
-  font-family: Tahoma, Arial, sans-serif;
-  background: #111;
-  color: #fff;
-  text-align: center;
+/* ====== ألوان عامة ====== */
+body{
+  margin:0;
+  font-family:sans-serif;
+  background: linear-gradient(180deg, #0e1624, #12263a);
+  color:#eaf2f8;
 }
 
-.stage {
-  padding: 30px 15px;
+/* توسيط الصفحات */
+.page{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
 }
 
-.word-box {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin: 30px 0;
-  direction: ltr;
+.hidden{display:none;}
+
+/* ====== حرف ⵣ ====== */
+#start div{
+  font-size:96px;
+  color:#2ecc71; /* أخضر هادئ */
+  margin-bottom:20px;
 }
 
-.letter {
-  width: 55px;
-  height: 65px;
-  font-size: 30px;
-  text-align: center;
-  border-radius: 10px;
-  border: 2px solid #444;
-  background: #1c1c1c;
-  color: #fff;
+/* ====== العناوين ====== */
+h2{
+  color:#a9d6e5; /* أزرق فاتح */
+  margin-bottom:10px;
 }
 
-.correct {
-  border-color: #2ecc71;
-  background: #1e7e34;
+/* ====== السؤال ====== */
+#question{
+  font-size:28px;
+  margin:10px;
+  color:#f6e58d; /* أصفر خفيف */
+  font-weight:bold;
 }
 
-.wrong {
-  border-color: #e74c3c;
-  background: #922b21;
+/* ====== الأزرار ====== */
+button{
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
+  border:none;
+  padding:12px 22px;
+  border-radius:10px;
+  font-size:18px;
+  cursor:pointer;
+  margin:8px;
+  color:#fff;
 }
 
-button {
-  margin-top: 20px;
-  padding: 12px 28px;
-  font-size: 16px;
-  border: none;
-  border-radius: 8px;
-  background: #3498db;
-  color: #fff;
-  cursor: pointer;
+button:active{
+  transform:scale(0.96);
+}
+
+/* ====== خانة الجواب ====== */
+input{
+  font-size:22px;
+  padding:10px;
+  width:80%;
+  border-radius:8px;
+  border:none;
+  text-align:center;
+  margin-top:10px;
+}
+
+/* ====== أزرار الحروف ====== */
+.letters{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:10px;
+  margin:20px;
+}
+
+.letters button{
+  width:56px;
+  height:56px;
+  font-size:24px;
+  font-weight:bold;
+  border-radius:10px;
+  background:#1e3a5f; /* أزرق غامق */
+  color:#eaf2f8;
 }
 </style>
 </head>
 
 <body>
 
-<div class="stage">
-  <h2 id="levelInfo"></h2>
-
-  <div class="word-box" id="wordBox"></div>
-
-  <div id="message">أدخل الكلمة</div>
-
-  <button onclick="nextLevel()">المرحلة التالية</button>
+<!-- صفحة الدخول -->
+<div id="start" class="page">
+  <div>ⵣ</div>
+  <button onclick="showLevels()">ابدأ</button>
 </div>
 
+<!-- اختيار المرحلة -->
+<div id="levels" class="page hidden">
+  <h2>اختر المرحلة</h2>
+  <button onclick="startGame(1)">المرحلة 1</button>
+  <button onclick="startGame(2)">المرحلة 2</button>
+  <button onclick="startGame(3)">المرحلة 3</button>
+</div>
+
+<!-- اللعبة -->
+<div id="game" class="page hidden">
+  <h2 id="levelTitle"></h2>
+  <div id="question"></div>
+
+  <input id="answer" readonly>
+
+  <button onclick="eraseLetter()">⌫ مسح</button>
+
+  <div class="letters" id="letters"></div>
+
+  <button onclick="checkAnswer()">تحقق</button>
+  <button onclick="backToLevels()">الرجوع للقائمة</button>
+</div>
+
+<audio id="clickSound">
+  <source src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg">
+</audio>
+
 <script>
-const levels = [
-  { answer: "AZUL" },
-  { answer: "AMUR" },
-  { answer: "TAFSUT" }
+const levelsData = {
+  1:[{q:"SUN",a:"ⵜⵉⵎⵉ"}],
+  2:[{q:"MOON",a:"ⴰⵢⵓⵔ"}],
+  3:[{q:"STAR",a:"ⵉⵜⵔⵉ"}]
+};
+
+const tifinagh = [
+ "ⴰ","ⴱ","ⵛ","ⴷ","ⴻ","ⴼ",
+ "ⴳ","ⵀ","ⵉ","ⵊ","ⴽ","ⵍ",
+ "ⵎ","ⵏ","ⵓ","ⵔ","ⵙ","ⵜ",
+ "ⵡ","ⵢ","ⵣ"
 ];
 
-let currentLevel = 0;
-let inputs = [];
+let currentAnswer="";
 
-function loadLevel() {
-  const wordBox = document.getElementById("wordBox");
-  wordBox.innerHTML = "";
-  inputs = [];
-
-  document.getElementById("levelInfo").textContent =
-    "المرحلة " + (currentLevel + 1);
-  document.getElementById("message").textContent = "أدخل الكلمة";
-
-  const answer = levels[currentLevel].answer;
-
-  for (let i = 0; i < answer.length; i++) {
-    const input = document.createElement("input");
-    input.maxLength = 1;
-    input.className = "letter";
-
-    input.addEventListener("input", () => {
-      input.value = input.value.toUpperCase();
-      checkWord();
-    });
-
-    inputs.push(input);
-    wordBox.appendChild(input);
-  }
-
-  inputs[0].focus();
+function playSound(){
+  document.getElementById("clickSound").play();
 }
 
-function checkWord() {
-  const answer = levels[currentLevel].answer;
-  const userWord = inputs.map(i => i.value).join("");
-
-  if (userWord.length < answer.length) return;
-
-  inputs.forEach(i => i.classList.remove("correct", "wrong"));
-
-  if (userWord === answer) {
-    inputs.forEach(i => i.classList.add("correct"));
-    document.getElementById("message").textContent = "✔ صحيح";
-  } else {
-    inputs.forEach(i => i.classList.add("wrong"));
-    document.getElementById("message").textContent = "✖ خطأ";
-  }
+function showLevels(){
+  start.classList.add("hidden");
+  levels.classList.remove("hidden");
 }
 
-function nextLevel() {
-  if (currentLevel < levels.length - 1) {
-    currentLevel++;
-    loadLevel();
-  } else {
-    document.getElementById("message").textContent =
-      "🎉 أكملت جميع المراحل";
-  }
+function startGame(lv){
+  levels.classList.add("hidden");
+  game.classList.remove("hidden");
+  levelTitle.innerText="المرحلة "+lv;
+  question.innerText=levelsData[lv][0].q;
+  currentAnswer=levelsData[lv][0].a;
+  answer.value="";
+  buildLetters();
 }
 
-loadLevel();
+function buildLetters(){
+  letters.innerHTML="";
+  tifinagh.forEach(l=>{
+    const b=document.createElement("button");
+    b.textContent=l;
+    b.onclick=()=>{
+      answer.value+=l;
+      playSound();
+    };
+    letters.appendChild(b);
+  });
+}
+
+function eraseLetter(){
+  answer.value = answer.value.slice(0,-1);
+  playSound();
+}
+
+function checkAnswer(){
+  alert(answer.value===currentAnswer ? "✔️ صحيح" : "❌ خطأ");
+}
+
+function backToLevels(){
+  game.classList.add("hidden");
+  levels.classList.remove("hidden");
+}
 </script>
 
 </body>
