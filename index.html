@@ -18,10 +18,6 @@ body {
   padding: 20px;
 }
 
-h1 {
-  margin-bottom: 10px;
-}
-
 .word-box {
   display: flex;
   justify-content: center;
@@ -41,12 +37,12 @@ h1 {
   color: #fff;
 }
 
-.letter.correct {
+.correct {
   border-color: #2ecc71;
   background: #1e7e34;
 }
 
-.letter.wrong {
+.wrong {
   border-color: #e74c3c;
   background: #922b21;
 }
@@ -63,23 +59,13 @@ h1 {
   100% { transform: translateX(0); }
 }
 
-.info {
-  margin-top: 10px;
-  font-size: 18px;
-}
-
 button {
-  margin-top: 20px;
   padding: 10px 25px;
-  font-size: 16px;
   border: none;
   border-radius: 6px;
   background: #3498db;
   color: #fff;
   cursor: pointer;
-}
-button:hover {
-  background: #2980b9;
 }
 </style>
 </head>
@@ -87,13 +73,13 @@ button:hover {
 <body>
 
 <div class="stage">
-  <h1>🧩 لعبة الكلمات الأمازيغية</h1>
-  <div id="levelInfo">المرحلة 1</div>
+  <h2 id="levelInfo"></h2>
 
   <div class="word-box" id="wordBox"></div>
 
-  <div class="info" id="message">أدخل الكلمة</div>
+  <div id="message">أدخل الكلمة</div>
 
+  <br>
   <button onclick="nextLevel()">المرحلة التالية</button>
 </div>
 
@@ -104,24 +90,28 @@ const levels = [
   { answer: "TAFSUT" }
 ];
 
-let currentLevel = 0;
+let currentLevel = Number(localStorage.getItem("amazighLevel")) || 0;
 let inputs = [];
 
 function loadLevel() {
   const wordBox = document.getElementById("wordBox");
-  const msg = document.getElementById("message");
   wordBox.innerHTML = "";
-  msg.textContent = "أدخل الكلمة";
-  document.getElementById("levelInfo").textContent = "المرحلة " + (currentLevel + 1);
+  inputs = [];
+
+  document.getElementById("message").textContent = "أدخل الكلمة";
+  document.getElementById("levelInfo").textContent =
+    "المرحلة " + (currentLevel + 1);
 
   const answer = levels[currentLevel].answer;
-  inputs = [];
 
   for (let i = 0; i < answer.length; i++) {
     const input = document.createElement("input");
     input.maxLength = 1;
     input.className = "letter";
-    input.oninput = () => handleInput(i);
+
+    input.addEventListener("input", () => handleInput(i));
+    input.addEventListener("keydown", e => handleBackspace(e, i));
+
     inputs.push(input);
     wordBox.appendChild(input);
   }
@@ -130,32 +120,45 @@ function loadLevel() {
 }
 
 function handleInput(index) {
-  const val = inputs[index].value.toUpperCase();
-  inputs[index].value = val;
+  inputs[index].value = inputs[index].value.toUpperCase();
 
-  if (val && index < inputs.length - 1) {
+  if (inputs[index].value && index < inputs.length - 1) {
     inputs[index + 1].focus();
   }
 
   checkWord();
 }
 
+function handleBackspace(e, index) {
+  if (e.key === "Backspace" && !inputs[index].value && index > 0) {
+    inputs[index - 1].focus();
+  }
+}
+
+function resetStyles() {
+  inputs.forEach(i => {
+    i.classList.remove("correct", "wrong");
+  });
+}
+
 function checkWord() {
   const answer = levels[currentLevel].answer;
-  let userWord = inputs.map(i => i.value).join("");
+  const userWord = inputs.map(i => i.value).join("");
 
   if (userWord.length < answer.length) return;
 
+  resetStyles();
+
   if (userWord === answer) {
     inputs.forEach(i => i.classList.add("correct"));
-    document.getElementById("message").textContent = "✔ جواب صحيح";
+    document.getElementById("message").textContent = "✔ صحيح";
     localStorage.setItem("amazighLevel", currentLevel + 1);
   } else {
     inputs.forEach(i => i.classList.add("wrong"));
     const box = document.getElementById("wordBox");
     box.classList.add("shake");
     setTimeout(() => box.classList.remove("shake"), 400);
-    document.getElementById("message").textContent = "✖ حاول مرة أخرى";
+    document.getElementById("message").textContent = "✖ خطأ، حاول مرة أخرى";
   }
 }
 
@@ -164,12 +167,9 @@ function nextLevel() {
     currentLevel++;
     loadLevel();
   } else {
-    document.getElementById("message").textContent = "🎉 أكملت جميع المراحل";
+    document.getElementById("message").textContent = "🎉 كملت اللعبة";
   }
 }
-
-const saved = localStorage.getItem("amazighLevel");
-if (saved) currentLevel = parseInt(saved);
 
 loadLevel();
 </script>
