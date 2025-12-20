@@ -35,6 +35,12 @@ body {
   border: 2px solid #444;
   background: #1c1c1c;
   color: #fff;
+  caret-color: transparent; /* ⬅️ حل المؤشر */
+}
+
+.letter:focus {
+  outline: none;
+  border-color: #fff;
 }
 
 .correct {
@@ -104,7 +110,6 @@ const levels = [
 
 let currentLevel = Number(localStorage.getItem("amazighLevel")) || 0;
 let inputs = [];
-
 const nextBtn = document.getElementById("nextBtn");
 
 function loadLevel() {
@@ -123,6 +128,9 @@ function loadLevel() {
 
   for (let i = 0; i < answer.length; i++) {
     const input = document.createElement("input");
+    input.type = "text";
+    input.inputMode = "latin";
+    input.autocomplete = "off";
     input.maxLength = 1;
     input.className = "letter";
 
