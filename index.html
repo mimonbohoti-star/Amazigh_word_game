@@ -98,25 +98,28 @@ input{
 const stages = [
   {
     title:"المرحلة 1",
-    word:"SUN",
+    answer:"SUN",
     showWord:true,
+    word:"SUN",
     image:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Sun_white.jpg/320px-Sun_white.jpg"
   },
   {
     title:"المرحلة 2",
-    word:"",
+    answer:"MOON",
     showWord:false,
+    word:"",
     image:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/FullMoon2010.jpg/320px-FullMoon2010.jpg"
   },
   {
     title:"المرحلة 3",
-    word:"STAR",
+    answer:"STAR",
     showWord:true,
+    word:"STAR",
     image:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Starsinthesky.jpg/320px-Starsinthesky.jpg"
   }
 ];
 
-const letters=["ⴰ","ⵛ","ⴻ","ⵓ","ⵉ","ⵔ","ⵏ","ⵎ","ⴽ","ⵙ","ⵍ","ⵟ"];
+const letters=["S","U","N","M","O","T","A","R"];
 let currentStage=0;
 
 function goToStages(){showScreen("stageScreen");}
@@ -157,7 +160,25 @@ function buildKeyboard(){
 }
 
 function clearInput(){answerInput.value="";}
-function checkAnswer(){alert("تم التحقق");}
+
+function checkAnswer(){
+  const user = answerInput.value.trim().toUpperCase();
+  const correct = stages[currentStage].answer;
+
+  if(user === correct){
+    alert("✔️ صحيح");
+    if(currentStage < stages.length - 1){
+      currentStage++;
+      loadStage();
+    }else{
+      alert("🎉 كملتي جميع المراحل");
+      showScreen("stageScreen");
+    }
+  }else{
+    alert("❌ خطأ، حاول مرة أخرى");
+    clearInput();
+  }
+}
 </script>
 
 </body>
