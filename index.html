@@ -72,6 +72,11 @@ input{
 
 <body>
 
+<!-- ===== الأصوات ===== -->
+<audio id="clickSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_7c8a8a4c3c.mp3"></audio>
+<audio id="successSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_4f6a0a9c48.mp3"></audio>
+<audio id="errorSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_8b3f6d3a5a.mp3"></audio>
+
 <div class="screen active" id="startScreen">
   <div class="logo">ⵣ</div>
   <button onclick="goToStages()">ابدأ</button>
@@ -98,21 +103,21 @@ input{
 const stages = [
   {
     title:"المرحلة 1",
-    answer:"ⵜⴰⴼⵓⵢⵜ",   // الشمس
+    answer:"ⵜⴰⴼⵓⵢⵜ",
     showWord:true,
     word:"ⵜⴰⴼⵓⵢⵜ",
     image:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Sun_white.jpg/320px-Sun_white.jpg"
   },
   {
     title:"المرحلة 2",
-    answer:"ⴰⵢⵢⵓⵔ",   // القمر
+    answer:"ⴰⵢⵢⵓⵔ",
     showWord:false,
     word:"",
     image:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/FullMoon2010.jpg/320px-FullMoon2010.jpg"
   },
   {
     title:"المرحلة 3",
-    answer:"ⵉⵜⵔⵉ",   // نجم
+    answer:"ⵉⵜⵔⵉ",
     showWord:true,
     word:"ⵉⵜⵔⵉ",
     image:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Starsinthesky.jpg/320px-Starsinthesky.jpg"
@@ -120,6 +125,16 @@ const stages = [
 ];
 
 let currentStage = 0;
+
+// ===== الأصوات =====
+const clickSound   = document.getElementById("clickSound");
+const successSound = document.getElementById("successSound");
+const errorSound   = document.getElementById("errorSound");
+
+function play(sound){
+  sound.currentTime = 0;
+  sound.play();
+}
 
 function goToStages(){
   showScreen("stageScreen");
@@ -155,13 +170,16 @@ function loadStage(){
 function buildKeyboard(){
   keyboard.innerHTML = "";
   const answer = stages[currentStage].answer;
-  const letters = [...new Set(answer.split(""))]; // بلا تكرار
+  const letters = [...new Set(answer.split(""))];
 
   letters.forEach(l=>{
     const d = document.createElement("div");
     d.className = "key";
     d.innerText = l;
-    d.onclick = ()=> answerInput.value += l;
+    d.onclick = ()=>{
+      play(clickSound);
+      answerInput.value += l;
+    };
     keyboard.appendChild(d);
   });
 }
@@ -175,6 +193,7 @@ function checkAnswer(){
   const correct = stages[currentStage].answer;
 
   if(user === correct){
+    play(successSound);
     alert("✔️ صحيح");
     if(currentStage < stages.length - 1){
       currentStage++;
@@ -184,6 +203,7 @@ function checkAnswer(){
       showScreen("stageScreen");
     }
   }else{
+    play(errorSound);
     alert("❌ خطأ");
     clearInput();
   }
