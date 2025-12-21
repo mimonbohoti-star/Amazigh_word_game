@@ -31,6 +31,10 @@ button{
   cursor:pointer;
   margin:10px;
 }
+button.locked{
+  background:#555;
+  cursor:not-allowed;
+}
 .logo{
   font-size:80px;
   color:#2ecc71;
@@ -67,8 +71,6 @@ input{
   border-radius:10px;
   cursor:pointer;
 }
-
-/* ===== رسالة التحقق ===== */
 #message{
   min-height:30px;
   font-size:20px;
@@ -88,9 +90,9 @@ input{
 
 <div class="screen" id="stageScreen">
   <h2>اختر المرحلة</h2>
-  <button onclick="startStage(0)">المرحلة 1</button>
-  <button onclick="startStage(1)">المرحلة 2</button>
-  <button onclick="startStage(2)">المرحلة 3</button>
+  <button id="stageBtn0" onclick="startStage(0)">المرحلة 1</button>
+  <button id="stageBtn1" onclick="startStage(1)">المرحلة 2</button>
+  <button id="stageBtn2" onclick="startStage(2)">المرحلة 3</button>
 </div>
 
 <div class="screen" id="gameScreen">
@@ -132,15 +134,33 @@ const stages = [
 ];
 
 let currentStage = 0;
+let unlockedStage = Number(localStorage.getItem("unlockedStage")) || 0;
 
 function goToStages(){
+  updateStageButtons();
   showScreen("stageScreen");
 }
+
+function updateStageButtons(){
+  stages.forEach((_,i)=>{
+    const btn = document.getElementById("stageBtn"+i);
+    if(i <= unlockedStage){
+      btn.classList.remove("locked");
+      btn.disabled = false;
+    }else{
+      btn.classList.add("locked");
+      btn.disabled = true;
+    }
+  });
+}
+
 function startStage(i){
+  if(i > unlockedStage) return;
   currentStage = i;
   loadStage();
   showScreen("gameScreen");
 }
+
 function showScreen(id){
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
@@ -162,15 +182,12 @@ function loadStage(){
 
   questionImage.src = stage.image;
   questionImage.style.display = "block";
-
   buildKeyboard();
 }
 
 function buildKeyboard(){
   keyboard.innerHTML = "";
-  const answer = stages[currentStage].answer;
-  const letters = [...new Set(answer.split(""))];
-
+  const letters = [...new Set(stages[currentStage].answer.split(""))];
   letters.forEach(l=>{
     const d = document.createElement("div");
     d.className = "key";
@@ -189,28 +206,18 @@ function clearInput(){
 function showMessage(text, type){
   message.innerText = text;
   message.className = type;
-  setTimeout(()=>{
-    message.innerText = "";
-    message.className = "";
-  },1500);
 }
 
 function checkAnswer(){
-  const user = answerInput.value.trim();
-  const correct = stages[currentStage].answer;
-
-  if(user === correct){
+  if(answerInput.value.trim() === stages[currentStage].answer){
     showMessage("✔️ أحسنت", "success");
-    if(currentStage < stages.length - 1){
-      setTimeout(()=>{
-        currentStage++;
-        loadStage();
-      },1500);
-    }else{
-      setTimeout(()=>{
-        showScreen("stageScreen");
-      },1500);
+
+    if(currentStage === unlockedStage && unlockedStage < stages.length-1){
+      unlockedStage++;
+      localStorage.setItem("unlockedStage", unlockedStage);
     }
+
+    setTimeout(()=>goToStages(), 1200);
   }else{
     showMessage("❌ حاول مرة أخرى", "error");
     clearInput();
