@@ -6,46 +6,74 @@
 <title>لعبة الكلمات الأمازيغية</title>
 
 <style>
+/* ===== خلفية العلم الأمازيغي ===== */
 body{
   margin:0;
   font-family:sans-serif;
-  background:linear-gradient(180deg,#0e1624,#12263a);
   color:#fff;
   text-align:center;
+  background: linear-gradient(
+    180deg,
+    #1e90ff 0%,   /* أزرق */
+    #1e90ff 33%,
+    #2ecc71 33%, /* أخضر */
+    #2ecc71 66%,
+    #f1c40f 66%, /* أصفر */
+    #f1c40f 100%
+  );
+  position:relative;
+  overflow:hidden;
 }
+
+/* ===== رمز ⵣ في الوسط (خلفي) ===== */
+body::before{
+  content:"ⵣ";
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  font-size:300px;
+  color:rgba(192,57,43,0.15); /* أحمر شفاف */
+  pointer-events:none;
+  z-index:0;
+}
+
 .screen{
   display:none;
   min-height:100vh;
   justify-content:center;
   align-items:center;
   flex-direction:column;
+  position:relative;
+  z-index:1; /* فوق الرمز */
 }
 .screen.active{display:flex;}
+
 button{
-  background:#2ecc71;
+  background:#c0392b; /* أحمر العلم */
   border:none;
   color:#fff;
   padding:14px 30px;
   font-size:18px;
-  border-radius:8px;
+  border-radius:10px;
   cursor:pointer;
   margin:10px;
 }
-button.locked{
-  background:#555;
-  cursor:not-allowed;
-}
+
 .logo{
-  font-size:80px;
-  color:#2ecc71;
+  font-size:90px;
+  color:#c0392b;
   margin-bottom:20px;
 }
+
 #questionImage{
   max-width:220px;
   margin:15px auto;
   display:none;
-  border-radius:12px;
+  border-radius:14px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.3);
 }
+
 input{
   padding:12px;
   font-size:22px;
@@ -53,10 +81,11 @@ input{
   max-width:300px;
   text-align:left;
   direction:ltr;
-  border-radius:8px;
+  border-radius:10px;
   border:none;
   margin-bottom:10px;
 }
+
 .keyboard{
   display:grid;
   grid-template-columns:repeat(4,70px);
@@ -64,20 +93,23 @@ input{
   justify-content:center;
   margin-top:15px;
 }
+
 .key{
-  background:#1e3553;
+  background:rgba(14,22,36,0.8);
   padding:18px;
   font-size:24px;
-  border-radius:10px;
+  border-radius:12px;
   cursor:pointer;
 }
+
+/* ===== رسالة التحقق ===== */
 #message{
   min-height:30px;
   font-size:20px;
   margin:10px;
 }
-.success{color:#2ecc71;}
-.error{color:#e74c3c;}
+.success{color:#0b3;}
+.error{color:#c0392b;}
 </style>
 </head>
 
@@ -90,9 +122,9 @@ input{
 
 <div class="screen" id="stageScreen">
   <h2>اختر المرحلة</h2>
-  <button id="stageBtn0" onclick="startStage(0)">المرحلة 1</button>
-  <button id="stageBtn1" onclick="startStage(1)">المرحلة 2</button>
-  <button id="stageBtn2" onclick="startStage(2)">المرحلة 3</button>
+  <button onclick="startStage(0)">المرحلة 1</button>
+  <button onclick="startStage(1)">المرحلة 2</button>
+  <button onclick="startStage(2)">المرحلة 3</button>
 </div>
 
 <div class="screen" id="gameScreen">
@@ -134,33 +166,15 @@ const stages = [
 ];
 
 let currentStage = 0;
-let unlockedStage = Number(localStorage.getItem("unlockedStage")) || 0;
 
 function goToStages(){
-  updateStageButtons();
   showScreen("stageScreen");
 }
-
-function updateStageButtons(){
-  stages.forEach((_,i)=>{
-    const btn = document.getElementById("stageBtn"+i);
-    if(i <= unlockedStage){
-      btn.classList.remove("locked");
-      btn.disabled = false;
-    }else{
-      btn.classList.add("locked");
-      btn.disabled = true;
-    }
-  });
-}
-
 function startStage(i){
-  if(i > unlockedStage) return;
   currentStage = i;
   loadStage();
   showScreen("gameScreen");
 }
-
 function showScreen(id){
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
@@ -182,12 +196,15 @@ function loadStage(){
 
   questionImage.src = stage.image;
   questionImage.style.display = "block";
+
   buildKeyboard();
 }
 
 function buildKeyboard(){
   keyboard.innerHTML = "";
-  const letters = [...new Set(stages[currentStage].answer.split(""))];
+  const answer = stages[currentStage].answer;
+  const letters = [...new Set(answer.split(""))];
+
   letters.forEach(l=>{
     const d = document.createElement("div");
     d.className = "key";
@@ -206,18 +223,28 @@ function clearInput(){
 function showMessage(text, type){
   message.innerText = text;
   message.className = type;
+  setTimeout(()=>{
+    message.innerText = "";
+    message.className = "";
+  },1500);
 }
 
 function checkAnswer(){
-  if(answerInput.value.trim() === stages[currentStage].answer){
+  const user = answerInput.value.trim();
+  const correct = stages[currentStage].answer;
+
+  if(user === correct){
     showMessage("✔️ أحسنت", "success");
-
-    if(currentStage === unlockedStage && unlockedStage < stages.length-1){
-      unlockedStage++;
-      localStorage.setItem("unlockedStage", unlockedStage);
+    if(currentStage < stages.length - 1){
+      setTimeout(()=>{
+        currentStage++;
+        loadStage();
+      },1500);
+    }else{
+      setTimeout(()=>{
+        showScreen("stageScreen");
+      },1500);
     }
-
-    setTimeout(()=>goToStages(), 1200);
   }else{
     showMessage("❌ حاول مرة أخرى", "error");
     clearInput();
