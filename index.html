@@ -44,7 +44,7 @@ button{
 }
 input{
   padding:12px;
-  font-size:20px;
+  font-size:22px;
   width:80%;
   max-width:300px;
   text-align:left;
@@ -63,7 +63,7 @@ input{
 .key{
   background:#1e3553;
   padding:18px;
-  font-size:22px;
+  font-size:24px;
   border-radius:10px;
   cursor:pointer;
 }
@@ -98,71 +98,80 @@ input{
 const stages = [
   {
     title:"المرحلة 1",
-    answer:"SUN",
+    answer:"ⵜⴰⴼⵓⵢⵜ",   // الشمس
     showWord:true,
-    word:"SUN",
+    word:"ⵜⴰⴼⵓⵢⵜ",
     image:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Sun_white.jpg/320px-Sun_white.jpg"
   },
   {
     title:"المرحلة 2",
-    answer:"MOON",
+    answer:"ⴰⵢⵢⵓⵔ",   // القمر
     showWord:false,
     word:"",
     image:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/FullMoon2010.jpg/320px-FullMoon2010.jpg"
   },
   {
     title:"المرحلة 3",
-    answer:"STAR",
+    answer:"ⵉⵜⵔⵉ",   // نجم
     showWord:true,
-    word:"STAR",
+    word:"ⵉⵜⵔⵉ",
     image:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Starsinthesky.jpg/320px-Starsinthesky.jpg"
   }
 ];
 
-const letters=["S","U","N","M","O","T","A","R"];
-let currentStage=0;
+let currentStage = 0;
 
-function goToStages(){showScreen("stageScreen");}
-function startStage(i){currentStage=i;loadStage();showScreen("gameScreen");}
-
+function goToStages(){
+  showScreen("stageScreen");
+}
+function startStage(i){
+  currentStage = i;
+  loadStage();
+  showScreen("gameScreen");
+}
 function showScreen(id){
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 }
 
 function loadStage(){
-  const stage=stages[currentStage];
-  stageTitle.innerText=stage.title;
-  answerInput.value="";
+  const stage = stages[currentStage];
+  stageTitle.innerText = stage.title;
+  answerInput.value = "";
 
   if(stage.showWord){
-    wordDisplay.innerText=stage.word;
-    wordDisplay.style.display="block";
+    wordDisplay.innerText = stage.word;
+    wordDisplay.style.display = "block";
   }else{
-    wordDisplay.style.display="none";
+    wordDisplay.style.display = "none";
   }
 
-  questionImage.src=stage.image;
-  questionImage.style.display="block";
+  questionImage.src = stage.image;
+  questionImage.style.display = "block";
 
   buildKeyboard();
 }
 
 function buildKeyboard(){
-  keyboard.innerHTML="";
+  keyboard.innerHTML = "";
+  const answer = stages[currentStage].answer;
+  const letters = [...new Set(answer.split(""))]; // بلا تكرار
+
   letters.forEach(l=>{
-    const d=document.createElement("div");
-    d.className="key";
-    d.innerText=l;
-    d.onclick=()=>answerInput.value+=l;
+    const d = document.createElement("div");
+    d.className = "key";
+    d.innerText = l;
+    d.onclick = ()=> answerInput.value += l;
     keyboard.appendChild(d);
   });
 }
 
-function clearInput(){answerInput.value="";}
+function clearInput(){
+  answerInput.value = "";
+}
 
 function checkAnswer(){
-  const user = answerInput.value.trim().toUpperCase();
+  const user = answerInput.value.trim();
   const correct = stages[currentStage].answer;
 
   if(user === correct){
@@ -175,7 +184,7 @@ function checkAnswer(){
       showScreen("stageScreen");
     }
   }else{
-    alert("❌ خطأ، حاول مرة أخرى");
+    alert("❌ خطأ");
     clearInput();
   }
 }
