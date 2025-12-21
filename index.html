@@ -2,88 +2,71 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>ⵣ لعبة الكلمات الأمازيغية</title>
+<title>لعبة الكلمات الأمازيغية</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-  body{
-    margin:0;
-    font-family: "Tahoma", Arial, sans-serif;
-    background:linear-gradient(135deg,#f7f3e9,#e9f5ee);
-    text-align:center;
-    color:#222;
-  }
+body{
+  margin:0;
+  font-family: Tahoma, Arial, sans-serif;
+  background:#f2f2f2;
+  text-align:center;
+}
 
-  .container{
-    max-width:600px;
-    margin:auto;
-    padding:20px;
-  }
+.container{
+  max-width:600px;
+  margin:auto;
+  padding:20px;
+}
 
-  h1{
-    margin-bottom:20px;
-    color:#1b5e20;
-    font-size:26px;
-  }
+h1{
+  margin-bottom:10px;
+}
 
-  .question-box{
-    background:#ffffff;
-    padding:20px;
-    border-radius:14px;
-    box-shadow:0 6px 15px rgba(0,0,0,0.12);
-    margin-bottom:20px;
-  }
+.question-box{
+  background:#fff;
+  padding:15px;
+  border-radius:10px;
+  box-shadow:0 0 10px rgba(0,0,0,0.1);
+  margin-bottom:15px;
+}
 
-  .question-text{
-    font-size:22px;
-    margin-bottom:15px;
-  }
+.question-text{
+  font-size:20px;
+  margin-bottom:10px;
+}
 
-  .question-image{
-    display:none;
-    max-width:100%;
-    border-radius:12px;
-    margin-bottom:15px;
-    border:2px solid #e0e0e0;
-  }
+.question-image{
+  display:none;
+  max-width:100%;
+  border-radius:10px;
+  margin-bottom:10px;
+}
 
-  input{
-    width:100%;
-    padding:12px;
-    font-size:18px;
-    direction:ltr;
-    text-align:center;
-    margin-bottom:15px;
-    border-radius:10px;
-    border:2px solid #c8e6c9;
-    outline:none;
-  }
+input{
+  width:100%;
+  padding:10px;
+  font-size:18px;
+  direction:ltr;
+  text-align:center;
+  margin-bottom:10px;
+}
 
-  input:focus{
-    border-color:#4caf50;
-  }
+button{
+  padding:10px 20px;
+  font-size:18px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  background:#4CAF50;
+  color:white;
+}
 
-  button{
-    padding:12px 25px;
-    font-size:18px;
-    border:none;
-    border-radius:10px;
-    cursor:pointer;
-    background:#2e7d32;
-    color:white;
-    transition:0.3s;
-  }
-
-  button:hover{
-    background:#1b5e20;
-  }
-
-  .result{
-    margin-top:15px;
-    font-size:18px;
-    min-height:26px;
-    font-weight:bold;
-  }
+.result{
+  margin-top:10px;
+  font-size:18px;
+  min-height:24px;
+}
 </style>
 </head>
 
@@ -103,23 +86,41 @@
 </div>
 
 <script>
+// ======================
+// الأسئلة
+// ======================
+
+// أسئلة نصية
 const textQuestions = [
   { type:"text", question:"شنو معنى ⴰⵎⴰⵣⵉⵖ؟", answer:"amazigh" },
   { type:"text", question:"شنو معنى ⵜⴰⵎⴰⵣⵉⵖⵜ؟", answer:"tamazight" }
 ];
 
+// ألغاز بالصور (موجودة ولكن قليلة)
 const imageQuestions = [
-  { type:"image", image:"azetta.png", question:"شنو هاد الأداة التراثية؟", answer:"azetta" },
-  { type:"image", image:"tazart.png", question:"شنو كتسمى هادي؟", answer:"tazart" }
+  {
+    type:"image",
+    image:"azetta.png",
+    question:"شنو هاد الأداة التراثية؟",
+    answer:"azetta"
+  }
 ];
+
+// ======================
+// منطق اللعبة
+// ======================
 
 let currentQuestion = null;
 
 function pickQuestion(){
   const useImage = Math.random() < 0.3 && imageQuestions.length > 0;
-  currentQuestion = useImage
-    ? imageQuestions[Math.floor(Math.random()*imageQuestions.length)]
-    : textQuestions[Math.floor(Math.random()*textQuestions.length)];
+
+  if(useImage){
+    currentQuestion = imageQuestions[Math.floor(Math.random()*imageQuestions.length)];
+  }else{
+    currentQuestion = textQuestions[Math.floor(Math.random()*textQuestions.length)];
+  }
+
   renderQuestion();
 }
 
@@ -132,7 +133,9 @@ function renderQuestion(){
   if(currentQuestion.type === "image"){
     qImg.src = currentQuestion.image;
     qImg.style.display = "block";
-    qImg.onerror = () => qImg.style.display = "none";
+    qImg.onerror = () => {
+      qImg.style.display = "none";
+    };
   }else{
     qImg.style.display = "none";
   }
@@ -143,16 +146,17 @@ function checkAnswer(){
   const result = document.getElementById("result");
 
   if(input.value.trim().toLowerCase() === currentQuestion.answer){
-    result.textContent = "✔️ جواب صحيح";
-    result.style.color = "#2e7d32";
+    result.textContent = "✔️ صحيح";
+    result.style.color = "green";
     input.value = "";
     pickQuestion();
   }else{
     result.textContent = "❌ حاول مرة أخرى";
-    result.style.color = "#c62828";
+    result.style.color = "red";
   }
 }
 
+// بدء اللعبة
 pickQuestion();
 </script>
 </body>
