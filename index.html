@@ -14,18 +14,18 @@ body{
   text-align:center;
   background: linear-gradient(
     180deg,
-    #1e90ff 0%,   /* أزرق */
+    #1e90ff 0%,
     #1e90ff 33%,
-    #2ecc71 33%, /* أخضر */
+    #2ecc71 33%,
     #2ecc71 66%,
-    #f1c40f 66%, /* أصفر */
+    #f1c40f 66%,
     #f1c40f 100%
   );
   position:relative;
   overflow:hidden;
 }
 
-/* ===== رمز ⵣ في الوسط (خلفي) ===== */
+/* ===== رمز ⵣ في الوسط ===== */
 body::before{
   content:"ⵣ";
   position:fixed;
@@ -33,7 +33,7 @@ body::before{
   left:50%;
   transform:translate(-50%,-50%);
   font-size:300px;
-  color:rgba(192,57,43,0.15); /* أحمر شفاف */
+  color:rgba(192,57,43,0.15);
   pointer-events:none;
   z-index:0;
 }
@@ -45,12 +45,12 @@ body::before{
   align-items:center;
   flex-direction:column;
   position:relative;
-  z-index:1; /* فوق الرمز */
+  z-index:1;
 }
 .screen.active{display:flex;}
 
 button{
-  background:#c0392b; /* أحمر العلم */
+  background:#c0392b;
   border:none;
   color:#fff;
   padding:14px 30px;
@@ -102,7 +102,6 @@ input{
   cursor:pointer;
 }
 
-/* ===== رسالة التحقق ===== */
 #message{
   min-height:30px;
   font-size:20px;
@@ -110,6 +109,29 @@ input{
 }
 .success{color:#0b3;}
 .error{color:#c0392b;}
+
+/* ===== الاحتفال ===== */
+#celebration{
+  position:fixed;
+  inset:0;
+  display:none;
+  pointer-events:none;
+  z-index:999;
+}
+
+.celebrate-item{
+  position:absolute;
+  top:-40px;
+  font-size:28px;
+  animation: fall 2.5s linear forwards;
+}
+
+@keyframes fall{
+  to{
+    transform:translateY(110vh) rotate(360deg);
+    opacity:0;
+  }
+}
 </style>
 </head>
 
@@ -140,6 +162,9 @@ input{
   <button onclick="checkAnswer()">تحقق</button>
 </div>
 
+<!-- طبقة الاحتفال -->
+<div id="celebration"></div>
+
 <script>
 const stages = [
   {
@@ -167,14 +192,14 @@ const stages = [
 
 let currentStage = 0;
 
-function goToStages(){
-  showScreen("stageScreen");
-}
+function goToStages(){ showScreen("stageScreen"); }
+
 function startStage(i){
   currentStage = i;
   loadStage();
   showScreen("gameScreen");
 }
+
 function showScreen(id){
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
@@ -223,10 +248,25 @@ function clearInput(){
 function showMessage(text, type){
   message.innerText = text;
   message.className = type;
-  setTimeout(()=>{
-    message.innerText = "";
-    message.className = "";
-  },1500);
+  setTimeout(()=>{ message.innerText=""; message.className=""; },1500);
+}
+
+/* ===== الاحتفال ===== */
+function showCelebration(){
+  const c = document.getElementById("celebration");
+  c.innerHTML = "";
+  c.style.display = "block";
+
+  for(let i=0;i<30;i++){
+    const el = document.createElement("div");
+    el.className = "celebrate-item";
+    el.style.left = Math.random()*100 + "%";
+    el.style.animationDuration = (2 + Math.random()) + "s";
+    el.textContent = Math.random() > 0.5 ? "💖" : "ⵣ";
+    c.appendChild(el);
+  }
+
+  setTimeout(()=>{ c.style.display="none"; },2000);
 }
 
 function checkAnswer(){
@@ -234,16 +274,13 @@ function checkAnswer(){
   const correct = stages[currentStage].answer;
 
   if(user === correct){
+    showCelebration();
     showMessage("✔️ أحسنت", "success");
+
     if(currentStage < stages.length - 1){
-      setTimeout(()=>{
-        currentStage++;
-        loadStage();
-      },1500);
+      setTimeout(()=>{ currentStage++; loadStage(); },1500);
     }else{
-      setTimeout(()=>{
-        showScreen("stageScreen");
-      },1500);
+      setTimeout(()=>{ showScreen("stageScreen"); },1500);
     }
   }else{
     showMessage("❌ حاول مرة أخرى", "error");
