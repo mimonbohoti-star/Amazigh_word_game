@@ -2,196 +2,167 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>لعبة الكلمات الأمازيغية</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-/* ====== ألوان عامة ====== */
-body{
-  margin:0;
-  font-family:sans-serif;
-  background: linear-gradient(180deg, #0e1624, #12263a);
-  color:#eaf2f8;
-}
-
-/* توسيط الصفحات */
-.page{
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-}
-
-.hidden{display:none;}
-
-/* ====== حرف ⵣ ====== */
-#start div{
-  font-size:96px;
-  color:#2ecc71; /* أخضر هادئ */
-  margin-bottom:20px;
-}
-
-/* ====== العناوين ====== */
-h2{
-  color:#a9d6e5; /* أزرق فاتح */
-  margin-bottom:10px;
-}
-
-/* ====== السؤال ====== */
-#question{
-  font-size:28px;
-  margin:10px;
-  color:#f6e58d; /* أصفر خفيف */
-  font-weight:bold;
-}
-
-/* ====== الأزرار ====== */
-button{
-  background: linear-gradient(135deg, #2ecc71, #27ae60);
-  border:none;
-  padding:12px 22px;
-  border-radius:10px;
-  font-size:18px;
-  cursor:pointer;
-  margin:8px;
-  color:#fff;
-}
-
-button:active{
-  transform:scale(0.96);
-}
-
-/* ====== خانة الجواب ====== */
-input{
-  font-size:22px;
-  padding:10px;
-  width:80%;
-  border-radius:8px;
-  border:none;
-  text-align:center;
-  margin-top:10px;
-}
-
-/* ====== أزرار الحروف ====== */
-.letters{
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:center;
-  gap:10px;
-  margin:20px;
-}
-
-.letters button{
-  width:56px;
-  height:56px;
-  font-size:24px;
-  font-weight:bold;
-  border-radius:10px;
-  background:#1e3a5f; /* أزرق غامق */
-  color:#eaf2f8;
-}
+  body{
+    margin:0;
+    font-family: Tahoma, Arial, sans-serif;
+    background:#f2f2f2;
+    text-align:center;
+  }
+  .container{
+    max-width:600px;
+    margin:auto;
+    padding:20px;
+  }
+  h1{
+    margin-bottom:10px;
+  }
+  .question-box{
+    background:#fff;
+    padding:15px;
+    border-radius:10px;
+    box-shadow:0 0 10px rgba(0,0,0,0.1);
+    margin-bottom:15px;
+  }
+  .question-text{
+    font-size:20px;
+    margin-bottom:10px;
+  }
+  .question-image{
+    display:none;
+    max-width:100%;
+    border-radius:10px;
+    margin-bottom:10px;
+  }
+  input{
+    width:100%;
+    padding:10px;
+    font-size:18px;
+    direction:ltr;
+    text-align:center;
+    margin-bottom:10px;
+  }
+  button{
+    padding:10px 20px;
+    font-size:18px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    background:#4CAF50;
+    color:white;
+  }
+  .result{
+    margin-top:10px;
+    font-size:18px;
+    min-height:24px;
+  }
 </style>
 </head>
 
 <body>
+<div class="container">
+  <h1>ⵣ لعبة الكلمات الأمازيغية</h1>
 
-<!-- صفحة الدخول -->
-<div id="start" class="page">
-  <div>ⵣ</div>
-  <button onclick="showLevels()">ابدأ</button>
-</div>
+  <div class="question-box">
+    <div class="question-text" id="questionText"></div>
+    <img id="questionImage" class="question-image" alt="">
+  </div>
 
-<!-- اختيار المرحلة -->
-<div id="levels" class="page hidden">
-  <h2>اختر المرحلة</h2>
-  <button onclick="startGame(1)">المرحلة 1</button>
-  <button onclick="startGame(2)">المرحلة 2</button>
-  <button onclick="startGame(3)">المرحلة 3</button>
-</div>
-
-<!-- اللعبة -->
-<div id="game" class="page hidden">
-  <h2 id="levelTitle"></h2>
-  <div id="question"></div>
-
-  <input id="answer" readonly>
-
-  <button onclick="eraseLetter()">⌫ مسح</button>
-
-  <div class="letters" id="letters"></div>
-
+  <input type="text" id="answerInput" placeholder="ⴰⵔⵔⴰ ⴰⵡⵉ ⴰⵙⴽⵔ">
   <button onclick="checkAnswer()">تحقق</button>
-  <button onclick="backToLevels()">الرجوع للقائمة</button>
-</div>
 
-<audio id="clickSound">
-  <source src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg">
-</audio>
+  <div class="result" id="result"></div>
+</div>
 
 <script>
-const levelsData = {
-  1:[{q:"SUN",a:"ⵜⵉⵎⵉ"}],
-  2:[{q:"MOON",a:"ⴰⵢⵓⵔ"}],
-  3:[{q:"STAR",a:"ⵉⵜⵔⵉ"}]
-};
+/* ======================
+   الأسئلة
+====================== */
 
-const tifinagh = [
- "ⴰ","ⴱ","ⵛ","ⴷ","ⴻ","ⴼ",
- "ⴳ","ⵀ","ⵉ","ⵊ","ⴽ","ⵍ",
- "ⵎ","ⵏ","ⵓ","ⵔ","ⵙ","ⵜ",
- "ⵡ","ⵢ","ⵣ"
+// أسئلة نصية
+const textQuestions = [
+  { type:"text", question:"شنو معنى ⴰⵎⴰⵣⵉⵖ؟", answer:"amazigh" },
+  { type:"text", question:"شنو معنى ⵜⴰⵎⴰⵣⵉⵖⵜ؟", answer:"tamazight" }
 ];
 
-let currentAnswer="";
+// ألغاز تراثية بالصور (مخزنة)
+const imageQuestions = [
+  {
+    type:"image",
+    image:"azetta.png", // صورة المنسج
+    question:"شنو هاد الأداة التراثية؟",
+    answer:"azetta"
+  },
+  {
+    type:"image",
+    image:"tazart.png", // الرحى
+    question:"شنو كتسمى هادي؟",
+    answer:"tazart"
+  }
+];
 
-function playSound(){
-  document.getElementById("clickSound").play();
+/* ======================
+   اختيار السؤال
+====================== */
+
+let currentQuestion = null;
+
+function pickQuestion(){
+  // احتمال صغير لأسئلة الصور
+  const useImage = Math.random() < 0.3 && imageQuestions.length > 0;
+
+  if(useImage){
+    currentQuestion = imageQuestions[Math.floor(Math.random()*imageQuestions.length)];
+  }else{
+    currentQuestion = textQuestions[Math.floor(Math.random()*textQuestions.length)];
+  }
+
+  renderQuestion();
 }
 
-function showLevels(){
-  start.classList.add("hidden");
-  levels.classList.remove("hidden");
-}
+function renderQuestion(){
+  const qText = document.getElementById("questionText");
+  const qImg  = document.getElementById("questionImage");
 
-function startGame(lv){
-  levels.classList.add("hidden");
-  game.classList.remove("hidden");
-  levelTitle.innerText="المرحلة "+lv;
-  question.innerText=levelsData[lv][0].q;
-  currentAnswer=levelsData[lv][0].a;
-  answer.value="";
-  buildLetters();
-}
+  qText.textContent = currentQuestion.question;
 
-function buildLetters(){
-  letters.innerHTML="";
-  tifinagh.forEach(l=>{
-    const b=document.createElement("button");
-    b.textContent=l;
-    b.onclick=()=>{
-      answer.value+=l;
-      playSound();
+  if(currentQuestion.type === "image"){
+    qImg.src = currentQuestion.image;
+    qImg.style.display = "block";
+
+    // حماية: إذا الصورة غير موجودة
+    qImg.onerror = () => {
+      qImg.style.display = "none";
     };
-    letters.appendChild(b);
-  });
+  }else{
+    qImg.style.display = "none";
+  }
 }
 
-function eraseLetter(){
-  answer.value = answer.value.slice(0,-1);
-  playSound();
-}
+/* ======================
+   التحقق
+====================== */
 
 function checkAnswer(){
-  alert(answer.value===currentAnswer ? "✔️ صحيح" : "❌ خطأ");
+  const input = document.getElementById("answerInput");
+  const result = document.getElementById("result");
+
+  if(input.value.trim().toLowerCase() === currentQuestion.answer){
+    result.textContent = "✔️ صحيح";
+    result.style.color = "green";
+    input.value = "";
+    pickQuestion();
+  }else{
+    result.textContent = "❌ حاول مرة أخرى";
+    result.style.color = "red";
+  }
 }
 
-function backToLevels(){
-  game.classList.add("hidden");
-  levels.classList.remove("hidden");
-}
+// بدء اللعبة
+pickQuestion();
 </script>
-
 </body>
 </html>
