@@ -2,143 +2,220 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>لعبة الكلمات الأمازيغية</title>
 
 <style>
 body{
   margin:0;
   font-family:sans-serif;
-  background:#0e1624;
+  background:linear-gradient(180deg,#0e1624,#12263a);
   color:#fff;
   text-align:center;
 }
-
-h1{ margin-top:20px; }
-
-.stage-buttons{
-  margin:20px;
+.screen{
+  display:none;
+  min-height:100vh;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
 }
-
-.stage-buttons button{
-  margin:5px;
-  padding:10px 15px;
+.screen.active{display:flex;}
+button{
+  background:#2ecc71;
   border:none;
-  border-radius:6px;
+  color:#fff;
+  padding:14px 30px;
+  font-size:18px;
+  border-radius:8px;
   cursor:pointer;
-  font-size:16px;
+  margin:10px;
 }
-
-.stage-buttons button.locked{
-  background:#555;
-  cursor:not-allowed;
+.logo{
+  font-size:80px;
+  color:#2ecc71;
+  margin-bottom:20px;
 }
-
-.stage-buttons button.active{
-  background:#1abc9c;
-  color:#000;
+#questionImage{
+  max-width:220px;
+  margin:15px auto;
+  display:none;
+  border-radius:12px;
 }
-
-.game-box{
-  margin-top:30px;
-}
-
 input{
-  padding:10px;
-  font-size:18px;
-  text-align:center;
-}
-
-button.submit{
-  margin-top:10px;
-  padding:10px 20px;
-  font-size:16px;
-  background:#3498db;
+  padding:12px;
+  font-size:22px;
+  width:80%;
+  max-width:300px;
+  text-align:left;
+  direction:ltr;
+  border-radius:8px;
   border:none;
-  border-radius:6px;
+  margin-bottom:10px;
+}
+.keyboard{
+  display:grid;
+  grid-template-columns:repeat(4,70px);
+  gap:10px;
+  justify-content:center;
+  margin-top:15px;
+}
+.key{
+  background:#1e3553;
+  padding:18px;
+  font-size:24px;
+  border-radius:10px;
   cursor:pointer;
 }
 
-.message{
-  margin-top:15px;
-  font-size:18px;
+/* ===== رسالة التحقق ===== */
+#message{
+  min-height:30px;
+  font-size:20px;
+  margin:10px;
 }
+.success{color:#2ecc71;}
+.error{color:#e74c3c;}
 </style>
 </head>
 
 <body>
 
-<h1>لعبة الكلمات الأمازيغية</h1>
+<div class="screen active" id="startScreen">
+  <div class="logo">ⵣ</div>
+  <button onclick="goToStages()">ابدأ</button>
+</div>
 
-<div class="stage-buttons" id="stageButtons"></div>
+<div class="screen" id="stageScreen">
+  <h2>اختر المرحلة</h2>
+  <button onclick="startStage(0)">المرحلة 1</button>
+  <button onclick="startStage(1)">المرحلة 2</button>
+  <button onclick="startStage(2)">المرحلة 3</button>
+</div>
 
-<div class="game-box">
-  <div id="question"></div>
-  <input id="answerInput" placeholder="أدخل الجواب">
-  <br>
-  <button class="submit" onclick="checkAnswer()">تحقق</button>
-  <div class="message" id="message"></div>
+<div class="screen" id="gameScreen">
+  <h2 id="stageTitle"></h2>
+  <img id="questionImage" alt="">
+  <h1 id="wordDisplay"></h1>
+
+  <div id="message"></div>
+
+  <input type="text" id="answerInput" readonly>
+  <button onclick="clearInput()">مسح</button>
+  <div class="keyboard" id="keyboard"></div>
+  <button onclick="checkAnswer()">تحقق</button>
 </div>
 
 <script>
-// ====== المراحل ======
 const stages = [
-  { question: "ⵣⵣⵣ (حرف أمازيغي)", answer: "ⵣ" },
-  { question: "ⵎⴰⵏ (ماذا)", answer: "ⵎⴰⵏ" },
-  { question: "ⴰⵣⵓⵍ (سلام)", answer: "ⴰⵣⵓⵍ" }
+  {
+    title:"المرحلة 1",
+    answer:"ⵜⴰⴼⵓⵢⵜ",
+    showWord:true,
+    word:"ⵜⴰⴼⵓⵢⵜ",
+    image:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Sun_white.jpg/320px-Sun_white.jpg"
+  },
+  {
+    title:"المرحلة 2",
+    answer:"ⴰⵢⵢⵓⵔ",
+    showWord:false,
+    word:"",
+    image:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/FullMoon2010.jpg/320px-FullMoon2010.jpg"
+  },
+  {
+    title:"المرحلة 3",
+    answer:"ⵉⵜⵔⵉ",
+    showWord:true,
+    word:"ⵉⵜⵔⵉ",
+    image:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Starsinthesky.jpg/320px-Starsinthesky.jpg"
+  }
 ];
 
-let unlockedStage = parseInt(localStorage.getItem("unlockedStage")) || 0;
-let currentStage = unlockedStage;
+let currentStage = 0;
 
-// ====== إنشاء أزرار المراحل ======
-function renderStages(){
-  const container = document.getElementById("stageButtons");
-  container.innerHTML = "";
+function goToStages(){
+  showScreen("stageScreen");
+}
+function startStage(i){
+  currentStage = i;
+  loadStage();
+  showScreen("gameScreen");
+}
+function showScreen(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
 
-  stages.forEach((_, index)=>{
-    const btn = document.createElement("button");
-    btn.textContent = "مرحلة " + (index + 1);
+function loadStage(){
+  const stage = stages[currentStage];
+  stageTitle.innerText = stage.title;
+  answerInput.value = "";
+  message.innerText = "";
+  message.className = "";
 
-    if(index <= unlockedStage){
-      btn.classList.add("active");
-      btn.onclick = ()=> loadStage(index);
-    }else{
-      btn.classList.add("locked");
-    }
+  if(stage.showWord){
+    wordDisplay.innerText = stage.word;
+    wordDisplay.style.display = "block";
+  }else{
+    wordDisplay.style.display = "none";
+  }
 
-    container.appendChild(btn);
+  questionImage.src = stage.image;
+  questionImage.style.display = "block";
+
+  buildKeyboard();
+}
+
+function buildKeyboard(){
+  keyboard.innerHTML = "";
+  const answer = stages[currentStage].answer;
+  const letters = [...new Set(answer.split(""))];
+
+  letters.forEach(l=>{
+    const d = document.createElement("div");
+    d.className = "key";
+    d.innerText = l;
+    d.onclick = ()=> answerInput.value += l;
+    keyboard.appendChild(d);
   });
 }
 
-// ====== تحميل المرحلة ======
-function loadStage(index){
-  currentStage = index;
-  document.getElementById("question").textContent =
-    "السؤال: " + stages[index].question;
-  document.getElementById("answerInput").value = "";
-  document.getElementById("message").textContent = "";
+function clearInput(){
+  answerInput.value = "";
+  message.innerText = "";
+  message.className = "";
 }
 
-// ====== التحقق ======
+function showMessage(text, type){
+  message.innerText = text;
+  message.className = type;
+  setTimeout(()=>{
+    message.innerText = "";
+    message.className = "";
+  },1500);
+}
+
 function checkAnswer(){
-  const input = document.getElementById("answerInput").value.trim();
+  const user = answerInput.value.trim();
   const correct = stages[currentStage].answer;
 
-  if(input === correct){
-    document.getElementById("message").textContent = "✔ جواب صحيح";
-    if(currentStage === unlockedStage && unlockedStage < stages.length - 1){
-      unlockedStage++;
-      localStorage.setItem("unlockedStage", unlockedStage);
-      renderStages();
+  if(user === correct){
+    showMessage("✔️ أحسنت", "success");
+    if(currentStage < stages.length - 1){
+      setTimeout(()=>{
+        currentStage++;
+        loadStage();
+      },1500);
+    }else{
+      setTimeout(()=>{
+        showScreen("stageScreen");
+      },1500);
     }
   }else{
-    document.getElementById("message").textContent = "✖ جواب خطأ";
+    showMessage("❌ حاول مرة أخرى", "error");
+    clearInput();
   }
 }
-
-// ====== تشغيل أولي ======
-renderStages();
-loadStage(currentStage);
 </script>
 
 </body>
