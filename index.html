@@ -67,19 +67,23 @@ input{
   border-radius:10px;
   cursor:pointer;
 }
+
+/* ===== رسالة التحقق ===== */
+#message{
+  min-height:30px;
+  font-size:20px;
+  margin:10px;
+}
+.success{color:#2ecc71;}
+.error{color:#e74c3c;}
 </style>
 </head>
 
 <body>
 
-<!-- ===== الأصوات ===== -->
-<audio id="clickSound" preload="auto" src="https://cdn.pixabay.com/audio/2022/03/15/audio_7c8a8a4c3c.mp3"></audio>
-<audio id="successSound" preload="auto" src="https://cdn.pixabay.com/audio/2022/03/15/audio_4f6a0a9c48.mp3"></audio>
-<audio id="errorSound" preload="auto" src="https://cdn.pixabay.com/audio/2022/03/15/audio_8b3f6d3a5a.mp3"></audio>
-
 <div class="screen active" id="startScreen">
   <div class="logo">ⵣ</div>
-  <button onclick="unlockAudio(); goToStages();">ابدأ</button>
+  <button onclick="goToStages()">ابدأ</button>
 </div>
 
 <div class="screen" id="stageScreen">
@@ -93,6 +97,9 @@ input{
   <h2 id="stageTitle"></h2>
   <img id="questionImage" alt="">
   <h1 id="wordDisplay"></h1>
+
+  <div id="message"></div>
+
   <input type="text" id="answerInput" readonly>
   <button onclick="clearInput()">مسح</button>
   <div class="keyboard" id="keyboard"></div>
@@ -101,42 +108,39 @@ input{
 
 <script>
 const stages = [
-  { title:"المرحلة 1", answer:"ⵜⴰⴼⵓⵢⵜ", showWord:true, word:"ⵜⴰⴼⵓⵢⵜ",
-    image:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Sun_white.jpg/320px-Sun_white.jpg" },
-  { title:"المرحلة 2", answer:"ⴰⵢⵢⵓⵔ", showWord:false, word:"",
-    image:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/FullMoon2010.jpg/320px-FullMoon2010.jpg" },
-  { title:"المرحلة 3", answer:"ⵉⵜⵔⵉ", showWord:true, word:"ⵉⵜⵔⵉ",
-    image:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Starsinthesky.jpg/320px-Starsinthesky.jpg" }
+  {
+    title:"المرحلة 1",
+    answer:"ⵜⴰⴼⵓⵢⵜ",
+    showWord:true,
+    word:"ⵜⴰⴼⵓⵢⵜ",
+    image:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Sun_white.jpg/320px-Sun_white.jpg"
+  },
+  {
+    title:"المرحلة 2",
+    answer:"ⴰⵢⵢⵓⵔ",
+    showWord:false,
+    word:"",
+    image:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/FullMoon2010.jpg/320px-FullMoon2010.jpg"
+  },
+  {
+    title:"المرحلة 3",
+    answer:"ⵉⵜⵔⵉ",
+    showWord:true,
+    word:"ⵉⵜⵔⵉ",
+    image:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Starsinthesky.jpg/320px-Starsinthesky.jpg"
+  }
 ];
 
 let currentStage = 0;
-let audioUnlocked = false;
 
-const clickSound   = document.getElementById("clickSound");
-const successSound = document.getElementById("successSound");
-const errorSound   = document.getElementById("errorSound");
-
-function unlockAudio(){
-  if(audioUnlocked) return;
-  [clickSound, successSound, errorSound].forEach(a=>{
-    a.muted = true;
-    a.play().then(()=>{
-      a.pause();
-      a.currentTime = 0;
-      a.muted = false;
-    }).catch(()=>{});
-  });
-  audioUnlocked = true;
+function goToStages(){
+  showScreen("stageScreen");
 }
-
-function play(sound){
-  if(!audioUnlocked) return;
-  sound.currentTime = 0;
-  sound.play();
+function startStage(i){
+  currentStage = i;
+  loadStage();
+  showScreen("gameScreen");
 }
-
-function goToStages(){ showScreen("stageScreen"); }
-function startStage(i){ currentStage = i; loadStage(); showScreen("gameScreen"); }
 function showScreen(id){
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
@@ -146,44 +150,69 @@ function loadStage(){
   const stage = stages[currentStage];
   stageTitle.innerText = stage.title;
   answerInput.value = "";
+  message.innerText = "";
+  message.className = "";
+
   if(stage.showWord){
     wordDisplay.innerText = stage.word;
     wordDisplay.style.display = "block";
-  }else wordDisplay.style.display = "none";
+  }else{
+    wordDisplay.style.display = "none";
+  }
+
   questionImage.src = stage.image;
   questionImage.style.display = "block";
+
   buildKeyboard();
 }
 
 function buildKeyboard(){
   keyboard.innerHTML = "";
-  const letters = [...new Set(stages[currentStage].answer.split(""))];
+  const answer = stages[currentStage].answer;
+  const letters = [...new Set(answer.split(""))];
+
   letters.forEach(l=>{
     const d = document.createElement("div");
     d.className = "key";
     d.innerText = l;
-    d.onclick = ()=>{
-      unlockAudio();
-      play(clickSound);
-      answerInput.value += l;
-    };
+    d.onclick = ()=> answerInput.value += l;
     keyboard.appendChild(d);
   });
 }
 
-function clearInput(){ answerInput.value = ""; }
+function clearInput(){
+  answerInput.value = "";
+  message.innerText = "";
+  message.className = "";
+}
+
+function showMessage(text, type){
+  message.innerText = text;
+  message.className = type;
+  setTimeout(()=>{
+    message.innerText = "";
+    message.className = "";
+  },1500);
+}
 
 function checkAnswer(){
   const user = answerInput.value.trim();
   const correct = stages[currentStage].answer;
+
   if(user === correct){
-    play(successSound);
-    alert("✔️ صحيح");
-    if(currentStage < stages.length - 1){ currentStage++; loadStage(); }
-    else{ alert("🎉 كملتي جميع المراحل"); showScreen("stageScreen"); }
+    showMessage("✔️ أحسنت", "success");
+    if(currentStage < stages.length - 1){
+      setTimeout(()=>{
+        currentStage++;
+        loadStage();
+      },1500);
+    }else{
+      setTimeout(()=>{
+        showScreen("stageScreen");
+      },1500);
+    }
   }else{
-    play(errorSound);
-    alert("❌ خطأ");
+    showMessage("❌ حاول مرة أخرى", "error");
     clearInput();
   }
 }
