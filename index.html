@@ -99,16 +99,19 @@ const stages = [
   {
     title:"المرحلة 1",
     word:"SUN",
+    showWord:true,
     image:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Sun_white.jpg/320px-Sun_white.jpg"
   },
   {
     title:"المرحلة 2",
-    word:"MOON",
+    word:"",
+    showWord:false,
     image:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/FullMoon2010.jpg/320px-FullMoon2010.jpg"
   },
   {
     title:"المرحلة 3",
     word:"STAR",
+    showWord:true,
     image:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Starsinthesky.jpg/320px-Starsinthesky.jpg"
   }
 ];
@@ -118,6 +121,7 @@ let currentStage=0;
 
 function goToStages(){showScreen("stageScreen");}
 function startStage(i){currentStage=i;loadStage();showScreen("gameScreen");}
+
 function showScreen(id){
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
@@ -126,11 +130,18 @@ function showScreen(id){
 function loadStage(){
   const stage=stages[currentStage];
   stageTitle.innerText=stage.title;
-  wordDisplay.innerText=stage.word;
   answerInput.value="";
-  const img=questionImage;
-  img.src=stage.image;
-  img.style.display="block";
+
+  if(stage.showWord){
+    wordDisplay.innerText=stage.word;
+    wordDisplay.style.display="block";
+  }else{
+    wordDisplay.style.display="none";
+  }
+
+  questionImage.src=stage.image;
+  questionImage.style.display="block";
+
   buildKeyboard();
 }
 
@@ -144,6 +155,7 @@ function buildKeyboard(){
     keyboard.appendChild(d);
   });
 }
+
 function clearInput(){answerInput.value="";}
 function checkAnswer(){alert("تم التحقق");}
 </script>
