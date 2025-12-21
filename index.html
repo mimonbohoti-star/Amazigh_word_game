@@ -6,7 +6,6 @@
 <title>لعبة الكلمات الأمازيغية</title>
 
 <style>
-/* ===== خلفية العلم الأمازيغي ===== */
 body{
   margin:0;
   font-family:sans-serif;
@@ -21,21 +20,17 @@ body{
     #f1c40f 66%,
     #f1c40f 100%
   );
-  position:relative;
   overflow:hidden;
 }
-
-/* ===== رمز ⵣ في الوسط ===== */
 body::before{
   content:"ⵣ";
   position:fixed;
   top:50%;
   left:50%;
   transform:translate(-50%,-50%);
-  font-size:300px;
+  font-size:320px;
   color:rgba(192,57,43,0.15);
   pointer-events:none;
-  z-index:0;
 }
 
 .screen{
@@ -44,8 +39,6 @@ body::before{
   justify-content:center;
   align-items:center;
   flex-direction:column;
-  position:relative;
-  z-index:1;
 }
 .screen.active{display:flex;}
 
@@ -71,7 +64,6 @@ button{
   margin:15px auto;
   display:none;
   border-radius:14px;
-  box-shadow:0 6px 20px rgba(0,0,0,0.3);
 }
 
 input{
@@ -83,7 +75,6 @@ input{
   direction:ltr;
   border-radius:10px;
   border:none;
-  margin-bottom:10px;
 }
 
 .keyboard{
@@ -110,7 +101,7 @@ input{
 .success{color:#0b3;}
 .error{color:#c0392b;}
 
-/* ===== الاحتفال ===== */
+/* الاحتفالات */
 #celebration{
   position:fixed;
   inset:0;
@@ -118,19 +109,14 @@ input{
   pointer-events:none;
   z-index:999;
 }
-
 .celebrate-item{
   position:absolute;
-  top:-40px;
-  font-size:28px;
-  animation: fall 2.5s linear forwards;
+  top:-50px;
+  font-size:34px;
+  animation: fall 3.5s linear forwards;
 }
-
 @keyframes fall{
-  to{
-    transform:translateY(110vh) rotate(360deg);
-    opacity:0;
-  }
+  to{transform:translateY(120vh) rotate(540deg);opacity:0;}
 }
 </style>
 </head>
@@ -139,153 +125,162 @@ input{
 
 <div class="screen active" id="startScreen">
   <div class="logo">ⵣ</div>
-  <button onclick="goToStages()">ابدأ</button>
+  <button onclick="continueGame()">متابعة</button>
+  <button onclick="goToStages()">اختيار المراحل</button>
 </div>
 
 <div class="screen" id="stageScreen">
-  <h2>اختر المرحلة</h2>
-  <button onclick="startStage(0)">المرحلة 1</button>
-  <button onclick="startStage(1)">المرحلة 2</button>
-  <button onclick="startStage(2)">المرحلة 3</button>
+  <h2>المراحل</h2>
+  <div id="stagesButtons"></div>
 </div>
 
 <div class="screen" id="gameScreen">
   <h2 id="stageTitle"></h2>
-  <img id="questionImage" alt="">
+  <img id="questionImage">
   <h1 id="wordDisplay"></h1>
-
   <div id="message"></div>
-
   <input type="text" id="answerInput" readonly>
   <button onclick="clearInput()">مسح</button>
   <div class="keyboard" id="keyboard"></div>
   <button onclick="checkAnswer()">تحقق</button>
 </div>
 
-<!-- طبقة الاحتفال -->
+<!-- شاشة النهاية -->
+<div class="screen" id="endScreen">
+  <div class="logo">ⵣ</div>
+  <h1>ⴰⵣⵓⵍ ⵉⵣⵣⵓⵔⴰ 🎉</h1>
+  <h3>ⵜⵉⵎⴰⵣⵉⵖⵜ ⵜⴰⵔⴰ ⵏⵏⴽ 💚</h3>
+  <p>أنهيت جميع المراحل بنجاح</p>
+  <button onclick="resetGame()">إعادة اللعب</button>
+</div>
+
 <div id="celebration"></div>
 
 <script>
-const stages = [
-  {
-    title:"المرحلة 1",
-    answer:"ⵜⴰⴼⵓⵢⵜ",
-    showWord:true,
-    word:"ⵜⴰⴼⵓⵢⵜ",
-    image:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Sun_white.jpg/320px-Sun_white.jpg"
-  },
-  {
-    title:"المرحلة 2",
-    answer:"ⴰⵢⵢⵓⵔ",
-    showWord:false,
-    word:"",
-    image:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/FullMoon2010.jpg/320px-FullMoon2010.jpg"
-  },
-  {
-    title:"المرحلة 3",
-    answer:"ⵉⵜⵔⵉ",
-    showWord:true,
-    word:"ⵉⵜⵔⵉ",
-    image:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Starsinthesky.jpg/320px-Starsinthesky.jpg"
-  }
+const stages=[
+ {title:"المرحلة 1",answer:"ⵜⴰⴼⵓⵢⵜ",showWord:true,word:"ⵜⴰⴼⵓⵢⵜ",image:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Sun_white.jpg/320px-Sun_white.jpg"},
+ {title:"المرحلة 2",answer:"ⴰⵢⵢⵓⵔ",showWord:false,word:"",image:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/FullMoon2010.jpg/320px-FullMoon2010.jpg"},
+ {title:"المرحلة 3",answer:"ⵉⵜⵔⵉ",showWord:true,word:"ⵉⵜⵔⵉ",image:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Starsinthesky.jpg/320px-Starsinthesky.jpg"},
+ {title:"المرحلة 4",answer:"ⴰⴷⵔⴰⵔ",showWord:false,word:"",image:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Mountain_range_in_Morocco.jpg/320px-Mountain_range_in_Morocco.jpg"}
 ];
 
-let currentStage = 0;
-
-function goToStages(){ showScreen("stageScreen"); }
-
-function startStage(i){
-  currentStage = i;
-  loadStage();
-  showScreen("gameScreen");
-}
+let currentStage=0;
+let unlockedStage=parseInt(localStorage.getItem("unlockedStage"))||0;
 
 function showScreen(id){
-  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
+ document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
+}
+
+function continueGame(){
+ currentStage=unlockedStage;
+ loadStage(); showScreen("gameScreen");
+}
+function goToStages(){buildStagesButtons();showScreen("stageScreen");}
+function startStage(i){currentStage=i;loadStage();showScreen("gameScreen");}
+
+function buildStagesButtons(){
+ stagesButtons.innerHTML="";
+ stages.forEach((s,i)=>{
+  const b=document.createElement("button");
+  b.textContent=i<=unlockedStage?s.title:s.title+" 🔒";
+  if(i<=unlockedStage) b.onclick=()=>startStage(i);
+  stagesButtons.appendChild(b);
+ });
 }
 
 function loadStage(){
-  const stage = stages[currentStage];
-  stageTitle.innerText = stage.title;
-  answerInput.value = "";
-  message.innerText = "";
-  message.className = "";
-
-  if(stage.showWord){
-    wordDisplay.innerText = stage.word;
-    wordDisplay.style.display = "block";
-  }else{
-    wordDisplay.style.display = "none";
-  }
-
-  questionImage.src = stage.image;
-  questionImage.style.display = "block";
-
-  buildKeyboard();
+ const s=stages[currentStage];
+ stageTitle.innerText=s.title;
+ answerInput.value="";
+ message.innerText="";
+ wordDisplay.style.display=s.showWord?"block":"none";
+ wordDisplay.innerText=s.word;
+ questionImage.src=s.image;
+ questionImage.style.display="block";
+ buildKeyboard();
 }
 
 function buildKeyboard(){
-  keyboard.innerHTML = "";
-  const answer = stages[currentStage].answer;
-  const letters = [...new Set(answer.split(""))];
+ keyboard.innerHTML="";
+ [...new Set(stages[currentStage].answer.split(""))].forEach(l=>{
+  const d=document.createElement("div");
+  d.className="key";
+  d.innerText=l;
+  d.onclick=()=>answerInput.value+=l;
+  keyboard.appendChild(d);
+ });
+}
+function clearInput(){answerInput.value="";}
 
-  letters.forEach(l=>{
-    const d = document.createElement("div");
-    d.className = "key";
-    d.innerText = l;
-    d.onclick = ()=> answerInput.value += l;
-    keyboard.appendChild(d);
-  });
+/* صوت الفوز */
+let audioCtx=null;
+function playWinSound(long=false){
+ if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+ const freqs=long?[523,659,784,988,784,659]:[523,659,784];
+ const now=audioCtx.currentTime;
+ freqs.forEach((f,i)=>{
+  const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+  o.frequency.value=f;
+  g.gain.setValueAtTime(0.001,now+i*0.15);
+  g.gain.exponentialRampToValueAtTime(0.4,now+i*0.15+0.05);
+  g.gain.exponentialRampToValueAtTime(0.001,now+i*0.15+0.35);
+  o.connect(g).connect(audioCtx.destination);
+  o.start(now+i*0.15); o.stop(now+i*0.15+0.4);
+ });
 }
 
-function clearInput(){
-  answerInput.value = "";
-  message.innerText = "";
-  message.className = "";
+/* احتفال */
+function showCelebration(big=false){
+ celebration.innerHTML="";
+ celebration.style.display="block";
+ const icons=big?["💖","🌹","⭐","ⵣ","💚","✨"]:["💖","ⵣ"];
+ const count=big?80:30;
+ for(let i=0;i<count;i++){
+  const e=document.createElement("div");
+  e.className="celebrate-item";
+  e.style.left=Math.random()*100+"%";
+  e.textContent=icons[Math.floor(Math.random()*icons.length)];
+  celebration.appendChild(e);
+ }
+ setTimeout(()=>celebration.style.display="none",big?4000:2000);
 }
 
-function showMessage(text, type){
-  message.innerText = text;
-  message.className = type;
-  setTimeout(()=>{ message.innerText=""; message.className=""; },1500);
-}
-
-/* ===== الاحتفال ===== */
-function showCelebration(){
-  const c = document.getElementById("celebration");
-  c.innerHTML = "";
-  c.style.display = "block";
-
-  for(let i=0;i<30;i++){
-    const el = document.createElement("div");
-    el.className = "celebrate-item";
-    el.style.left = Math.random()*100 + "%";
-    el.style.animationDuration = (2 + Math.random()) + "s";
-    el.textContent = Math.random() > 0.5 ? "💖" : "ⵣ";
-    c.appendChild(el);
-  }
-
-  setTimeout(()=>{ c.style.display="none"; },2000);
-}
-
+/* تحقق */
 function checkAnswer(){
-  const user = answerInput.value.trim();
-  const correct = stages[currentStage].answer;
+ if(answerInput.value===stages[currentStage].answer){
+  playWinSound();
+  showCelebration();
+  message.innerText="✔️ أحسنت";
+  message.className="success";
 
-  if(user === correct){
-    showCelebration();
-    showMessage("✔️ أحسنت", "success");
-
-    if(currentStage < stages.length - 1){
-      setTimeout(()=>{ currentStage++; loadStage(); },1500);
-    }else{
-      setTimeout(()=>{ showScreen("stageScreen"); },1500);
-    }
-  }else{
-    showMessage("❌ حاول مرة أخرى", "error");
-    clearInput();
+  if(currentStage===unlockedStage && unlockedStage<stages.length-1){
+    unlockedStage++;
+    localStorage.setItem("unlockedStage",unlockedStage);
   }
+
+  setTimeout(()=>{
+   if(currentStage===stages.length-1){
+    playWinSound(true);
+    showCelebration(true);
+    showScreen("endScreen");
+   }else{
+    currentStage++;
+    loadStage();
+   }
+  },1500);
+ }else{
+  message.innerText="❌ حاول مرة أخرى";
+  message.className="error";
+  clearInput();
+ }
+}
+
+function resetGame(){
+ unlockedStage=0;
+ currentStage=0;
+ localStorage.removeItem("unlockedStage");
+ goToStages();
 }
 </script>
 
