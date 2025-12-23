@@ -52,6 +52,28 @@ body::before{
   border-radius:12px;
 }
 
+/* ===== Modal ===== */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.65);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:2000;
+}
+.modal.active{display:flex;}
+.modal-content{
+  background:#12263a;
+  padding:22px;
+  border-radius:18px;
+  width:85%;
+  max-width:360px;
+  box-shadow:0 15px 35px rgba(0,0,0,0.6);
+}
+.modal-content h2{margin-top:0;}
+.modal-content button{margin-top:15px;}
+
 /* ===== Screens ===== */
 .screen{
   display:none;
@@ -80,15 +102,16 @@ button{
   margin-bottom:20px;
 }
 
-/* ===== Image ===== */
+/* ===== Question Image ===== */
 #questionImage{
   width:260px;
-  height:200px;
-  object-fit:cover;
+  max-width:90%;
   margin:20px auto;
   border-radius:18px;
   background:#fff;
+  padding:8px;
   box-shadow:0 10px 25px rgba(0,0,0,0.35);
+  min-height:200px;
 }
 
 /* ===== Input & Keyboard ===== */
@@ -119,21 +142,64 @@ input{
   cursor:pointer;
 }
 
-#message{min-height:30px;font-size:20px;}
+/* ===== Messages ===== */
+#message{
+  min-height:30px;
+  font-size:20px;
+  margin:10px;
+}
 .success{color:#00ff88;}
 .error{color:#ff4c4c;}
+
+/* ===== Celebration ===== */
+#celebration{
+  position:fixed;
+  inset:0;
+  display:none;
+  pointer-events:none;
+  z-index:1500;
+}
+.celebrate-item{
+  position:absolute;
+  top:-40px;
+  font-size:30px;
+  animation:fall 3s linear forwards;
+}
+@keyframes fall{
+  to{transform:translateY(120vh) rotate(540deg);opacity:0;}
+}
 </style>
 </head>
 
 <body>
 
 <div class="topbar">
-  <button onclick="goToStages()">📋</button>
+  <button onclick="openInfo()">ℹ️</button>
+  <button onclick="openSettings()">⚙️</button>
+</div>
+
+<div class="modal" id="infoModal">
+  <div class="modal-content">
+    <h2>كيفية اللعب</h2>
+    <p>انظر إلى الصورة، ثم اختر الحروف الصحيحة لتكوين الكلمة بالأمازيغية.</p>
+    <button onclick="closeModals()">إغلاق</button>
+  </div>
+</div>
+
+<div class="modal" id="settingsModal">
+  <div class="modal-content">
+    <h2>الإعدادات</h2>
+    <p>الصوت:
+      <button onclick="toggleSound()" id="soundBtn">🔊 مفعل</button>
+    </p>
+    <button onclick="closeModals()">إغلاق</button>
+  </div>
 </div>
 
 <div class="screen active" id="startScreen">
   <div class="logo">ⵣ</div>
   <button onclick="continueGame()">متابعة</button>
+  <button onclick="goToStages()">اختيار المراحل</button>
 </div>
 
 <div class="screen" id="stageScreen">
@@ -143,10 +209,12 @@ input{
 
 <div class="screen" id="gameScreen">
   <h2 id="stageTitle"></h2>
+  <!-- ✅ التعديل الوحيد هنا -->
   <img id="questionImage">
   <h1 id="wordDisplay"></h1>
   <div id="message"></div>
   <input id="answerInput" readonly>
+  <button onclick="clearInput()">مسح</button>
   <div class="keyboard" id="keyboard"></div>
   <button onclick="checkAnswer()">تحقق</button>
 </div>
@@ -157,38 +225,30 @@ input{
   <button onclick="resetGame()">إعادة اللعب</button>
 </div>
 
+<div id="celebration"></div>
+
 <script>
-/* ===== Data (صور محلية) ===== */
+/* ===== Data ===== */
 const stages=[
- {title:"المرحلة 1",answer:"ⵜⴰⴼⵓⵢⵜ",word:"ⵜⴰⴼⵓⵢⵜ",showWord:true,image:"images/sun.jpg"},
- {title:"المرحلة 2",answer:"ⴰⵢⵢⵓⵔ",word:"",showWord:false,image:"images/moon.jpg"},
- {title:"المرحلة 3",answer:"ⵉⵜⵔⵉ",word:"ⵉⵜⵔⵉ",showWord:true,image:"images/stars.jpg"},
- {title:"المرحلة 4",answer:"ⴰⴷⵔⴰⵔ",word:"",showWord:false,image:"images/mountain.jpg"},
- {title:"المرحلة 5",answer:"ⴰⵙⵉⴼ",word:"",showWord:false,image:"images/river.jpg"}
+ {title:"المرحلة 1",answer:"ⵜⴰⴼⵓⵢⵜ",showWord:true,word:"ⵜⴰⴼⵓⵢⵜ",image:"https://upload.wikimedia.org/wikipedia/commons/4/4c/Sun_white.jpg"},
+ {title:"المرحلة 2",answer:"ⴰⵢⵢⵓⵔ",showWord:false,word:"",image:"https://upload.wikimedia.org/wikipedia/commons/e/e1/FullMoon2010.jpg"},
+ {title:"المرحلة 3",answer:"ⵉⵜⵔⵉ",showWord:true,word:"ⵉⵜⵔⵉ",image:"https://upload.wikimedia.org/wikipedia/commons/2/2f/Starsinthesky.jpg"},
+ {title:"المرحلة 4",answer:"ⴰⴷⵔⴰⵔ",showWord:false,word:"",image:"https://upload.wikimedia.org/wikipedia/commons/6/60/Mountain_range_in_Morocco.jpg"},
+ {title:"المرحلة 5",answer:"ⴰⵙⵉⴼ",showWord:false,word:"",image:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='250'><rect width='400' height='250' fill='%23aee1f9'/><path d='M0 150 Q 100 120 200 150 T 400 150 L 400 250 L 0 250 Z' fill='%23298fca'/></svg>"}
 ];
 
 let currentStage=0;
 let unlockedStage=parseInt(localStorage.getItem("unlockedStage"))||0;
+let soundOn=true;
 
 /* ===== Navigation ===== */
 function showScreen(id){
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 }
-function continueGame(){
-  currentStage=unlockedStage;
-  loadStage();
-  showScreen("gameScreen");
-}
-function goToStages(){
-  buildStagesButtons();
-  showScreen("stageScreen");
-}
-function startStage(i){
-  currentStage=i;
-  loadStage();
-  showScreen("gameScreen");
-}
+function continueGame(){currentStage=unlockedStage;loadStage();showScreen("gameScreen");}
+function goToStages(){buildStagesButtons();showScreen("stageScreen");}
+function startStage(i){currentStage=i;loadStage();showScreen("gameScreen");}
 
 /* ===== UI ===== */
 function buildStagesButtons(){
@@ -208,24 +268,52 @@ function loadStage(){
   message.innerText="";
   wordDisplay.style.display=s.showWord?"block":"none";
   wordDisplay.innerText=s.word;
+  questionImage.style.display="block";
   questionImage.src=s.image;
   buildKeyboard();
 }
 
 function buildKeyboard(){
   keyboard.innerHTML="";
-  [...new Set(stages[currentStage].answer)].forEach(l=>{
-    const k=document.createElement("div");
-    k.className="key";
-    k.innerText=l;
-    k.onclick=()=>answerInput.value+=l;
-    keyboard.appendChild(k);
+  [...new Set(stages[currentStage].answer.split(""))].forEach(l=>{
+    const d=document.createElement("div");
+    d.className="key";
+    d.innerText=l;
+    d.onclick=()=>answerInput.value+=l;
+    keyboard.appendChild(d);
   });
 }
+function clearInput(){answerInput.value="";}
 
-/* ===== Logic ===== */
+/* ===== Sound & Celebration ===== */
+function playWinSound(){
+  if(!soundOn) return;
+  const ctx=new (window.AudioContext||window.webkitAudioContext)();
+  const o=ctx.createOscillator(),g=ctx.createGain();
+  o.frequency.value=880;
+  g.gain.value=0.15;
+  o.connect(g).connect(ctx.destination);
+  o.start(); o.stop(ctx.currentTime+0.25);
+}
+
+function showCelebration(){
+  celebration.innerHTML="";
+  celebration.style.display="block";
+  for(let i=0;i<30;i++){
+    const e=document.createElement("div");
+    e.className="celebrate-item";
+    e.style.left=Math.random()*100+"%";
+    e.textContent=["⭐","✨","ⵣ"][Math.floor(Math.random()*3)];
+    celebration.appendChild(e);
+  }
+  setTimeout(()=>celebration.style.display="none",2000);
+}
+
+/* ===== Game Logic ===== */
 function checkAnswer(){
   if(answerInput.value===stages[currentStage].answer){
+    playWinSound();
+    showCelebration();
     message.innerText="✔️ أحسنت";
     message.className="success";
     if(currentStage===unlockedStage && unlockedStage<stages.length-1){
@@ -233,14 +321,12 @@ function checkAnswer(){
       localStorage.setItem("unlockedStage",unlockedStage);
     }
     setTimeout(()=>{
-      currentStage===stages.length-1
-        ? showScreen("endScreen")
-        : loadStage(++currentStage);
-    },800);
+      currentStage===stages.length-1?showScreen("endScreen"):loadStage(++currentStage);
+    },1200);
   }else{
     message.innerText="❌ حاول مرة أخرى";
     message.className="error";
-    answerInput.value="";
+    clearInput();
   }
 }
 
@@ -248,7 +334,19 @@ function resetGame(){
   unlockedStage=0;
   currentStage=0;
   localStorage.removeItem("unlockedStage");
-  showScreen("startScreen");
+  goToStages();
+}
+
+/* ===== Modals ===== */
+function openInfo(){infoModal.classList.add("active");}
+function openSettings(){settingsModal.classList.add("active");}
+function closeModals(){
+  infoModal.classList.remove("active");
+  settingsModal.classList.remove("active");
+}
+function toggleSound(){
+  soundOn=!soundOn;
+  soundBtn.innerText=soundOn?"🔊 مفعل":"🔇 صامت";
 }
 </script>
 
