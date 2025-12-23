@@ -33,7 +33,6 @@ body::before{
   pointer-events:none;
 }
 
-/* ===== Top Bar ===== */
 .topbar{
   position:fixed;
   top:0; left:0;
@@ -52,29 +51,6 @@ body::before{
   border-radius:12px;
 }
 
-/* ===== Modal ===== */
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.65);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:2000;
-}
-.modal.active{display:flex;}
-.modal-content{
-  background:#12263a;
-  padding:22px;
-  border-radius:18px;
-  width:85%;
-  max-width:360px;
-  box-shadow:0 15px 35px rgba(0,0,0,0.6);
-}
-.modal-content h2{margin-top:0;}
-.modal-content button{margin-top:15px;}
-
-/* ===== Screens ===== */
 .screen{
   display:none;
   min-height:100vh;
@@ -102,19 +78,16 @@ button{
   margin-bottom:20px;
 }
 
-/* ===== Question Image ===== */
 #questionImage{
   width:260px;
   max-width:90%;
   margin:20px auto;
   border-radius:18px;
   background:#fff;
-  padding:8px;
+  padding:10px;
   box-shadow:0 10px 25px rgba(0,0,0,0.35);
-  min-height:200px; /* تثبيت المكان */
 }
 
-/* ===== Input & Keyboard ===== */
 input{
   padding:12px;
   font-size:22px;
@@ -133,7 +106,6 @@ input{
   justify-content:center;
   margin-top:15px;
 }
-
 .key{
   background:rgba(14,22,36,0.85);
   padding:18px;
@@ -142,68 +114,26 @@ input{
   cursor:pointer;
 }
 
-/* ===== Messages ===== */
 #message{
   min-height:30px;
   font-size:20px;
-  margin:10px;
 }
 .success{color:#00ff88;}
 .error{color:#ff4c4c;}
-
-/* ===== Celebration ===== */
-#celebration{
-  position:fixed;
-  inset:0;
-  display:none;
-  pointer-events:none;
-  z-index:1500;
-}
-.celebrate-item{
-  position:absolute;
-  top:-40px;
-  font-size:30px;
-  animation:fall 3s linear forwards;
-}
-@keyframes fall{
-  to{transform:translateY(120vh) rotate(540deg);opacity:0;}
-}
 </style>
 </head>
 
 <body>
 
-<!-- Top Bar -->
 <div class="topbar">
   <button onclick="openInfo()">ℹ️</button>
   <button onclick="openSettings()">⚙️</button>
 </div>
 
-<!-- Info Modal -->
-<div class="modal" id="infoModal">
-  <div class="modal-content">
-    <h2>كيفية اللعب</h2>
-    <p>انظر إلى الصورة، ثم اختر الحروف الصحيحة لتكوين الكلمة بالأمازيغية.</p>
-    <button onclick="closeModals()">إغلاق</button>
-  </div>
-</div>
-
-<!-- Settings Modal -->
-<div class="modal" id="settingsModal">
-  <div class="modal-content">
-    <h2>الإعدادات</h2>
-    <p>الصوت:
-      <button onclick="toggleSound()" id="soundBtn">🔊 مفعل</button>
-    </p>
-    <button onclick="closeModals()">إغلاق</button>
-  </div>
-</div>
-
-<!-- Screens -->
 <div class="screen active" id="startScreen">
   <div class="logo">ⵣ</div>
   <button onclick="continueGame()">متابعة</button>
-  <button onclick="goToStages()">اختيار المراحل</button>
+  <button onclick="goToStages()">المراحل</button>
 </div>
 
 <div class="screen" id="stageScreen">
@@ -213,7 +143,7 @@ input{
 
 <div class="screen" id="gameScreen">
   <h2 id="stageTitle"></h2>
-  <img id="questionImage" onerror="this.style.display='none'">
+  <img id="questionImage">
   <h1 id="wordDisplay"></h1>
   <div id="message"></div>
   <input id="answerInput" readonly>
@@ -222,134 +152,94 @@ input{
   <button onclick="checkAnswer()">تحقق</button>
 </div>
 
-<div class="screen" id="endScreen">
-  <div class="logo">ⵣ</div>
-  <h1>أحسنت 🎉</h1>
-  <button onclick="resetGame()">إعادة اللعب</button>
-</div>
-
-<div id="celebration"></div>
-
 <script>
-/* ===== Data ===== */
+const images={
+ sun:`data:image/svg+xml;utf8,
+ <svg xmlns='http://www.w3.org/2000/svg' width='300' height='200'>
+ <rect width='300' height='200' fill='%23aee1ff'/>
+ <circle cx='150' cy='100' r='50' fill='yellow'/>
+ </svg>`,
+
+ moon:`data:image/svg+xml;utf8,
+ <svg xmlns='http://www.w3.org/2000/svg' width='300' height='200'>
+ <rect width='300' height='200' fill='%230b1d3a'/>
+ <circle cx='150' cy='100' r='45' fill='%23eee'/>
+ </svg>`,
+
+ star:`data:image/svg+xml;utf8,
+ <svg xmlns='http://www.w3.org/2000/svg' width='300' height='200'>
+ <rect width='300' height='200' fill='black'/>
+ <text x='150' y='110' font-size='60' text-anchor='middle' fill='white'>★</text>
+ </svg>`,
+
+ mountain:`data:image/svg+xml;utf8,
+ <svg xmlns='http://www.w3.org/2000/svg' width='300' height='200'>
+ <rect width='300' height='200' fill='%239cd'/>
+ <polygon points='50,170 150,40 250,170' fill='%23555'/>
+ </svg>`
+};
+
 const stages=[
- {title:"المرحلة 1",answer:"ⵜⴰⴼⵓⵢⵜ",showWord:true,word:"ⵜⴰⴼⵓⵢⵜ",image:"https://upload.wikimedia.org/wikipedia/commons/4/4c/Sun_white.jpg"},
- {title:"المرحلة 2",answer:"ⴰⵢⵢⵓⵔ",showWord:false,word:"",image:"https://upload.wikimedia.org/wikipedia/commons/e/e1/FullMoon2010.jpg"},
- {title:"المرحلة 3",answer:"ⵉⵜⵔⵉ",showWord:true,word:"ⵉⵜⵔⵉ",image:"https://upload.wikimedia.org/wikipedia/commons/2/2f/Starsinthesky.jpg"},
- {title:"المرحلة 4",answer:"ⴰⴷⵔⴰⵔ",showWord:false,word:"",image:"https://upload.wikimedia.org/wikipedia/commons/6/60/Mountain_range_in_Morocco.jpg"},
- {title:"المرحلة 5",answer:"ⴰⵙⵉⴼ",showWord:false,word:"",image:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='250'><rect width='400' height='250' fill='%23aee1f9'/><path d='M0 150 Q 100 120 200 150 T 400 150 L 400 250 L 0 250 Z' fill='%23298fca'/></svg>"}
+ {title:"المرحلة 1",answer:"ⵜⴰⴼⵓⵢⵜ",showWord:true,word:"ⵜⴰⴼⵓⵢⵜ",image:images.sun},
+ {title:"المرحلة 2",answer:"ⴰⵢⵢⵓⵔ",showWord:false,word:"",image:images.moon},
+ {title:"المرحلة 3",answer:"ⵉⵜⵔⵉ",showWord:true,word:"ⵉⵜⵔⵉ",image:images.star},
+ {title:"المرحلة 4",answer:"ⴰⴷⵔⴰⵔ",showWord:false,word:"",image:images.mountain}
 ];
 
 let currentStage=0;
-let unlockedStage=parseInt(localStorage.getItem("unlockedStage"))||0;
-let soundOn=true;
+let unlockedStage=0;
 
-/* ===== Navigation ===== */
 function showScreen(id){
-  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
+ document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
 }
-function continueGame(){currentStage=unlockedStage;loadStage();showScreen("gameScreen");}
-function goToStages(){buildStagesButtons();showScreen("stageScreen");}
-function startStage(i){currentStage=i;loadStage();showScreen("gameScreen");}
 
-/* ===== UI ===== */
+function continueGame(){loadStage();showScreen("gameScreen");}
+function goToStages(){buildStagesButtons();showScreen("stageScreen");}
+
 function buildStagesButtons(){
-  stagesButtons.innerHTML="";
-  stages.forEach((s,i)=>{
-    const b=document.createElement("button");
-    b.textContent=i<=unlockedStage?s.title:s.title+" 🔒";
-    if(i<=unlockedStage) b.onclick=()=>startStage(i);
-    stagesButtons.appendChild(b);
-  });
+ stagesButtons.innerHTML="";
+ stages.forEach((s,i)=>{
+  const b=document.createElement("button");
+  b.textContent=s.title;
+  b.onclick=()=>{currentStage=i;loadStage();showScreen("gameScreen");};
+  stagesButtons.appendChild(b);
+ });
 }
 
 function loadStage(){
-  const s=stages[currentStage];
-  stageTitle.innerText=s.title;
-  answerInput.value="";
-  message.innerText="";
-  wordDisplay.style.display=s.showWord?"block":"none";
-  wordDisplay.innerText=s.word;
-  questionImage.style.display="block";
-  questionImage.src=s.image;
-  buildKeyboard();
+ const s=stages[currentStage];
+ stageTitle.innerText=s.title;
+ questionImage.src=s.image;
+ answerInput.value="";
+ message.innerText="";
+ wordDisplay.style.display=s.showWord?"block":"none";
+ wordDisplay.innerText=s.word;
+ buildKeyboard();
 }
 
 function buildKeyboard(){
-  keyboard.innerHTML="";
-  [...new Set(stages[currentStage].answer.split(""))].forEach(l=>{
-    const d=document.createElement("div");
-    d.className="key";
-    d.innerText=l;
-    d.onclick=()=>answerInput.value+=l;
-    keyboard.appendChild(d);
-  });
+ keyboard.innerHTML="";
+ [...new Set(stages[currentStage].answer.split(""))].forEach(l=>{
+  const d=document.createElement("div");
+  d.className="key";
+  d.innerText=l;
+  d.onclick=()=>answerInput.value+=l;
+  keyboard.appendChild(d);
+ });
 }
+
 function clearInput(){answerInput.value="";}
 
-/* ===== Sound & Celebration ===== */
-function playWinSound(){
-  if(!soundOn) return;
-  const ctx=new (window.AudioContext||window.webkitAudioContext)();
-  const o=ctx.createOscillator(),g=ctx.createGain();
-  o.frequency.value=880;
-  g.gain.value=0.15;
-  o.connect(g).connect(ctx.destination);
-  o.start(); o.stop(ctx.currentTime+0.25);
-}
-
-function showCelebration(){
-  celebration.innerHTML="";
-  celebration.style.display="block";
-  for(let i=0;i<30;i++){
-    const e=document.createElement("div");
-    e.className="celebrate-item";
-    e.style.left=Math.random()*100+"%";
-    e.textContent=["⭐","✨","ⵣ"][Math.floor(Math.random()*3)];
-    celebration.appendChild(e);
-  }
-  setTimeout(()=>celebration.style.display="none",2000);
-}
-
-/* ===== Game Logic ===== */
 function checkAnswer(){
-  if(answerInput.value===stages[currentStage].answer){
-    playWinSound();
-    showCelebration();
-    message.innerText="✔️ أحسنت";
-    message.className="success";
-    if(currentStage===unlockedStage && unlockedStage<stages.length-1){
-      unlockedStage++;
-      localStorage.setItem("unlockedStage",unlockedStage);
-    }
-    setTimeout(()=>{
-      currentStage===stages.length-1?showScreen("endScreen"):loadStage(++currentStage);
-    },1200);
-  }else{
-    message.innerText="❌ حاول مرة أخرى";
-    message.className="error";
-    clearInput();
-  }
-}
-
-function resetGame(){
-  unlockedStage=0;
-  currentStage=0;
-  localStorage.removeItem("unlockedStage");
-  goToStages();
-}
-
-/* ===== Modals ===== */
-function openInfo(){infoModal.classList.add("active");}
-function openSettings(){settingsModal.classList.add("active");}
-function closeModals(){
-  infoModal.classList.remove("active");
-  settingsModal.classList.remove("active");
-}
-function toggleSound(){
-  soundOn=!soundOn;
-  soundBtn.innerText=soundOn?"🔊 مفعل":"🔇 صامت";
+ if(answerInput.value===stages[currentStage].answer){
+  message.innerText="✔️ أحسنت";
+  message.className="success";
+ }else{
+  message.innerText="❌ حاول مرة أخرى";
+  message.className="error";
+  clearInput();
+ }
 }
 </script>
 
