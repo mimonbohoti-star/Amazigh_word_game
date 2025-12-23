@@ -6,13 +6,12 @@
 <title>لعبة الكلمات الأمازيغية</title>
 
 <style>
-*{box-sizing:border-box}
-
 body{
   margin:0;
   font-family:sans-serif;
   color:#fff;
   text-align:center;
+  overflow:hidden;
   background:linear-gradient(
     180deg,
     #1e90ff 0%,
@@ -23,15 +22,13 @@ body{
     #f1c40f 100%
   );
 }
-
-/* رمز ⵣ */
 body::before{
   content:"ⵣ";
   position:fixed;
   top:50%;
   left:50%;
   transform:translate(-50%,-50%);
-  font-size:300px;
+  font-size:320px;
   color:rgba(192,57,43,0.12);
   pointer-events:none;
 }
@@ -55,18 +52,39 @@ body::before{
   border-radius:12px;
 }
 
+/* ===== Modal ===== */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.65);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:2000;
+}
+.modal.active{display:flex;}
+.modal-content{
+  background:#12263a;
+  padding:22px;
+  border-radius:18px;
+  width:85%;
+  max-width:360px;
+  box-shadow:0 15px 35px rgba(0,0,0,0.6);
+}
+.modal-content h2{margin-top:0;}
+.modal-content button{margin-top:15px;}
+
 /* ===== Screens ===== */
 .screen{
   display:none;
   min-height:100vh;
-  padding:80px 10px 140px; /* ✔ حل مشكل الحروف لتحت */
-  flex-direction:column;
+  justify-content:center;
   align-items:center;
-  justify-content:flex-start;
+  flex-direction:column;
+  padding-top:70px;
 }
-.screen.active{display:flex}
+.screen.active{display:flex;}
 
-/* ===== Buttons ===== */
 button{
   background:#c0392b;
   border:none;
@@ -75,44 +93,45 @@ button{
   font-size:18px;
   border-radius:12px;
   cursor:pointer;
-  margin:8px;
+  margin:10px;
 }
 
 .logo{
   font-size:90px;
-  margin:30px 0;
+  color:#c0392b;
+  margin-bottom:20px;
 }
 
-/* ===== Image ===== */
+/* ===== Question Image ===== */
 #questionImage{
   width:260px;
   max-width:90%;
-  margin:15px auto;
+  margin:20px auto;
   border-radius:18px;
   background:#fff;
   padding:8px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.35);
+  min-height:200px; /* تثبيت المكان */
 }
 
-/* ===== Input ===== */
+/* ===== Input & Keyboard ===== */
 input{
   padding:12px;
   font-size:22px;
-  width:90%;
-  max-width:320px;
+  width:80%;
+  max-width:300px;
   text-align:left;
   direction:ltr;
   border-radius:10px;
   border:none;
 }
 
-/* ===== Keyboard ===== */
 .keyboard{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(65px,1fr));
+  grid-template-columns:repeat(4,70px);
   gap:10px;
-  width:100%;
-  max-width:320px;
-  margin:15px auto;
+  justify-content:center;
+  margin-top:15px;
 }
 
 .key{
@@ -129,26 +148,25 @@ input{
   font-size:20px;
   margin:10px;
 }
-.success{color:#00ff88}
-.error{color:#ff4c4c}
+.success{color:#00ff88;}
+.error{color:#ff4c4c;}
 
-/* ===== Modal ===== */
-.modal{
+/* ===== Celebration ===== */
+#celebration{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,0.65);
   display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:2000;
+  pointer-events:none;
+  z-index:1500;
 }
-.modal.active{display:flex}
-.modal-content{
-  background:#12263a;
-  padding:22px;
-  border-radius:18px;
-  width:90%;
-  max-width:360px;
+.celebrate-item{
+  position:absolute;
+  top:-40px;
+  font-size:30px;
+  animation:fall 3s linear forwards;
+}
+@keyframes fall{
+  to{transform:translateY(120vh) rotate(540deg);opacity:0;}
 }
 </style>
 </head>
@@ -161,42 +179,41 @@ input{
   <button onclick="openSettings()">⚙️</button>
 </div>
 
-<!-- Info -->
+<!-- Info Modal -->
 <div class="modal" id="infoModal">
   <div class="modal-content">
     <h2>كيفية اللعب</h2>
-    <p>شوف الصورة وركّب الكلمة بالأمازيغية</p>
+    <p>انظر إلى الصورة، ثم اختر الحروف الصحيحة لتكوين الكلمة بالأمازيغية.</p>
     <button onclick="closeModals()">إغلاق</button>
   </div>
 </div>
 
-<!-- Settings -->
+<!-- Settings Modal -->
 <div class="modal" id="settingsModal">
   <div class="modal-content">
     <h2>الإعدادات</h2>
-    <button onclick="toggleSound()" id="soundBtn">🔊 مفعل</button>
-    <br><br>
+    <p>الصوت:
+      <button onclick="toggleSound()" id="soundBtn">🔊 مفعل</button>
+    </p>
     <button onclick="closeModals()">إغلاق</button>
   </div>
 </div>
 
-<!-- Start -->
+<!-- Screens -->
 <div class="screen active" id="startScreen">
   <div class="logo">ⵣ</div>
   <button onclick="continueGame()">متابعة</button>
-  <button onclick="goToStages()">المراحل</button>
+  <button onclick="goToStages()">اختيار المراحل</button>
 </div>
 
-<!-- Stages -->
 <div class="screen" id="stageScreen">
   <h2>المراحل</h2>
   <div id="stagesButtons"></div>
 </div>
 
-<!-- Game -->
 <div class="screen" id="gameScreen">
   <h2 id="stageTitle"></h2>
-  <img id="questionImage">
+  <img id="questionImage" onerror="this.style.display='none'">
   <h1 id="wordDisplay"></h1>
   <div id="message"></div>
   <input id="answerInput" readonly>
@@ -205,33 +222,38 @@ input{
   <button onclick="checkAnswer()">تحقق</button>
 </div>
 
-<!-- End -->
 <div class="screen" id="endScreen">
   <div class="logo">ⵣ</div>
   <h1>أحسنت 🎉</h1>
   <button onclick="resetGame()">إعادة اللعب</button>
 </div>
 
+<div id="celebration"></div>
+
 <script>
+/* ===== Data ===== */
 const stages=[
  {title:"المرحلة 1",answer:"ⵜⴰⴼⵓⵢⵜ",showWord:true,word:"ⵜⴰⴼⵓⵢⵜ",image:"https://upload.wikimedia.org/wikipedia/commons/4/4c/Sun_white.jpg"},
  {title:"المرحلة 2",answer:"ⴰⵢⵢⵓⵔ",showWord:false,word:"",image:"https://upload.wikimedia.org/wikipedia/commons/e/e1/FullMoon2010.jpg"},
- {title:"المرحلة 3",answer:"ⵉⵜⵔⵉ",showWord:true,word:"ⵉⵜⵔⵉ",image:"https://upload.wikimedia.org/wikipedia/commons/2/2f/Starsinthesky.jpg"}
+ {title:"المرحلة 3",answer:"ⵉⵜⵔⵉ",showWord:true,word:"ⵉⵜⵔⵉ",image:"https://upload.wikimedia.org/wikipedia/commons/2/2f/Starsinthesky.jpg"},
+ {title:"المرحلة 4",answer:"ⴰⴷⵔⴰⵔ",showWord:false,word:"",image:"https://upload.wikimedia.org/wikipedia/commons/6/60/Mountain_range_in_Morocco.jpg"},
+ {title:"المرحلة 5",answer:"ⴰⵙⵉⴼ",showWord:false,word:"",image:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='250'><rect width='400' height='250' fill='%23aee1f9'/><path d='M0 150 Q 100 120 200 150 T 400 150 L 400 250 L 0 250 Z' fill='%23298fca'/></svg>"}
 ];
 
 let currentStage=0;
-let unlockedStage=+localStorage.getItem("unlockedStage")||0;
+let unlockedStage=parseInt(localStorage.getItem("unlockedStage"))||0;
 let soundOn=true;
 
+/* ===== Navigation ===== */
 function showScreen(id){
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 }
+function continueGame(){currentStage=unlockedStage;loadStage();showScreen("gameScreen");}
+function goToStages(){buildStagesButtons();showScreen("stageScreen");}
+function startStage(i){currentStage=i;loadStage();showScreen("gameScreen");}
 
-function continueGame(){currentStage=unlockedStage;loadStage();showScreen("gameScreen")}
-function goToStages(){buildStagesButtons();showScreen("stageScreen")}
-function startStage(i){currentStage=i;loadStage();showScreen("gameScreen")}
-
+/* ===== UI ===== */
 function buildStagesButtons(){
   stagesButtons.innerHTML="";
   stages.forEach((s,i)=>{
@@ -249,51 +271,85 @@ function loadStage(){
   message.innerText="";
   wordDisplay.style.display=s.showWord?"block":"none";
   wordDisplay.innerText=s.word;
+  questionImage.style.display="block";
   questionImage.src=s.image;
   buildKeyboard();
 }
 
 function buildKeyboard(){
   keyboard.innerHTML="";
-  [...new Set(stages[currentStage].answer)].forEach(l=>{
-    const k=document.createElement("div");
-    k.className="key";
-    k.textContent=l;
-    k.onclick=()=>answerInput.value+=l;
-    keyboard.appendChild(k);
+  [...new Set(stages[currentStage].answer.split(""))].forEach(l=>{
+    const d=document.createElement("div");
+    d.className="key";
+    d.innerText=l;
+    d.onclick=()=>answerInput.value+=l;
+    keyboard.appendChild(d);
   });
 }
+function clearInput(){answerInput.value="";}
 
-function clearInput(){answerInput.value=""}
+/* ===== Sound & Celebration ===== */
+function playWinSound(){
+  if(!soundOn) return;
+  const ctx=new (window.AudioContext||window.webkitAudioContext)();
+  const o=ctx.createOscillator(),g=ctx.createGain();
+  o.frequency.value=880;
+  g.gain.value=0.15;
+  o.connect(g).connect(ctx.destination);
+  o.start(); o.stop(ctx.currentTime+0.25);
+}
 
+function showCelebration(){
+  celebration.innerHTML="";
+  celebration.style.display="block";
+  for(let i=0;i<30;i++){
+    const e=document.createElement("div");
+    e.className="celebrate-item";
+    e.style.left=Math.random()*100+"%";
+    e.textContent=["⭐","✨","ⵣ"][Math.floor(Math.random()*3)];
+    celebration.appendChild(e);
+  }
+  setTimeout(()=>celebration.style.display="none",2000);
+}
+
+/* ===== Game Logic ===== */
 function checkAnswer(){
   if(answerInput.value===stages[currentStage].answer){
-    message.textContent="✔️ أحسنت";
+    playWinSound();
+    showCelebration();
+    message.innerText="✔️ أحسنت";
     message.className="success";
-    if(currentStage===unlockedStage) localStorage.setItem("unlockedStage",++unlockedStage);
-    setTimeout(()=>currentStage<stages.length-1?loadStage(++currentStage):showScreen("endScreen"),900);
+    if(currentStage===unlockedStage && unlockedStage<stages.length-1){
+      unlockedStage++;
+      localStorage.setItem("unlockedStage",unlockedStage);
+    }
+    setTimeout(()=>{
+      currentStage===stages.length-1?showScreen("endScreen"):loadStage(++currentStage);
+    },1200);
   }else{
-    message.textContent="❌ حاول مرة أخرى";
+    message.innerText="❌ حاول مرة أخرى";
     message.className="error";
     clearInput();
   }
 }
 
 function resetGame(){
-  localStorage.clear();
   unlockedStage=0;
+  currentStage=0;
+  localStorage.removeItem("unlockedStage");
   goToStages();
 }
 
-function openInfo(){infoModal.classList.add("active")}
-function openSettings(){settingsModal.classList.add("active")}
+/* ===== Modals ===== */
+function openInfo(){infoModal.classList.add("active");}
+function openSettings(){settingsModal.classList.add("active");}
 function closeModals(){
   infoModal.classList.remove("active");
   settingsModal.classList.remove("active");
 }
 function toggleSound(){
   soundOn=!soundOn;
-  soundBtn.textContent=soundOn?"🔊 مفعل":"🔇 صامت";
+  soundBtn.innerText=soundOn?"🔊 مفعل":"🔇 صامت";
 }
 </script>
 
