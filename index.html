@@ -9,24 +9,12 @@
 body{
   margin:0;
   font-family:sans-serif;
-  background:linear-gradient(180deg,#0e1624,#12263a);
+  background:#0e1624;
   color:#fff;
   text-align:center;
 }
-body::before{
-  content:"ⵣ";
-  position:fixed;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  font-size:320px;
-  color:rgba(255,255,255,0.06);
-  pointer-events:none;
-}
-
-.screen{display:none;min-height:100vh;justify-content:center;align-items:center;flex-direction:column;padding-top:60px;}
-.screen.active{display:flex;}
-
+.screen{display:none;min-height:100vh;justify-content:center;align-items:center;flex-direction:column}
+.screen.active{display:flex}
 button{
   background:#c0392b;
   border:none;
@@ -36,18 +24,25 @@ button{
   border-radius:12px;
   margin:10px;
 }
-
-.logo{font-size:90px;color:#e74c3c;}
-
 #questionImage{
   width:260px;
   max-width:90%;
-  margin:20px auto;
   background:#fff;
   border-radius:18px;
   padding:10px;
 }
-
+.keyboard{
+  display:grid;
+  grid-template-columns:repeat(4,70px);
+  gap:10px;
+  margin-top:15px;
+}
+.key{
+  background:#1c2b3a;
+  padding:18px;
+  font-size:24px;
+  border-radius:14px;
+}
 input{
   padding:12px;
   font-size:22px;
@@ -58,111 +53,82 @@ input{
   border-radius:10px;
   border:none;
 }
-
-.keyboard{
-  display:grid;
-  grid-template-columns:repeat(4,70px);
-  gap:10px;
-  justify-content:center;
-  margin-top:15px;
-}
-.key{
-  background:#1c2b3a;
-  padding:18px;
-  font-size:24px;
-  border-radius:14px;
-}
-
-#message{min-height:30px;font-size:20px;}
-.success{color:#2ecc71;}
-.error{color:#e74c3c;}
+.success{color:#2ecc71}
+.error{color:#e74c3c}
 </style>
 </head>
 
 <body>
 
-<div class="screen active" id="startScreen">
-  <div class="logo">ⵣ</div>
-  <button onclick="startGame()">ابدأ</button>
+<div class="screen active" id="start">
+  <h1>ⵣ</h1>
+  <button onclick="start()">ابدأ</button>
 </div>
 
-<div class="screen" id="gameScreen">
-  <h2 id="stageTitle"></h2>
+<div class="screen" id="game">
+  <h2 id="title"></h2>
   <img id="questionImage">
-  <h1 id="wordDisplay"></h1>
-  <div id="message"></div>
-  <input id="answerInput" readonly>
-  <button onclick="clearInput()">مسح</button>
-  <div class="keyboard" id="keyboard"></div>
-  <button onclick="checkAnswer()">تحقق</button>
+  <h1 id="word"></h1>
+  <div id="msg"></div>
+  <input id="input" readonly>
+  <button onclick="input.value=''">مسح</button>
+  <div class="keyboard" id="kb"></div>
+  <button onclick="check()">تحقق</button>
 </div>
 
 <script>
-/* ===== صور SVG مدموجة ===== */
-const IMAGES={
- sun:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='200'><circle cx='150' cy='100' r='50' fill='orange'/></svg>",
- moon:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='200'><circle cx='150' cy='100' r='50' fill='%23ddd'/></svg>",
- star:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='200'><polygon points='150,30 170,90 230,90 180,130 200,190 150,155 100,190 120,130 70,90 130,90' fill='yellow'/></svg>",
- mountain:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='200'><polygon points='0,180 80,80 160,180' fill='%23777'/><polygon points='140,180 220,60 300,180' fill='%23999'/></svg>",
- river:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='200'><rect width='300' height='200' fill='%23bde7ff'/><path d='M0 120 Q150 80 300 120' stroke='%23007acc' stroke-width='20' fill='none'/></svg>"
+/* ===== صور base64 (مضمونة) ===== */
+const IMG={
+ sun:"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxNTAiIGN5PSIxMDAiIHI9IjUwIiBmaWxsPSJvcmFuZ2UiLz48L3N2Zz4=",
+ moon:"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxNTAiIGN5PSIxMDAiIHI9IjUwIiBmaWxsPSIjZGRkIi8+PC9zdmc+",
+ star:"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cG9seWdvbiBwb2ludHM9IjE1MCwzMCAxNzAsOTAgMjMwLDkwIDE4MCwxMzAgMjAwLDE5MCAxNTAsMTU1IDEwMCwxOTAgMTIwLDEzMCA3MCw5MCAxMzAsOTAiIGZpbGw9InllbGxvdyIvPjwvc3ZnPg==",
+ mountain:"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cG9seWdvbiBwb2ludHM9IjAsMTgwIDgwLDgwIDE2MCwxODAiIGZpbGw9IiM3NzciLz48cG9seWdvbiBwb2ludHM9IjE0MCwxODAgMjIwLDYwIDMwMCwxODAiIGZpbGw9IiM5OTkiLz48L3N2Zz4=",
+ river:"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2JkZTdmZiIvPjxwYXRoIGQ9Ik0wIDEyMCBRMTUwIDgwIDMwMCAxMjAiIHN0cm9rZT0iIzAwN2FjYyIgc3Ryb2tlLXdpZHRoPSIyMCIgZmlsbD0ibm9uZSIvPjwvc3ZnPg=="
 };
 
-/* ===== المراحل ===== */
 const stages=[
- {title:"المرحلة 1",answer:"ⵜⴰⴼⵓⵢⵜ",show:true,word:"ⵜⴰⴼⵓⵢⵜ",img:IMAGES.sun},
- {title:"المرحلة 2",answer:"ⴰⵢⵢⵓⵔ",show:false,word:"",img:IMAGES.moon},
- {title:"المرحلة 3",answer:"ⵉⵜⵔⵉ",show:true,word:"ⵉⵜⵔⵉ",img:IMAGES.star},
- {title:"المرحلة 4",answer:"ⴰⴷⵔⴰⵔ",show:false,word:"",img:IMAGES.mountain},
- {title:"المرحلة 5",answer:"ⴰⵙⵉⴼ",show:false,word:"",img:IMAGES.river}
+ {t:"المرحلة 1",a:"ⵜⴰⴼⵓⵢⵜ",w:"ⵜⴰⴼⵓⵢⵜ",i:IMG.sun},
+ {t:"المرحلة 2",a:"ⴰⵢⵢⵓⵔ",w:"",i:IMG.moon},
+ {t:"المرحلة 3",a:"ⵉⵜⵔⵉ",w:"ⵉⵜⵔⵉ",i:IMG.star},
+ {t:"المرحلة 4",a:"ⴰⴷⵔⴰⵔ",w:"",i:IMG.mountain},
+ {t:"المرحلة 5",a:"ⴰⵙⵉⴼ",w:"",i:IMG.river}
 ];
 
-let current=0;
+let c=0;
 
-/* ===== تشغيل ===== */
-function startGame(){
-  document.getElementById("startScreen").classList.remove("active");
-  document.getElementById("gameScreen").classList.add("active");
-  loadStage();
+function start(){
+start.classList.remove("active");
+game.classList.add("active");
+load();
 }
-
-function loadStage(){
-  const s=stages[current];
-  stageTitle.innerText=s.title;
-  questionImage.src=s.img;
-  wordDisplay.style.display=s.show?"block":"none";
-  wordDisplay.innerText=s.word;
-  answerInput.value="";
-  message.innerText="";
-  buildKeyboard();
+function load(){
+title.innerText=stages[c].t;
+questionImage.src=stages[c].i;
+word.innerText=stages[c].w;
+input.value="";
+msg.innerText="";
+kb.innerHTML="";
+[...new Set(stages[c].a.split(""))].forEach(l=>{
+const d=document.createElement("div");
+d.className="key";
+d.innerText=l;
+d.onclick=()=>input.value+=l;
+kb.appendChild(d);
+});
 }
-
-function buildKeyboard(){
-  keyboard.innerHTML="";
-  [...new Set(stages[current].answer.split(""))].forEach(l=>{
-    const k=document.createElement("div");
-    k.className="key";
-    k.innerText=l;
-    k.onclick=()=>answerInput.value+=l;
-    keyboard.appendChild(k);
-  });
+function check(){
+if(input.value===stages[c].a){
+msg.innerText="✔️ صحيح";
+msg.className="success";
+c++;
+if(c<stages.length) setTimeout(load,800);
+else msg.innerText="🎉 سالات اللعبة";
+}else{
+msg.innerText="❌ خطأ";
+msg.className="error";
+input.value="";
 }
-
-function clearInput(){answerInput.value="";}
-
-function checkAnswer(){
-  if(answerInput.value===stages[current].answer){
-    message.innerText="✔️ صحيح";
-    message.className="success";
-    current++;
-    if(current<stages.length) setTimeout(loadStage,800);
-    else message.innerText="🎉 كملتي اللعبة";
-  }else{
-    message.innerText="❌ خطأ";
-    message.className="error";
-    clearInput();
-  }
 }
 </script>
-
 </body>
 </html>
