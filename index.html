@@ -48,7 +48,9 @@ button{
   cursor:pointer;
   background:#1abc9c;
   color:#fff;
+  transition:.2s;
 }
+button:active{transform:scale(.96)}
 
 #message{
   min-height:30px;
@@ -57,6 +59,16 @@ button{
 }
 .success{color:#00ff99}
 .error{color:#ff5555}
+
+/* shake */
+.shake{
+  animation:shake .3s;
+}
+@keyframes shake{
+  0%,100%{transform:translateX(0)}
+  25%{transform:translateX(6px)}
+  75%{transform:translateX(-6px)}
+}
 
 /* celebration */
 #celebration{
@@ -80,8 +92,8 @@ button{
 <body>
 
 <div class="game">
-  <h1 id="title">ⵜⴰⴼⵓⵢⵜ</h1>
-  <img id="image" src="">
+  <h1 id="title"></h1>
+  <img id="image" src="" onerror="this.style.display='none'">
   <input id="answer" readonly>
   <button onclick="check()">تحقق</button>
   <div id="message"></div>
@@ -109,14 +121,21 @@ loadStage();
 function loadStage(){
   const s = stages[stage];
   title.textContent = s.word;
+  img.style.display="block";
   img.src = s.image;
   ans.value = "";
   msg.textContent = "";
+  msg.className="";
 }
 
 document.addEventListener("keydown",e=>{
-  if(e.key==="Backspace") ans.value=ans.value.slice(0,-1);
-  else if(e.key.length===1) ans.value+=e.key;
+  const max = stages[stage].word.length;
+  if(e.key==="Backspace"){
+    ans.value = ans.value.slice(0,-1);
+  }
+  else if(e.key.length===1 && ans.value.length < max){
+    ans.value += e.key;
+  }
 });
 
 function check(){
@@ -132,6 +151,8 @@ function check(){
   }else{
     msg.textContent="❌ حاول مرة أخرى";
     msg.className="error";
+    ans.classList.add("shake");
+    setTimeout(()=>ans.classList.remove("shake"),300);
     ans.value="";
   }
 }
