@@ -2,10 +2,12 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>لعبة الكلمات الأمازيغية</title>
 
 <style>
+*{box-sizing:border-box}
+
 body{
   margin:0;
   font-family:sans-serif;
@@ -22,17 +24,16 @@ body{
   );
 }
 
+/* رمز ⵣ */
 body::before{
   content:"ⵣ";
   position:fixed;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
   font-size:300px;
   color:rgba(192,57,43,0.12);
   pointer-events:none;
-  z-index:0;
 }
 
 /* ===== Top Bar ===== */
@@ -58,14 +59,14 @@ body::before{
 .screen{
   display:none;
   min-height:100vh;
-  padding:80px 10px 40px;
-  box-sizing:border-box;
-  justify-content:flex-start;
-  align-items:center;
+  padding:80px 10px 140px; /* ✔ حل مشكل الحروف لتحت */
   flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
 }
-.screen.active{display:flex;}
+.screen.active{display:flex}
 
+/* ===== Buttons ===== */
 button{
   background:#c0392b;
   border:none;
@@ -74,13 +75,12 @@ button{
   font-size:18px;
   border-radius:12px;
   cursor:pointer;
-  margin:10px;
+  margin:8px;
 }
 
 .logo{
   font-size:90px;
-  color:#c0392b;
-  margin:20px 0;
+  margin:30px 0;
 }
 
 /* ===== Image ===== */
@@ -91,28 +91,28 @@ button{
   border-radius:18px;
   background:#fff;
   padding:8px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.35);
 }
 
-/* ===== Input & Keyboard ===== */
+/* ===== Input ===== */
 input{
   padding:12px;
   font-size:22px;
-  width:80%;
-  max-width:300px;
+  width:90%;
+  max-width:320px;
   text-align:left;
   direction:ltr;
   border-radius:10px;
   border:none;
-  margin-bottom:10px;
 }
 
+/* ===== Keyboard ===== */
 .keyboard{
   display:grid;
-  grid-template-columns:repeat(4,70px);
+  grid-template-columns:repeat(auto-fit,minmax(65px,1fr));
   gap:10px;
-  justify-content:center;
-  margin:10px 0 20px;
+  width:100%;
+  max-width:320px;
+  margin:15px auto;
 }
 
 .key{
@@ -129,23 +129,62 @@ input{
   font-size:20px;
   margin:10px;
 }
-.success{color:#00ff88;}
-.error{color:#ff4c4c;}
+.success{color:#00ff88}
+.error{color:#ff4c4c}
+
+/* ===== Modal ===== */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.65);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:2000;
+}
+.modal.active{display:flex}
+.modal-content{
+  background:#12263a;
+  padding:22px;
+  border-radius:18px;
+  width:90%;
+  max-width:360px;
+}
 </style>
 </head>
 
 <body>
 
+<!-- Top Bar -->
 <div class="topbar">
-  <button onclick="showScreen('startScreen')">🏠</button>
-  <button onclick="showScreen('stageScreen')">📚</button>
+  <button onclick="openInfo()">ℹ️</button>
+  <button onclick="openSettings()">⚙️</button>
+</div>
+
+<!-- Info -->
+<div class="modal" id="infoModal">
+  <div class="modal-content">
+    <h2>كيفية اللعب</h2>
+    <p>شوف الصورة وركّب الكلمة بالأمازيغية</p>
+    <button onclick="closeModals()">إغلاق</button>
+  </div>
+</div>
+
+<!-- Settings -->
+<div class="modal" id="settingsModal">
+  <div class="modal-content">
+    <h2>الإعدادات</h2>
+    <button onclick="toggleSound()" id="soundBtn">🔊 مفعل</button>
+    <br><br>
+    <button onclick="closeModals()">إغلاق</button>
+  </div>
 </div>
 
 <!-- Start -->
 <div class="screen active" id="startScreen">
   <div class="logo">ⵣ</div>
   <button onclick="continueGame()">متابعة</button>
-  <button onclick="goToStages()">اختيار المراحل</button>
+  <button onclick="goToStages()">المراحل</button>
 </div>
 
 <!-- Stages -->
@@ -166,58 +205,57 @@ input{
   <button onclick="checkAnswer()">تحقق</button>
 </div>
 
+<!-- End -->
+<div class="screen" id="endScreen">
+  <div class="logo">ⵣ</div>
+  <h1>أحسنت 🎉</h1>
+  <button onclick="resetGame()">إعادة اللعب</button>
+</div>
+
 <script>
 const stages=[
  {title:"المرحلة 1",answer:"ⵜⴰⴼⵓⵢⵜ",showWord:true,word:"ⵜⴰⴼⵓⵢⵜ",image:"https://upload.wikimedia.org/wikipedia/commons/4/4c/Sun_white.jpg"},
  {title:"المرحلة 2",answer:"ⴰⵢⵢⵓⵔ",showWord:false,word:"",image:"https://upload.wikimedia.org/wikipedia/commons/e/e1/FullMoon2010.jpg"},
- {title:"المرحلة 3",answer:"ⵉⵜⵔⵉ",showWord:true,word:"ⵉⵜⵔⵉ",image:"https://upload.wikimedia.org/wikipedia/commons/2/2f/Starsinthesky.jpg"},
- {title:"المرحلة 4",answer:"ⴰⴷⵔⴰⵔ",showWord:false,word:"",image:"https://upload.wikimedia.org/wikipedia/commons/6/60/Mountain_range_in_Morocco.jpg"},
- {title:"المرحلة 5",answer:"ⴰⵙⵉⴼ",showWord:false,word:"",image:"https://upload.wikimedia.org/wikipedia/commons/5/5c/River_in_Morocco.jpg"}
+ {title:"المرحلة 3",answer:"ⵉⵜⵔⵉ",showWord:true,word:"ⵉⵜⵔⵉ",image:"https://upload.wikimedia.org/wikipedia/commons/2/2f/Starsinthesky.jpg"}
 ];
 
 let currentStage=0;
-let unlockedStage=parseInt(localStorage.getItem("unlockedStage"))||0;
+let unlockedStage=+localStorage.getItem("unlockedStage")||0;
+let soundOn=true;
 
 function showScreen(id){
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 }
 
-function continueGame(){
-  currentStage=unlockedStage;
-  loadStage();
-  showScreen("gameScreen");
-}
-
-function goToStages(){
-  buildStagesButtons();
-  showScreen("stageScreen");
-}
+function continueGame(){currentStage=unlockedStage;loadStage();showScreen("gameScreen")}
+function goToStages(){buildStagesButtons();showScreen("stageScreen")}
+function startStage(i){currentStage=i;loadStage();showScreen("gameScreen")}
 
 function buildStagesButtons(){
   stagesButtons.innerHTML="";
   stages.forEach((s,i)=>{
     const b=document.createElement("button");
-    b.textContent=i<=unlockedStage ? s.title : s.title+" 🔒";
-    if(i<=unlockedStage) b.onclick=()=>{currentStage=i;loadStage();showScreen("gameScreen");};
+    b.textContent=i<=unlockedStage?s.title:s.title+" 🔒";
+    if(i<=unlockedStage) b.onclick=()=>startStage(i);
     stagesButtons.appendChild(b);
   });
 }
 
 function loadStage(){
   const s=stages[currentStage];
-  stageTitle.textContent=s.title;
-  wordDisplay.style.display=s.showWord?"block":"none";
-  wordDisplay.textContent=s.word;
-  questionImage.src=s.image;
+  stageTitle.innerText=s.title;
   answerInput.value="";
-  message.textContent="";
+  message.innerText="";
+  wordDisplay.style.display=s.showWord?"block":"none";
+  wordDisplay.innerText=s.word;
+  questionImage.src=s.image;
   buildKeyboard();
 }
 
 function buildKeyboard(){
   keyboard.innerHTML="";
-  [...new Set(stages[currentStage].answer.split(""))].forEach(l=>{
+  [...new Set(stages[currentStage].answer)].forEach(l=>{
     const k=document.createElement("div");
     k.className="key";
     k.textContent=l;
@@ -226,26 +264,36 @@ function buildKeyboard(){
   });
 }
 
-function clearInput(){answerInput.value="";}
+function clearInput(){answerInput.value=""}
 
 function checkAnswer(){
   if(answerInput.value===stages[currentStage].answer){
     message.textContent="✔️ أحسنت";
     message.className="success";
-    if(currentStage===unlockedStage && unlockedStage<stages.length-1){
-      unlockedStage++;
-      localStorage.setItem("unlockedStage",unlockedStage);
-    }
-    setTimeout(()=>{
-      currentStage++;
-      if(currentStage<stages.length){loadStage();}
-      else showScreen("startScreen");
-    },1000);
+    if(currentStage===unlockedStage) localStorage.setItem("unlockedStage",++unlockedStage);
+    setTimeout(()=>currentStage<stages.length-1?loadStage(++currentStage):showScreen("endScreen"),900);
   }else{
     message.textContent="❌ حاول مرة أخرى";
     message.className="error";
     clearInput();
   }
+}
+
+function resetGame(){
+  localStorage.clear();
+  unlockedStage=0;
+  goToStages();
+}
+
+function openInfo(){infoModal.classList.add("active")}
+function openSettings(){settingsModal.classList.add("active")}
+function closeModals(){
+  infoModal.classList.remove("active");
+  settingsModal.classList.remove("active");
+}
+function toggleSound(){
+  soundOn=!soundOn;
+  soundBtn.textContent=soundOn?"🔊 مفعل":"🔇 صامت";
 }
 </script>
 
