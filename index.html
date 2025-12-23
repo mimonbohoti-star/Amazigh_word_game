@@ -32,25 +32,22 @@ body::before{
   color:rgba(192,57,43,0.12);
   pointer-events:none;
 }
-
 .topbar{
   position:fixed;
-  top:0; left:0;
+  top:0;left:0;
   width:100%;
   display:flex;
   justify-content:space-between;
   padding:10px 15px;
-  z-index:1000;
 }
 .topbar button{
-  background:rgba(0,0,0,0.45);
+  background:rgba(0,0,0,.45);
   border:none;
   color:#fff;
   font-size:20px;
   padding:8px 14px;
   border-radius:12px;
 }
-
 .screen{
   display:none;
   min-height:100vh;
@@ -60,7 +57,6 @@ body::before{
   padding-top:70px;
 }
 .screen.active{display:flex;}
-
 button{
   background:#c0392b;
   border:none;
@@ -68,16 +64,9 @@ button{
   padding:14px 30px;
   font-size:18px;
   border-radius:12px;
-  cursor:pointer;
   margin:10px;
 }
-
-.logo{
-  font-size:90px;
-  color:#c0392b;
-  margin-bottom:20px;
-}
-
+.logo{font-size:90px;color:#c0392b;}
 #questionImage{
   width:260px;
   max-width:90%;
@@ -85,42 +74,29 @@ button{
   border-radius:18px;
   background:#fff;
   padding:8px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.35);
   min-height:200px;
 }
-
 input{
   padding:12px;
   font-size:22px;
   width:80%;
   max-width:300px;
-  text-align:left;
   direction:ltr;
   border-radius:10px;
   border:none;
 }
-
 .keyboard{
   display:grid;
   grid-template-columns:repeat(4,70px);
   gap:10px;
-  justify-content:center;
-  margin-top:15px;
 }
-
 .key{
-  background:rgba(14,22,36,0.85);
+  background:#12263a;
   padding:18px;
   font-size:24px;
   border-radius:14px;
-  cursor:pointer;
 }
-
-#message{
-  min-height:30px;
-  font-size:20px;
-  margin:10px;
-}
+#message{min-height:30px;font-size:20px;}
 .success{color:#00ff88;}
 .error{color:#ff4c4c;}
 </style>
@@ -134,7 +110,7 @@ input{
 
 <div class="screen active" id="startScreen">
   <div class="logo">ⵣ</div>
-  <button onclick="startGame()">ابدأ</button>
+  <button onclick="startStage(0)">ابدأ</button>
 </div>
 
 <div class="screen" id="gameScreen">
@@ -143,83 +119,63 @@ input{
   <h1 id="wordDisplay"></h1>
   <div id="message"></div>
   <input id="answerInput" readonly>
-  <button onclick="clearInput()">مسح</button>
   <div class="keyboard" id="keyboard"></div>
   <button onclick="checkAnswer()">تحقق</button>
 </div>
 
-<div class="screen" id="endScreen">
-  <div class="logo">ⵣ</div>
-  <h1>أحسنت 🎉</h1>
-  <button onclick="location.reload()">إعادة</button>
-</div>
-
 <script>
-const stages = [
- {title:"المرحلة 1", answer:"ⵜⴰⴼⵓⵢⵜ", showWord:true,  word:"ⵜⴰⴼⵓⵢⵜ", image:"images/sun.jpg"},
- {title:"المرحلة 2", answer:"ⴰⵢⵢⵓⵔ", showWord:false, word:"", image:"images/moon.jpg"},
- {title:"المرحلة 3", answer:"ⵉⵜⵔⵉ", showWord:true,  word:"ⵉⵜⵔⵉ", image:"images/stars.jpg"},
- {title:"المرحلة 4", answer:"ⴰⴷⵔⴰⵔ", showWord:false, word:"", image:"images/mountain.jpg"},
- {title:"المرحلة 5", answer:"ⴰⵙⵉⴼ", showWord:false, word:"", image:"images/river.jpg"}
+const stages=[
+ {title:"المرحلة 1",answer:"ⵜⴰⴼⵓⵢⵜ",showWord:true,word:"ⵜⴰⴼⵓⵢⵜ",image:"images/sun.jpg"},
+ {title:"المرحلة 2",answer:"ⴰⵢⵢⵓⵔ",showWord:false,word:"",image:"images/moon.jpg"},
+ {title:"المرحلة 3",answer:"ⵉⵜⵔⵉ",showWord:true,word:"ⵉⵜⵔⵉ",image:"images/stars.jpg"},
+ {title:"المرحلة 4",answer:"ⴰⴷⵔⴰⵔ",showWord:false,word:"",image:"images/mountain.jpg"},
+ {title:"المرحلة 5",answer:"ⴰⵙⵉⴼ",showWord:false,word:"",image:"images/river.jpg"}
 ];
 
-let current = 0;
-
-const stageTitle = document.getElementById("stageTitle");
-const questionImage = document.getElementById("questionImage");
-const wordDisplay = document.getElementById("wordDisplay");
-const answerInput = document.getElementById("answerInput");
-const keyboard = document.getElementById("keyboard");
-const message = document.getElementById("message");
+let currentStage=0;
 
 function showScreen(id){
-  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
+ document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
 }
 
-function startGame(){
-  current = 0;
-  loadStage();
-  showScreen("gameScreen");
+function startStage(i){
+ currentStage=i;
+ loadStage();
+ showScreen("gameScreen");
 }
 
 function loadStage(){
-  const s = stages[current];
-  stageTitle.textContent = s.title;
-  questionImage.src = s.image;
-  wordDisplay.style.display = s.showWord ? "block" : "none";
-  wordDisplay.textContent = s.word;
-  answerInput.value = "";
-  message.textContent = "";
-  buildKeyboard();
+ const s=stages[currentStage];
+ stageTitle.innerText=s.title;
+ wordDisplay.style.display=s.showWord?"block":"none";
+ wordDisplay.innerText=s.word;
+ questionImage.src=s.image;
+ answerInput.value="";
+ message.innerText="";
+ buildKeyboard();
 }
 
 function buildKeyboard(){
-  keyboard.innerHTML = "";
-  [...new Set(stages[current].answer.split(""))].forEach(l=>{
-    const d = document.createElement("div");
-    d.className = "key";
-    d.textContent = l;
-    d.onclick = ()=> answerInput.value += l;
-    keyboard.appendChild(d);
-  });
+ keyboard.innerHTML="";
+ [...new Set(stages[currentStage].answer.split(""))].forEach(l=>{
+   const k=document.createElement("div");
+   k.className="key";
+   k.innerText=l;
+   k.onclick=()=>answerInput.value+=l;
+   keyboard.appendChild(k);
+ });
 }
 
-function clearInput(){ answerInput.value=""; }
-
 function checkAnswer(){
-  if(answerInput.value === stages[current].answer){
-    message.textContent = "✔️ أحسنت";
-    message.className = "success";
-    setTimeout(()=>{
-      current++;
-      current >= stages.length ? showScreen("endScreen") : loadStage();
-    },800);
-  }else{
-    message.textContent = "❌ حاول مرة أخرى";
-    message.className = "error";
-    clearInput();
-  }
+ if(answerInput.value===stages[currentStage].answer){
+   message.innerText="✔️ أحسنت";
+   message.className="success";
+ }else{
+   message.innerText="❌ خطأ";
+   message.className="error";
+   answerInput.value="";
+ }
 }
 </script>
 
