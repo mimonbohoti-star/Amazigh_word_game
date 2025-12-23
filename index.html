@@ -9,18 +9,9 @@
 body{
   margin:0;
   font-family:sans-serif;
+  background:linear-gradient(180deg,#0e1624,#12263a);
   color:#fff;
   text-align:center;
-  overflow:hidden;
-  background:linear-gradient(
-    180deg,
-    #1e90ff 0%,
-    #1e90ff 33%,
-    #2ecc71 33%,
-    #2ecc71 66%,
-    #f1c40f 66%,
-    #f1c40f 100%
-  );
 }
 body::before{
   content:"ⵣ";
@@ -29,92 +20,34 @@ body::before{
   left:50%;
   transform:translate(-50%,-50%);
   font-size:320px;
-  color:rgba(192,57,43,0.12);
+  color:rgba(255,255,255,0.06);
   pointer-events:none;
 }
 
-/* ===== Top Bar ===== */
-.topbar{
-  position:fixed;
-  top:0; left:0;
-  width:100%;
-  display:flex;
-  justify-content:space-between;
-  padding:10px 15px;
-  z-index:1000;
-}
-.topbar button{
-  background:rgba(0,0,0,0.45);
-  border:none;
-  color:#fff;
-  font-size:20px;
-  padding:8px 14px;
-  border-radius:12px;
-}
-
-/* ===== Modal ===== */
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.65);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:2000;
-}
-.modal.active{display:flex;}
-.modal-content{
-  background:#12263a;
-  padding:22px;
-  border-radius:18px;
-  width:85%;
-  max-width:360px;
-  box-shadow:0 15px 35px rgba(0,0,0,0.6);
-}
-.modal-content h2{margin-top:0;}
-.modal-content button{margin-top:15px;}
-
-/* ===== Screens ===== */
-.screen{
-  display:none;
-  min-height:100vh;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-  padding-top:70px;
-}
+.screen{display:none;min-height:100vh;justify-content:center;align-items:center;flex-direction:column;padding-top:60px;}
 .screen.active{display:flex;}
 
 button{
   background:#c0392b;
   border:none;
   color:#fff;
-  padding:14px 30px;
+  padding:14px 26px;
   font-size:18px;
   border-radius:12px;
-  cursor:pointer;
   margin:10px;
 }
 
-.logo{
-  font-size:90px;
-  color:#c0392b;
-  margin-bottom:20px;
-}
+.logo{font-size:90px;color:#e74c3c;}
 
-/* ===== Question Image ===== */
 #questionImage{
   width:260px;
   max-width:90%;
   margin:20px auto;
-  border-radius:18px;
   background:#fff;
-  padding:8px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.35);
-  min-height:200px; /* تثبيت المكان */
+  border-radius:18px;
+  padding:10px;
 }
 
-/* ===== Input & Keyboard ===== */
 input{
   padding:12px;
   font-size:22px;
@@ -133,87 +66,29 @@ input{
   justify-content:center;
   margin-top:15px;
 }
-
 .key{
-  background:rgba(14,22,36,0.85);
+  background:#1c2b3a;
   padding:18px;
   font-size:24px;
   border-radius:14px;
-  cursor:pointer;
 }
 
-/* ===== Messages ===== */
-#message{
-  min-height:30px;
-  font-size:20px;
-  margin:10px;
-}
-.success{color:#00ff88;}
-.error{color:#ff4c4c;}
-
-/* ===== Celebration ===== */
-#celebration{
-  position:fixed;
-  inset:0;
-  display:none;
-  pointer-events:none;
-  z-index:1500;
-}
-.celebrate-item{
-  position:absolute;
-  top:-40px;
-  font-size:30px;
-  animation:fall 3s linear forwards;
-}
-@keyframes fall{
-  to{transform:translateY(120vh) rotate(540deg);opacity:0;}
-}
+#message{min-height:30px;font-size:20px;}
+.success{color:#2ecc71;}
+.error{color:#e74c3c;}
 </style>
 </head>
 
 <body>
 
-<!-- Top Bar -->
-<div class="topbar">
-  <button onclick="openInfo()">ℹ️</button>
-  <button onclick="openSettings()">⚙️</button>
-</div>
-
-<!-- Info Modal -->
-<div class="modal" id="infoModal">
-  <div class="modal-content">
-    <h2>كيفية اللعب</h2>
-    <p>انظر إلى الصورة، ثم اختر الحروف الصحيحة لتكوين الكلمة بالأمازيغية.</p>
-    <button onclick="closeModals()">إغلاق</button>
-  </div>
-</div>
-
-<!-- Settings Modal -->
-<div class="modal" id="settingsModal">
-  <div class="modal-content">
-    <h2>الإعدادات</h2>
-    <p>الصوت:
-      <button onclick="toggleSound()" id="soundBtn">🔊 مفعل</button>
-    </p>
-    <button onclick="closeModals()">إغلاق</button>
-  </div>
-</div>
-
-<!-- Screens -->
 <div class="screen active" id="startScreen">
   <div class="logo">ⵣ</div>
-  <button onclick="continueGame()">متابعة</button>
-  <button onclick="goToStages()">اختيار المراحل</button>
-</div>
-
-<div class="screen" id="stageScreen">
-  <h2>المراحل</h2>
-  <div id="stagesButtons"></div>
+  <button onclick="startGame()">ابدأ</button>
 </div>
 
 <div class="screen" id="gameScreen">
   <h2 id="stageTitle"></h2>
-  <img id="questionImage" onerror="this.style.display='none'">
+  <img id="questionImage">
   <h1 id="wordDisplay"></h1>
   <div id="message"></div>
   <input id="answerInput" readonly>
@@ -222,134 +97,70 @@ input{
   <button onclick="checkAnswer()">تحقق</button>
 </div>
 
-<div class="screen" id="endScreen">
-  <div class="logo">ⵣ</div>
-  <h1>أحسنت 🎉</h1>
-  <button onclick="resetGame()">إعادة اللعب</button>
-</div>
-
-<div id="celebration"></div>
-
 <script>
-/* ===== Data ===== */
+/* ===== صور SVG مدموجة ===== */
+const IMAGES={
+ sun:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='200'><circle cx='150' cy='100' r='50' fill='orange'/></svg>",
+ moon:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='200'><circle cx='150' cy='100' r='50' fill='%23ddd'/></svg>",
+ star:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='200'><polygon points='150,30 170,90 230,90 180,130 200,190 150,155 100,190 120,130 70,90 130,90' fill='yellow'/></svg>",
+ mountain:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='200'><polygon points='0,180 80,80 160,180' fill='%23777'/><polygon points='140,180 220,60 300,180' fill='%23999'/></svg>",
+ river:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='200'><rect width='300' height='200' fill='%23bde7ff'/><path d='M0 120 Q150 80 300 120' stroke='%23007acc' stroke-width='20' fill='none'/></svg>"
+};
+
+/* ===== المراحل ===== */
 const stages=[
- {title:"المرحلة 1",answer:"ⵜⴰⴼⵓⵢⵜ",showWord:true,word:"ⵜⴰⴼⵓⵢⵜ",image:"https://upload.wikimedia.org/wikipedia/commons/4/4c/Sun_white.jpg"},
- {title:"المرحلة 2",answer:"ⴰⵢⵢⵓⵔ",showWord:false,word:"",image:"https://upload.wikimedia.org/wikipedia/commons/e/e1/FullMoon2010.jpg"},
- {title:"المرحلة 3",answer:"ⵉⵜⵔⵉ",showWord:true,word:"ⵉⵜⵔⵉ",image:"https://upload.wikimedia.org/wikipedia/commons/2/2f/Starsinthesky.jpg"},
- {title:"المرحلة 4",answer:"ⴰⴷⵔⴰⵔ",showWord:false,word:"",image:"https://upload.wikimedia.org/wikipedia/commons/6/60/Mountain_range_in_Morocco.jpg"},
- {title:"المرحلة 5",answer:"ⴰⵙⵉⴼ",showWord:false,word:"",image:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='250'><rect width='400' height='250' fill='%23aee1f9'/><path d='M0 150 Q 100 120 200 150 T 400 150 L 400 250 L 0 250 Z' fill='%23298fca'/></svg>"}
+ {title:"المرحلة 1",answer:"ⵜⴰⴼⵓⵢⵜ",show:true,word:"ⵜⴰⴼⵓⵢⵜ",img:IMAGES.sun},
+ {title:"المرحلة 2",answer:"ⴰⵢⵢⵓⵔ",show:false,word:"",img:IMAGES.moon},
+ {title:"المرحلة 3",answer:"ⵉⵜⵔⵉ",show:true,word:"ⵉⵜⵔⵉ",img:IMAGES.star},
+ {title:"المرحلة 4",answer:"ⴰⴷⵔⴰⵔ",show:false,word:"",img:IMAGES.mountain},
+ {title:"المرحلة 5",answer:"ⴰⵙⵉⴼ",show:false,word:"",img:IMAGES.river}
 ];
 
-let currentStage=0;
-let unlockedStage=parseInt(localStorage.getItem("unlockedStage"))||0;
-let soundOn=true;
+let current=0;
 
-/* ===== Navigation ===== */
-function showScreen(id){
-  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-}
-function continueGame(){currentStage=unlockedStage;loadStage();showScreen("gameScreen");}
-function goToStages(){buildStagesButtons();showScreen("stageScreen");}
-function startStage(i){currentStage=i;loadStage();showScreen("gameScreen");}
-
-/* ===== UI ===== */
-function buildStagesButtons(){
-  stagesButtons.innerHTML="";
-  stages.forEach((s,i)=>{
-    const b=document.createElement("button");
-    b.textContent=i<=unlockedStage?s.title:s.title+" 🔒";
-    if(i<=unlockedStage) b.onclick=()=>startStage(i);
-    stagesButtons.appendChild(b);
-  });
+/* ===== تشغيل ===== */
+function startGame(){
+  document.getElementById("startScreen").classList.remove("active");
+  document.getElementById("gameScreen").classList.add("active");
+  loadStage();
 }
 
 function loadStage(){
-  const s=stages[currentStage];
+  const s=stages[current];
   stageTitle.innerText=s.title;
+  questionImage.src=s.img;
+  wordDisplay.style.display=s.show?"block":"none";
+  wordDisplay.innerText=s.word;
   answerInput.value="";
   message.innerText="";
-  wordDisplay.style.display=s.showWord?"block":"none";
-  wordDisplay.innerText=s.word;
-  questionImage.style.display="block";
-  questionImage.src=s.image;
   buildKeyboard();
 }
 
 function buildKeyboard(){
   keyboard.innerHTML="";
-  [...new Set(stages[currentStage].answer.split(""))].forEach(l=>{
-    const d=document.createElement("div");
-    d.className="key";
-    d.innerText=l;
-    d.onclick=()=>answerInput.value+=l;
-    keyboard.appendChild(d);
+  [...new Set(stages[current].answer.split(""))].forEach(l=>{
+    const k=document.createElement("div");
+    k.className="key";
+    k.innerText=l;
+    k.onclick=()=>answerInput.value+=l;
+    keyboard.appendChild(k);
   });
 }
+
 function clearInput(){answerInput.value="";}
 
-/* ===== Sound & Celebration ===== */
-function playWinSound(){
-  if(!soundOn) return;
-  const ctx=new (window.AudioContext||window.webkitAudioContext)();
-  const o=ctx.createOscillator(),g=ctx.createGain();
-  o.frequency.value=880;
-  g.gain.value=0.15;
-  o.connect(g).connect(ctx.destination);
-  o.start(); o.stop(ctx.currentTime+0.25);
-}
-
-function showCelebration(){
-  celebration.innerHTML="";
-  celebration.style.display="block";
-  for(let i=0;i<30;i++){
-    const e=document.createElement("div");
-    e.className="celebrate-item";
-    e.style.left=Math.random()*100+"%";
-    e.textContent=["⭐","✨","ⵣ"][Math.floor(Math.random()*3)];
-    celebration.appendChild(e);
-  }
-  setTimeout(()=>celebration.style.display="none",2000);
-}
-
-/* ===== Game Logic ===== */
 function checkAnswer(){
-  if(answerInput.value===stages[currentStage].answer){
-    playWinSound();
-    showCelebration();
-    message.innerText="✔️ أحسنت";
+  if(answerInput.value===stages[current].answer){
+    message.innerText="✔️ صحيح";
     message.className="success";
-    if(currentStage===unlockedStage && unlockedStage<stages.length-1){
-      unlockedStage++;
-      localStorage.setItem("unlockedStage",unlockedStage);
-    }
-    setTimeout(()=>{
-      currentStage===stages.length-1?showScreen("endScreen"):loadStage(++currentStage);
-    },1200);
+    current++;
+    if(current<stages.length) setTimeout(loadStage,800);
+    else message.innerText="🎉 كملتي اللعبة";
   }else{
-    message.innerText="❌ حاول مرة أخرى";
+    message.innerText="❌ خطأ";
     message.className="error";
     clearInput();
   }
-}
-
-function resetGame(){
-  unlockedStage=0;
-  currentStage=0;
-  localStorage.removeItem("unlockedStage");
-  goToStages();
-}
-
-/* ===== Modals ===== */
-function openInfo(){infoModal.classList.add("active");}
-function openSettings(){settingsModal.classList.add("active");}
-function closeModals(){
-  infoModal.classList.remove("active");
-  settingsModal.classList.remove("active");
-}
-function toggleSound(){
-  soundOn=!soundOn;
-  soundBtn.innerText=soundOn?"🔊 مفعل":"🔇 صامت";
 }
 </script>
 
