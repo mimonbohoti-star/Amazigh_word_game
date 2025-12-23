@@ -33,7 +33,6 @@ body::before{
   pointer-events:none;
 }
 
-/* ===== Top Bar ===== */
 .topbar{
   position:fixed;
   top:0; left:0;
@@ -52,7 +51,6 @@ body::before{
   border-radius:12px;
 }
 
-/* ===== Screens ===== */
 .screen{
   display:none;
   min-height:100vh;
@@ -80,7 +78,6 @@ button{
   margin-bottom:20px;
 }
 
-/* ===== Image ===== */
 #questionImage{
   width:260px;
   max-width:90%;
@@ -92,7 +89,6 @@ button{
   min-height:200px;
 }
 
-/* ===== Input & Keyboard ===== */
 input{
   padding:12px;
   font-size:22px;
@@ -120,7 +116,6 @@ input{
   cursor:pointer;
 }
 
-/* ===== Messages ===== */
 #message{
   min-height:30px;
   font-size:20px;
@@ -134,18 +129,12 @@ input{
 <body>
 
 <div class="topbar">
-  <button onclick="goToStages()">📂</button>
+  <button onclick="showScreen('startScreen')">🏠</button>
 </div>
 
 <div class="screen active" id="startScreen">
   <div class="logo">ⵣ</div>
-  <button onclick="continueGame()">متابعة</button>
-  <button onclick="goToStages()">المراحل</button>
-</div>
-
-<div class="screen" id="stageScreen">
-  <h2>المراحل</h2>
-  <div id="stagesButtons"></div>
+  <button onclick="startGame()">ابدأ</button>
 </div>
 
 <div class="screen" id="gameScreen">
@@ -162,86 +151,75 @@ input{
 <div class="screen" id="endScreen">
   <div class="logo">ⵣ</div>
   <h1>أحسنت 🎉</h1>
-  <button onclick="resetGame()">إعادة</button>
+  <button onclick="location.reload()">إعادة</button>
 </div>
 
 <script>
-const stages=[
- {title:"المرحلة 1",answer:"ⵜⴰⴼⵓⵢⵜ",showWord:true,word:"ⵜⴰⴼⵓⵢⵜ",image:"Images/sun.jpg"},
- {title:"المرحلة 2",answer:"ⴰⵢⵢⵓⵔ",showWord:false,word:"",image:"Images/moon.jpg"},
- {title:"المرحلة 3",answer:"ⵉⵜⵔⵉ",showWord:true,word:"ⵉⵜⵔⵉ",image:"Images/stars.jpg"},
- {title:"المرحلة 4",answer:"ⴰⴷⵔⴰⵔ",showWord:false,word:"",image:"Images/mountain.jpg"},
- {title:"المرحلة 5",answer:"ⴰⵙⵉⴼ",showWord:false,word:"",image:"Images/river.jpg"}
+const stages = [
+ {title:"المرحلة 1", answer:"ⵜⴰⴼⵓⵢⵜ", showWord:true,  word:"ⵜⴰⴼⵓⵢⵜ", image:"images/sun.jpg"},
+ {title:"المرحلة 2", answer:"ⴰⵢⵢⵓⵔ", showWord:false, word:"", image:"images/moon.jpg"},
+ {title:"المرحلة 3", answer:"ⵉⵜⵔⵉ", showWord:true,  word:"ⵉⵜⵔⵉ", image:"images/stars.jpg"},
+ {title:"المرحلة 4", answer:"ⴰⴷⵔⴰⵔ", showWord:false, word:"", image:"images/mountain.jpg"},
+ {title:"المرحلة 5", answer:"ⴰⵙⵉⴼ", showWord:false, word:"", image:"images/river.jpg"}
 ];
 
-let currentStage=0;
-let unlockedStage=parseInt(localStorage.getItem("unlockedStage"))||0;
+let current = 0;
+
+const stageTitle = document.getElementById("stageTitle");
+const questionImage = document.getElementById("questionImage");
+const wordDisplay = document.getElementById("wordDisplay");
+const answerInput = document.getElementById("answerInput");
+const keyboard = document.getElementById("keyboard");
+const message = document.getElementById("message");
 
 function showScreen(id){
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 }
-function continueGame(){currentStage=unlockedStage;loadStage();showScreen("gameScreen");}
-function goToStages(){buildStagesButtons();showScreen("stageScreen");}
-function startStage(i){currentStage=i;loadStage();showScreen("gameScreen");}
 
-function buildStagesButtons(){
-  stagesButtons.innerHTML="";
-  stages.forEach((s,i)=>{
-    const b=document.createElement("button");
-    b.textContent=i<=unlockedStage?s.title:s.title+" 🔒";
-    if(i<=unlockedStage) b.onclick=()=>startStage(i);
-    stagesButtons.appendChild(b);
-  });
+function startGame(){
+  current = 0;
+  loadStage();
+  showScreen("gameScreen");
 }
 
 function loadStage(){
-  const s=stages[currentStage];
-  stageTitle.innerText=s.title;
-  answerInput.value="";
-  message.innerText="";
-  wordDisplay.style.display=s.showWord?"block":"none";
-  wordDisplay.innerText=s.word;
-  questionImage.src=s.image;
+  const s = stages[current];
+  stageTitle.textContent = s.title;
+  questionImage.src = s.image;
+  wordDisplay.style.display = s.showWord ? "block" : "none";
+  wordDisplay.textContent = s.word;
+  answerInput.value = "";
+  message.textContent = "";
   buildKeyboard();
 }
 
 function buildKeyboard(){
-  keyboard.innerHTML="";
-  [...new Set(stages[currentStage].answer.split(""))].forEach(l=>{
-    const d=document.createElement("div");
-    d.className="key";
-    d.innerText=l;
-    d.onclick=()=>answerInput.value+=l;
+  keyboard.innerHTML = "";
+  [...new Set(stages[current].answer.split(""))].forEach(l=>{
+    const d = document.createElement("div");
+    d.className = "key";
+    d.textContent = l;
+    d.onclick = ()=> answerInput.value += l;
     keyboard.appendChild(d);
   });
 }
 
-function clearInput(){answerInput.value="";}
+function clearInput(){ answerInput.value=""; }
 
 function checkAnswer(){
-  if(answerInput.value===stages[currentStage].answer){
-    message.innerText="✔️ أحسنت";
-    message.className="success";
-    if(currentStage===unlockedStage && unlockedStage<stages.length-1){
-      unlockedStage++;
-      localStorage.setItem("unlockedStage",unlockedStage);
-    }
+  if(answerInput.value === stages[current].answer){
+    message.textContent = "✔️ أحسنت";
+    message.className = "success";
     setTimeout(()=>{
-      currentStage===stages.length-1?showScreen("endScreen"):loadStage(++currentStage);
-    },900);
+      current++;
+      current >= stages.length ? showScreen("endScreen") : loadStage();
+    },800);
   }else{
-    message.innerText="❌ خطأ";
-    message.className="error";
+    message.textContent = "❌ حاول مرة أخرى";
+    message.className = "error";
     clearInput();
   }
-}
-
-function resetGame(){
-  localStorage.removeItem("unlockedStage");
-  unlockedStage=0;
-  currentStage=0;
-  showScreen("startScreen");
 }
 </script>
 
