@@ -9,40 +9,106 @@
 body{
   margin:0;
   font-family:sans-serif;
-  background:#0e1624;
   color:#fff;
   text-align:center;
+  overflow:hidden;
+  background:linear-gradient(
+    180deg,
+    #1e90ff 0%,
+    #1e90ff 33%,
+    #2ecc71 33%,
+    #2ecc71 66%,
+    #f1c40f 66%,
+    #f1c40f 100%
+  );
 }
-.screen{display:none;min-height:100vh;justify-content:center;align-items:center;flex-direction:column}
-.screen.active{display:flex}
+body::before{
+  content:"ⵣ";
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  font-size:320px;
+  color:rgba(192,57,43,0.12);
+  pointer-events:none;
+}
+
+/* ===== Top Bar ===== */
+.topbar{
+  position:fixed;
+  top:0; left:0;
+  width:100%;
+  display:flex;
+  justify-content:space-between;
+  padding:10px 15px;
+  z-index:1000;
+}
+.topbar button{
+  background:rgba(0,0,0,0.45);
+  border:none;
+  color:#fff;
+  font-size:20px;
+  padding:8px 14px;
+  border-radius:12px;
+}
+
+/* ===== Screens ===== */
+.screen{
+  display:none;
+  min-height:100vh;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  padding-top:70px;
+}
+.screen.active{display:flex;}
+
 button{
   background:#c0392b;
   border:none;
   color:#fff;
-  padding:14px 26px;
+  padding:14px 30px;
   font-size:18px;
   border-radius:12px;
+  cursor:pointer;
   margin:10px;
 }
-#questionImage{
+
+.logo{
+  font-size:90px;
+  color:#c0392b;
+  margin-bottom:20px;
+}
+
+/* ===== Image Container ===== */
+.image-box{
   width:260px;
   max-width:90%;
-  background:#fff;
+  height:200px;
+  margin:20px auto;
   border-radius:18px;
-  padding:10px;
+  background:#fff;
+  box-shadow:0 10px 25px rgba(0,0,0,0.35);
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
 }
-.keyboard{
-  display:grid;
-  grid-template-columns:repeat(4,70px);
-  gap:10px;
-  margin-top:15px;
+
+.image-box span{
+  font-size:90px;
+  color:#c0392b;
+  opacity:0.25;
 }
-.key{
-  background:#1c2b3a;
-  padding:18px;
-  font-size:24px;
-  border-radius:14px;
+
+.image-box img{
+  max-width:100%;
+  max-height:100%;
+  display:none;
 }
+
+/* ===== Input & Keyboard ===== */
 input{
   padding:12px;
   font-size:22px;
@@ -53,82 +119,153 @@ input{
   border-radius:10px;
   border:none;
 }
-.success{color:#2ecc71}
-.error{color:#e74c3c}
+
+.keyboard{
+  display:grid;
+  grid-template-columns:repeat(4,70px);
+  gap:10px;
+  justify-content:center;
+  margin-top:15px;
+}
+
+.key{
+  background:rgba(14,22,36,0.85);
+  padding:18px;
+  font-size:24px;
+  border-radius:14px;
+  cursor:pointer;
+}
+
+/* ===== Messages ===== */
+#message{
+  min-height:30px;
+  font-size:20px;
+  margin:10px;
+}
+.success{color:#00ff88;}
+.error{color:#ff4c4c;}
 </style>
 </head>
 
 <body>
 
-<div class="screen active" id="start">
-  <h1>ⵣ</h1>
-  <button onclick="start()">ابدأ</button>
+<div class="topbar">
+  <button onclick="goHome()">🏠</button>
 </div>
 
-<div class="screen" id="game">
-  <h2 id="title"></h2>
-  <img id="questionImage">
-  <h1 id="word"></h1>
-  <div id="msg"></div>
-  <input id="input" readonly>
-  <button onclick="input.value=''">مسح</button>
-  <div class="keyboard" id="kb"></div>
-  <button onclick="check()">تحقق</button>
+<div class="screen active" id="startScreen">
+  <div class="logo">ⵣ</div>
+  <button onclick="continueGame()">متابعة</button>
+  <button onclick="goToStages()">المراحل</button>
+</div>
+
+<div class="screen" id="stageScreen">
+  <h2>المراحل</h2>
+  <div id="stagesButtons"></div>
+</div>
+
+<div class="screen" id="gameScreen">
+  <h2 id="stageTitle"></h2>
+
+  <div class="image-box">
+    <span id="imgPlaceholder">ⵣ</span>
+    <img id="questionImage">
+  </div>
+
+  <h1 id="wordDisplay"></h1>
+  <div id="message"></div>
+  <input id="answerInput" readonly>
+  <button onclick="clearInput()">مسح</button>
+  <div class="keyboard" id="keyboard"></div>
+  <button onclick="checkAnswer()">تحقق</button>
 </div>
 
 <script>
-/* ===== صور base64 (مضمونة) ===== */
-const IMG={
- sun:"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxNTAiIGN5PSIxMDAiIHI9IjUwIiBmaWxsPSJvcmFuZ2UiLz48L3N2Zz4=",
- moon:"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxNTAiIGN5PSIxMDAiIHI9IjUwIiBmaWxsPSIjZGRkIi8+PC9zdmc+",
- star:"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cG9seWdvbiBwb2ludHM9IjE1MCwzMCAxNzAsOTAgMjMwLDkwIDE4MCwxMzAgMjAwLDE5MCAxNTAsMTU1IDEwMCwxOTAgMTIwLDEzMCA3MCw5MCAxMzAsOTAiIGZpbGw9InllbGxvdyIvPjwvc3ZnPg==",
- mountain:"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cG9seWdvbiBwb2ludHM9IjAsMTgwIDgwLDgwIDE2MCwxODAiIGZpbGw9IiM3NzciLz48cG9seWdvbiBwb2ludHM9IjE0MCwxODAgMjIwLDYwIDMwMCwxODAiIGZpbGw9IiM5OTkiLz48L3N2Zz4=",
- river:"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2JkZTdmZiIvPjxwYXRoIGQ9Ik0wIDEyMCBRMTUwIDgwIDMwMCAxMjAiIHN0cm9rZT0iIzAwN2FjYyIgc3Ryb2tlLXdpZHRoPSIyMCIgZmlsbD0ibm9uZSIvPjwvc3ZnPg=="
-};
-
 const stages=[
- {t:"المرحلة 1",a:"ⵜⴰⴼⵓⵢⵜ",w:"ⵜⴰⴼⵓⵢⵜ",i:IMG.sun},
- {t:"المرحلة 2",a:"ⴰⵢⵢⵓⵔ",w:"",i:IMG.moon},
- {t:"المرحلة 3",a:"ⵉⵜⵔⵉ",w:"ⵉⵜⵔⵉ",i:IMG.star},
- {t:"المرحلة 4",a:"ⴰⴷⵔⴰⵔ",w:"",i:IMG.mountain},
- {t:"المرحلة 5",a:"ⴰⵙⵉⴼ",w:"",i:IMG.river}
+ {title:"المرحلة 1",answer:"ⵜⴰⴼⵓⵢⵜ",showWord:true,word:"ⵜⴰⴼⵓⵢⵜ",image:"https://upload.wikimedia.org/wikipedia/commons/4/4c/Sun_white.jpg"},
+ {title:"المرحلة 2",answer:"ⴰⵢⵢⵓⵔ",showWord:false,word:"",image:"https://upload.wikimedia.org/wikipedia/commons/e/e1/FullMoon2010.jpg"},
+ {title:"المرحلة 3",answer:"ⵉⵜⵔⵉ",showWord:true,word:"ⵉⵜⵔⵉ",image:"https://upload.wikimedia.org/wikipedia/commons/2/2f/Starsinthesky.jpg"}
 ];
 
-let c=0;
+let currentStage=0;
+let unlockedStage=parseInt(localStorage.getItem("unlockedStage"))||0;
 
-function start(){
-start.classList.remove("active");
-game.classList.add("active");
-load();
+function showScreen(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
 }
-function load(){
-title.innerText=stages[c].t;
-questionImage.src=stages[c].i;
-word.innerText=stages[c].w;
-input.value="";
-msg.innerText="";
-kb.innerHTML="";
-[...new Set(stages[c].a.split(""))].forEach(l=>{
-const d=document.createElement("div");
-d.className="key";
-d.innerText=l;
-d.onclick=()=>input.value+=l;
-kb.appendChild(d);
-});
+
+function goHome(){showScreen("startScreen");}
+function continueGame(){currentStage=unlockedStage;loadStage();showScreen("gameScreen");}
+function goToStages(){buildStagesButtons();showScreen("stageScreen");}
+function startStage(i){currentStage=i;loadStage();showScreen("gameScreen");}
+
+function buildStagesButtons(){
+  stagesButtons.innerHTML="";
+  stages.forEach((s,i)=>{
+    const b=document.createElement("button");
+    b.textContent=i<=unlockedStage?s.title:s.title+" 🔒";
+    if(i<=unlockedStage) b.onclick=()=>startStage(i);
+    stagesButtons.appendChild(b);
+  });
 }
-function check(){
-if(input.value===stages[c].a){
-msg.innerText="✔️ صحيح";
-msg.className="success";
-c++;
-if(c<stages.length) setTimeout(load,800);
-else msg.innerText="🎉 سالات اللعبة";
-}else{
-msg.innerText="❌ خطأ";
-msg.className="error";
-input.value="";
+
+function loadStage(){
+  const s=stages[currentStage];
+  stageTitle.innerText=s.title;
+  answerInput.value="";
+  message.innerText="";
+  wordDisplay.style.display=s.showWord?"block":"none";
+  wordDisplay.innerText=s.word;
+
+  const img=questionImage;
+  img.style.display="none";
+  imgPlaceholder.style.display="block";
+
+  img.onload=()=>{
+    imgPlaceholder.style.display="none";
+    img.style.display="block";
+  };
+  img.onerror=()=>{
+    imgPlaceholder.style.display="block";
+    img.style.display="none";
+  };
+  img.src=s.image;
+
+  buildKeyboard();
 }
+
+function buildKeyboard(){
+  keyboard.innerHTML="";
+  [...new Set(stages[currentStage].answer.split(""))].forEach(l=>{
+    const d=document.createElement("div");
+    d.className="key";
+    d.innerText=l;
+    d.onclick=()=>answerInput.value+=l;
+    keyboard.appendChild(d);
+  });
+}
+
+function clearInput(){answerInput.value="";}
+
+function checkAnswer(){
+  if(answerInput.value===stages[currentStage].answer){
+    message.innerText="✔️ أحسنت";
+    message.className="success";
+    if(currentStage===unlockedStage && unlockedStage<stages.length-1){
+      unlockedStage++;
+      localStorage.setItem("unlockedStage",unlockedStage);
+    }
+    setTimeout(()=>{
+      currentStage===stages.length-1?goHome():loadStage(++currentStage);
+    },1000);
+  }else{
+    message.innerText="❌ حاول مرة أخرى";
+    message.className="error";
+    clearInput();
+  }
 }
 </script>
+
 </body>
 </html>
