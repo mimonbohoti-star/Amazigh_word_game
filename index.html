@@ -33,6 +33,25 @@ body::before{
   pointer-events:none;
 }
 
+/* ===== Top Bar ===== */
+.topbar{
+  position:fixed;
+  top:0; left:0;
+  width:100%;
+  display:flex;
+  justify-content:space-between;
+  padding:10px 15px;
+  z-index:1000;
+}
+.topbar button{
+  background:rgba(0,0,0,0.45);
+  border:none;
+  color:#fff;
+  font-size:20px;
+  padding:8px 14px;
+  border-radius:12px;
+}
+
 /* ===== Screens ===== */
 .screen{
   display:none;
@@ -40,7 +59,7 @@ body::before{
   justify-content:center;
   align-items:center;
   flex-direction:column;
-  padding-top:60px;
+  padding-top:70px;
 }
 .screen.active{display:flex;}
 
@@ -64,12 +83,12 @@ button{
 /* ===== Image ===== */
 #questionImage{
   width:260px;
-  max-width:90%;
+  height:200px;
+  object-fit:cover;
   margin:20px auto;
   border-radius:18px;
   background:#fff;
-  padding:8px;
-  box-shadow:0 10px 25px rgba(0,0,0,.35);
+  box-shadow:0 10px 25px rgba(0,0,0,0.35);
 }
 
 /* ===== Input & Keyboard ===== */
@@ -93,18 +112,14 @@ input{
 }
 
 .key{
-  background:#12263a;
+  background:rgba(14,22,36,0.85);
   padding:18px;
   font-size:24px;
   border-radius:14px;
   cursor:pointer;
 }
 
-#message{
-  min-height:30px;
-  font-size:20px;
-  margin:10px;
-}
+#message{min-height:30px;font-size:20px;}
 .success{color:#00ff88;}
 .error{color:#ff4c4c;}
 </style>
@@ -112,14 +127,24 @@ input{
 
 <body>
 
+<div class="topbar">
+  <button onclick="goToStages()">📋</button>
+</div>
+
 <div class="screen active" id="startScreen">
   <div class="logo">ⵣ</div>
-  <button onclick="startGame()">ابدأ</button>
+  <button onclick="continueGame()">متابعة</button>
+</div>
+
+<div class="screen" id="stageScreen">
+  <h2>المراحل</h2>
+  <div id="stagesButtons"></div>
 </div>
 
 <div class="screen" id="gameScreen">
   <h2 id="stageTitle"></h2>
   <img id="questionImage">
+  <h1 id="wordDisplay"></h1>
   <div id="message"></div>
   <input id="answerInput" readonly>
   <div class="keyboard" id="keyboard"></div>
@@ -129,28 +154,51 @@ input{
 <div class="screen" id="endScreen">
   <div class="logo">ⵣ</div>
   <h1>أحسنت 🎉</h1>
+  <button onclick="resetGame()">إعادة اللعب</button>
 </div>
 
 <script>
+/* ===== Data (صور محلية) ===== */
 const stages=[
- {title:"المرحلة 1",answer:"ⵜⴰⴼⵓⵢⵜ",image:"images/sun.jpg"},
- {title:"المرحلة 2",answer:"ⴰⵢⵢⵓⵔ",image:"images/moon.jpg"},
- {title:"المرحلة 3",answer:"ⵉⵜⵔⵉ",image:"images/star.jpg"},
- {title:"المرحلة 4",answer:"ⴰⴷⵔⴰⵔ",image:"images/mountain.jpg"},
- {title:"المرحلة 5",answer:"ⴰⵙⵉⴼ",image:"images/river.jpg"}
+ {title:"المرحلة 1",answer:"ⵜⴰⴼⵓⵢⵜ",word:"ⵜⴰⴼⵓⵢⵜ",showWord:true,image:"images/sun.jpg"},
+ {title:"المرحلة 2",answer:"ⴰⵢⵢⵓⵔ",word:"",showWord:false,image:"images/moon.jpg"},
+ {title:"المرحلة 3",answer:"ⵉⵜⵔⵉ",word:"ⵉⵜⵔⵉ",showWord:true,image:"images/stars.jpg"},
+ {title:"المرحلة 4",answer:"ⴰⴷⵔⴰⵔ",word:"",showWord:false,image:"images/mountain.jpg"},
+ {title:"المرحلة 5",answer:"ⴰⵙⵉⴼ",word:"",showWord:false,image:"images/river.jpg"}
 ];
 
 let currentStage=0;
+let unlockedStage=parseInt(localStorage.getItem("unlockedStage"))||0;
 
+/* ===== Navigation ===== */
 function showScreen(id){
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 }
-
-function startGame(){
-  currentStage=0;
+function continueGame(){
+  currentStage=unlockedStage;
   loadStage();
   showScreen("gameScreen");
+}
+function goToStages(){
+  buildStagesButtons();
+  showScreen("stageScreen");
+}
+function startStage(i){
+  currentStage=i;
+  loadStage();
+  showScreen("gameScreen");
+}
+
+/* ===== UI ===== */
+function buildStagesButtons(){
+  stagesButtons.innerHTML="";
+  stages.forEach((s,i)=>{
+    const b=document.createElement("button");
+    b.textContent=i<=unlockedStage?s.title:s.title+" 🔒";
+    if(i<=unlockedStage) b.onclick=()=>startStage(i);
+    stagesButtons.appendChild(b);
+  });
 }
 
 function loadStage(){
@@ -158,31 +206,49 @@ function loadStage(){
   stageTitle.innerText=s.title;
   answerInput.value="";
   message.innerText="";
+  wordDisplay.style.display=s.showWord?"block":"none";
+  wordDisplay.innerText=s.word;
   questionImage.src=s.image;
+  buildKeyboard();
+}
 
+function buildKeyboard(){
   keyboard.innerHTML="";
-  [...new Set(s.answer.split(""))].forEach(l=>{
+  [...new Set(stages[currentStage].answer)].forEach(l=>{
     const k=document.createElement("div");
     k.className="key";
-    k.textContent=l;
+    k.innerText=l;
     k.onclick=()=>answerInput.value+=l;
     keyboard.appendChild(k);
   });
 }
 
+/* ===== Logic ===== */
 function checkAnswer(){
   if(answerInput.value===stages[currentStage].answer){
-    message.textContent="✔️ صحيح";
+    message.innerText="✔️ أحسنت";
     message.className="success";
-    currentStage++;
+    if(currentStage===unlockedStage && unlockedStage<stages.length-1){
+      unlockedStage++;
+      localStorage.setItem("unlockedStage",unlockedStage);
+    }
     setTimeout(()=>{
-      currentStage<stages.length ? loadStage() : showScreen("endScreen");
+      currentStage===stages.length-1
+        ? showScreen("endScreen")
+        : loadStage(++currentStage);
     },800);
   }else{
-    message.textContent="❌ خطأ";
+    message.innerText="❌ حاول مرة أخرى";
     message.className="error";
     answerInput.value="";
   }
+}
+
+function resetGame(){
+  unlockedStage=0;
+  currentStage=0;
+  localStorage.removeItem("unlockedStage");
+  showScreen("startScreen");
 }
 </script>
 
