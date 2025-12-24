@@ -117,7 +117,6 @@ button{
   object-fit:cover;
   border-radius:16px;
 }
-
 @keyframes zoomIn{
   from{transform:scale(.85);opacity:0}
   to{transform:scale(1);opacity:1}
@@ -134,7 +133,6 @@ input{
   border-radius:10px;
   border:none;
 }
-
 .keyboard{
   display:grid;
   grid-template-columns:repeat(4,70px);
@@ -142,7 +140,6 @@ input{
   justify-content:center;
   margin-top:15px;
 }
-
 .key{
   background:rgba(14,22,36,0.85);
   padding:18px;
@@ -160,27 +157,54 @@ input{
 .success{color:#00ff88;}
 .error{color:#ff4c4c;}
 
-/* ===== Celebration ===== */
+/* ===== Celebration (HARD 🔥) ===== */
 .celebration{
   position:fixed;
   inset:0;
   display:none;
   justify-content:center;
   align-items:center;
-  font-size:80px;
-  background:rgba(0,0,0,0.55);
+  background:rgba(0,0,0,0.75);
   z-index:3000;
 }
 .celebration.active{display:flex;}
+
+.celebration-box{
+  background:#12263a;
+  padding:30px;
+  border-radius:22px;
+  box-shadow:0 20px 45px rgba(0,0,0,0.8);
+  animation:pop .5s ease;
+}
+.celebration-box h1{
+  font-size:70px;
+  margin:0;
+}
+.celebration-box p{
+  font-size:26px;
+  margin:10px 0;
+}
+
+@keyframes pop{
+  from{transform:scale(.7);opacity:0}
+  to{transform:scale(1);opacity:1}
+}
 </style>
 </head>
 
 <body>
 
-<!-- Sounds -->
+<!-- Sound -->
 <audio id="successSound" src="success.mp3"></audio>
 
-<div class="celebration" id="celebration">🎉</div>
+<div class="celebration" id="celebration">
+  <div class="celebration-box">
+    <h1>🎉 ⵣ 🎉</h1>
+    <p>🌸 ⭐ ❤️ ⵣ ⭐ 🌸</p>
+    <p>👏 أحسنت 👏</p>
+    <button onclick="backToStart()">العودة للبداية</button>
+  </div>
+</div>
 
 <div class="topbar">
   <button onclick="goBack()">⬅️</button>
@@ -219,11 +243,9 @@ input{
 
 <div class="screen" id="gameScreen">
   <h2 id="stageTitle"></h2>
-
   <div class="image-box">
     <img id="questionImage">
   </div>
-
   <h1 id="wordDisplay"></h1>
   <div id="message"></div>
   <input id="answerInput" readonly>
@@ -253,6 +275,10 @@ function showScreen(id){
 }
 
 function goBack(){ showScreen(lastScreen); }
+function backToStart(){
+  celebration.classList.remove("active");
+  showScreen("startScreen");
+}
 
 function continueGame(){currentStage=unlockedStage;loadStage();showScreen("gameScreen");}
 function goToStages(){buildStagesButtons();showScreen("stageScreen");}
@@ -292,24 +318,29 @@ function buildKeyboard(){
 
 function clearInput(){answerInput.value="";}
 
-function celebrate(){
+function celebrate(final=false){
   celebration.classList.add("active");
   if(soundOn) successSound.play();
-  setTimeout(()=>celebration.classList.remove("active"),900);
+  if(!final){
+    setTimeout(()=>celebration.classList.remove("active"),1000);
+  }
 }
 
 function checkAnswer(){
   if(answerInput.value===stages[currentStage].answer){
     message.innerText="✔️ أحسنت";
     message.className="success";
-    celebrate();
-    if(currentStage===unlockedStage && unlockedStage<stages.length-1){
-      unlockedStage++;
-      localStorage.setItem("unlockedStage",unlockedStage);
+
+    if(currentStage===stages.length-1){
+      celebrate(true);
+    }else{
+      celebrate(false);
+      if(currentStage===unlockedStage){
+        unlockedStage++;
+        localStorage.setItem("unlockedStage",unlockedStage);
+      }
+      setTimeout(()=>{currentStage++;loadStage();},1000);
     }
-    setTimeout(()=>{
-      currentStage<stages.length-1 && loadStage(++currentStage);
-    },1000);
   }else{
     message.innerText="❌ حاول مرة أخرى";
     message.className="error";
