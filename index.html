@@ -33,55 +33,38 @@ body::before{
   pointer-events:none;
 }
 
-/* ===== Top Bar ===== */
-.topbar{
+/* ===== Celebration ===== */
+.celebration span{
   position:fixed;
-  top:0; left:0;
+  top:-50px;
+  font-size:26px;
+  animation:fall linear forwards;
+  pointer-events:none;
+  z-index:3000;
+}
+@keyframes fall{
+  to{
+    transform:translateY(120vh) rotate(360deg);
+    opacity:0;
+  }
+}
+
+/* ===== UI ===== */
+.image-box{
+  width:90%;
+  max-width:320px;
+  background:#fff;
+  padding:8px;
+  border-radius:20px;
+  box-shadow:0 18px 40px rgba(0,0,0,0.35);
+  margin:20px auto;
+}
+.image-box img{
   width:100%;
-  display:flex;
-  justify-content:space-between;
-  padding:10px 15px;
-  z-index:1000;
+  height:320px;
+  object-fit:cover;
+  border-radius:16px;
 }
-.topbar button{
-  background:rgba(0,0,0,0.45);
-  border:none;
-  color:#fff;
-  font-size:20px;
-  padding:8px 14px;
-  border-radius:12px;
-}
-
-/* ===== Modal ===== */
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.65);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:2000;
-}
-.modal.active{display:flex;}
-.modal-content{
-  background:#12263a;
-  padding:22px;
-  border-radius:18px;
-  width:85%;
-  max-width:360px;
-  box-shadow:0 15px 35px rgba(0,0,0,0.6);
-}
-
-/* ===== Screens ===== */
-.screen{
-  display:none;
-  min-height:100vh;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-  padding-top:70px;
-}
-.screen.active{display:flex;}
 
 button{
   background:#c0392b;
@@ -94,73 +77,39 @@ button{
   margin:10px;
 }
 
-.logo{
-  font-size:90px;
-  color:#c0392b;
-  margin-bottom:20px;
+.screen{
+  display:none;
+  min-height:100vh;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  padding-top:70px;
 }
-
-/* ===== Improved Image Card ===== */
-.image-box{
-  width:90%;
-  max-width:320px;
-  background:#fff;
-  padding:8px;
-  border-radius:20px;
-  box-shadow:0 18px 40px rgba(0,0,0,0.35);
-  margin:20px auto;
-  animation:zoomIn .6s ease;
-}
-.image-box img{
-  width:100%;
-  height:320px;
-  object-fit:cover;
-  border-radius:16px;
-  transition:transform .3s ease;
-}
-.image-box img:active{
-  transform:scale(1.05);
-}
-
-@keyframes zoomIn{
-  from{transform:scale(.85);opacity:0}
-  to{transform:scale(1);opacity:1}
-}
-
-/* ===== Input & Keyboard ===== */
-input{
-  padding:12px;
-  font-size:22px;
-  width:80%;
-  max-width:300px;
-  text-align:left;
-  direction:ltr;
-  border-radius:10px;
-  border:none;
-}
+.screen.active{display:flex;}
 
 .keyboard{
   display:grid;
   grid-template-columns:repeat(4,70px);
   gap:10px;
   justify-content:center;
-  margin-top:15px;
 }
-
 .key{
-  background:rgba(14,22,36,0.85);
+  background:#0e1624;
   padding:18px;
   font-size:24px;
   border-radius:14px;
-  cursor:pointer;
 }
 
-/* ===== Messages ===== */
-#message{
-  min-height:30px;
-  font-size:20px;
-  margin:10px;
+input{
+  padding:12px;
+  font-size:22px;
+  width:80%;
+  max-width:300px;
+  direction:ltr;
+  border-radius:10px;
+  border:none;
 }
+
 .success{color:#00ff88;}
 .error{color:#ff4c4c;}
 </style>
@@ -168,98 +117,46 @@ input{
 
 <body>
 
-<div class="topbar">
-  <button onclick="openInfo()">ℹ️</button>
-  <button onclick="openSettings()">⚙️</button>
-</div>
-
-<div class="modal" id="infoModal">
-  <div class="modal-content">
-    <h2>كيفية اللعب</h2>
-    <p>انظر إلى الصورة، ثم كوّن الكلمة بالأمازيغية.</p>
-    <button onclick="closeModals()">إغلاق</button>
-  </div>
-</div>
-
-<div class="modal" id="settingsModal">
-  <div class="modal-content">
-    <h2>الإعدادات</h2>
-    <button onclick="toggleSound()" id="soundBtn">🔊 مفعل</button>
-    <button onclick="closeModals()">إغلاق</button>
-  </div>
-</div>
-
-<div class="screen active" id="startScreen">
-  <div class="logo">ⵣ</div>
-  <button onclick="continueGame()">متابعة</button>
-  <button onclick="goToStages()">اختيار المراحل</button>
-</div>
-
-<div class="screen" id="stageScreen">
-  <h2>المراحل</h2>
-  <div id="stagesButtons"></div>
-</div>
-
-<div class="screen" id="gameScreen">
+<div class="screen active" id="gameScreen">
   <h2 id="stageTitle"></h2>
 
   <div class="image-box">
     <img id="questionImage">
   </div>
 
-  <h1 id="wordDisplay"></h1>
   <div id="message"></div>
   <input id="answerInput" readonly>
   <button onclick="clearInput()">مسح</button>
   <div class="keyboard" id="keyboard"></div>
   <button onclick="checkAnswer()">تحقق</button>
+
+  <button id="backHomeBtn" onclick="goHome()" style="display:none;background:#27ae60">
+    ⬅️ العودة للبداية
+  </button>
 </div>
 
 <script>
 const stages=[
- {title:"المرحلة 1",answer:"ⵜⴰⴼⵓⵢⵜ",showWord:true, word:"ⵜⴰⴼⵓⵢⵜ", image:"sun.jpg"},
- {title:"المرحلة 2",answer:"ⴰⵢⵢⵓⵔ",showWord:false,word:"", image:"moon.jpg"},
- {title:"المرحلة 3",answer:"ⵉⵜⵔⵉ",showWord:true, word:"ⵉⵜⵔⵉ", image:"flower.jpg"},
- {title:"المرحلة 4",answer:"ⴰⴷⵔⴰⵔ",showWord:false,word:"", image:"mountain.jpg"},
- {title:"المرحلة 5",answer:"ⴰⵙⵉⴼ",showWord:false,word:"", image:"river.jpg"}
+ {title:"المرحلة 1",answer:"ⵜⴰⴼⵓⵢⵜ",image:"sun.jpg"},
+ {title:"المرحلة 2",answer:"ⴰⵢⵢⵓⵔ",image:"moon.jpg"},
+ {title:"المرحلة 3",answer:"ⵉⵜⵔⵉ",image:"flower.jpg"},
+ {title:"المرحلة 4",answer:"ⴰⴷⵔⴰⵔ",image:"mountain.jpg"},
+ {title:"المرحلة 5",answer:"ⴰⵙⵉⴼ",image:"river.jpg"}
 ];
 
 let currentStage=0;
-let unlockedStage=parseInt(localStorage.getItem("unlockedStage"))||0;
-let soundOn=true;
-
-function showScreen(id){
-  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-}
-function continueGame(){currentStage=unlockedStage;loadStage();showScreen("gameScreen");}
-function goToStages(){buildStagesButtons();showScreen("stageScreen");}
-function startStage(i){currentStage=i;loadStage();showScreen("gameScreen");}
-
-function buildStagesButtons(){
-  stagesButtons.innerHTML="";
-  stages.forEach((s,i)=>{
-    const b=document.createElement("button");
-    b.textContent=i<=unlockedStage?s.title:s.title+" 🔒";
-    if(i<=unlockedStage) b.onclick=()=>startStage(i);
-    stagesButtons.appendChild(b);
-  });
-}
 
 function loadStage(){
-  const s=stages[currentStage];
-  stageTitle.innerText=s.title;
+  stageTitle.innerText=stages[currentStage].title;
+  questionImage.src=stages[currentStage].image;
   answerInput.value="";
   message.innerText="";
-  wordDisplay.style.display=s.showWord?"block":"none";
-  wordDisplay.innerText=s.word;
-  questionImage.src=s.image;
   buildKeyboard();
 }
 
 function buildKeyboard(){
   keyboard.innerHTML="";
-  [...new Set(stages[currentStage].answer.split(""))].forEach(l=>{
+  [...new Set(stages[currentStage].answer)].forEach(l=>{
     const d=document.createElement("div");
     d.className="key";
     d.innerText=l;
@@ -267,19 +164,19 @@ function buildKeyboard(){
     keyboard.appendChild(d);
   });
 }
+
 function clearInput(){answerInput.value="";}
 
 function checkAnswer(){
   if(answerInput.value===stages[currentStage].answer){
     message.innerText="✔️ أحسنت";
     message.className="success";
-    if(currentStage===unlockedStage && unlockedStage<stages.length-1){
-      unlockedStage++;
-      localStorage.setItem("unlockedStage",unlockedStage);
+
+    if(currentStage===stages.length-1){
+      finalCelebration();
+    }else{
+      setTimeout(()=>{currentStage++;loadStage();},800);
     }
-    setTimeout(()=>{
-      currentStage<stages.length-1 && loadStage(++currentStage);
-    },1000);
   }else{
     message.innerText="❌ حاول مرة أخرى";
     message.className="error";
@@ -287,16 +184,29 @@ function checkAnswer(){
   }
 }
 
-function openInfo(){infoModal.classList.add("active");}
-function openSettings(){settingsModal.classList.add("active");}
-function closeModals(){
-  infoModal.classList.remove("active");
-  settingsModal.classList.remove("active");
+/* ===== Celebration ===== */
+function finalCelebration(){
+  backHomeBtn.style.display="block";
+  const icons=["🌸","🌼","❤️","⭐","ⵣ","🎉","✨"];
+  for(let i=0;i<80;i++){
+    const s=document.createElement("span");
+    s.innerText=icons[Math.floor(Math.random()*icons.length)];
+    s.style.left=Math.random()*100+"%";
+    s.style.animationDuration=2+Math.random()*3+"s";
+    document.body.appendChild(s);
+    s.className="celebration";
+    setTimeout(()=>s.remove(),5000);
+  }
+  new Audio("https://assets.mixkit.co/sfx/preview/mixkit-crowd-cheering-2013.mp3").play();
 }
-function toggleSound(){
-  soundOn=!soundOn;
-  soundBtn.innerText=soundOn?"🔊 مفعل":"🔇 صامت";
+
+function goHome(){
+  currentStage=0;
+  backHomeBtn.style.display="none";
+  loadStage();
 }
+
+loadStage();
 </script>
 
 </body>
