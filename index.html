@@ -41,6 +41,7 @@ body::before{
   display:flex;
   justify-content:space-between;
   padding:10px 15px;
+  z-index:1000;
 }
 .topbar button{
   background:rgba(0,0,0,0.45);
@@ -49,6 +50,26 @@ body::before{
   font-size:20px;
   padding:8px 14px;
   border-radius:12px;
+}
+
+/* ===== Modal ===== */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.65);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:2000;
+}
+.modal.active{display:flex;}
+.modal-content{
+  background:#12263a;
+  padding:22px;
+  border-radius:18px;
+  width:85%;
+  max-width:360px;
+  box-shadow:0 15px 35px rgba(0,0,0,0.6);
 }
 
 /* ===== Screens ===== */
@@ -76,6 +97,7 @@ button{
 .logo{
   font-size:90px;
   color:#c0392b;
+  margin-bottom:20px;
 }
 
 /* ===== Image ===== */
@@ -85,8 +107,10 @@ button{
   margin:20px auto;
   border-radius:18px;
   background:#fff;
-  padding:6px;
+  padding:8px;
   box-shadow:0 10px 25px rgba(0,0,0,0.35);
+  min-height:200px;
+  object-fit:cover;
 }
 
 /* ===== Input & Keyboard ===== */
@@ -108,6 +132,7 @@ input{
   justify-content:center;
   margin-top:15px;
 }
+
 .key{
   background:rgba(14,22,36,0.85);
   padding:18px;
@@ -116,9 +141,11 @@ input{
   cursor:pointer;
 }
 
+/* ===== Messages ===== */
 #message{
   min-height:30px;
   font-size:20px;
+  margin:10px;
 }
 .success{color:#00ff88;}
 .error{color:#ff4c4c;}
@@ -128,14 +155,30 @@ input{
 <body>
 
 <div class="topbar">
-  <button onclick="goToStages()">📂</button>
-  <button onclick="resetGame()">🔄</button>
+  <button onclick="openInfo()">ℹ️</button>
+  <button onclick="openSettings()">⚙️</button>
+</div>
+
+<div class="modal" id="infoModal">
+  <div class="modal-content">
+    <h2>كيفية اللعب</h2>
+    <p>انظر إلى الصورة، ثم كوّن الكلمة بالأمازيغية.</p>
+    <button onclick="closeModals()">إغلاق</button>
+  </div>
+</div>
+
+<div class="modal" id="settingsModal">
+  <div class="modal-content">
+    <h2>الإعدادات</h2>
+    <button onclick="toggleSound()" id="soundBtn">🔊 مفعل</button>
+    <button onclick="closeModals()">إغلاق</button>
+  </div>
 </div>
 
 <div class="screen active" id="startScreen">
   <div class="logo">ⵣ</div>
   <button onclick="continueGame()">متابعة</button>
-  <button onclick="goToStages()">المراحل</button>
+  <button onclick="goToStages()">اختيار المراحل</button>
 </div>
 
 <div class="screen" id="stageScreen">
@@ -146,6 +189,7 @@ input{
 <div class="screen" id="gameScreen">
   <h2 id="stageTitle"></h2>
   <img id="questionImage">
+  <h1 id="wordDisplay"></h1>
   <div id="message"></div>
   <input id="answerInput" readonly>
   <button onclick="clearInput()">مسح</button>
@@ -154,78 +198,91 @@ input{
 </div>
 
 <script>
+/* ===== Data ===== */
 const stages=[
- {title:"المرحلة 1",answer:"ⵜⴰⴼⵓⵢⵜ",image:"images/sun.jpg"},
- {title:"المرحلة 2",answer:"ⴰⵢⵢⵓⵔ",image:"images/moon.jpg"},
- {title:"المرحلة 3",answer:"ⴰⴷⵔⴰⵔ",image:"images/mountain.jpg"},
- {title:"المرحلة 4",answer:"ⴰⵙⵉⴼ",image:"images/river.jpg"},
- {title:"المرحلة 5",answer:"ⵜⴰⵣⴰⵔⵜ",image:"images/flower.jpg"},
- {title:"المرحلة 6",answer:"ⵜⵉⵎⴰⵣⵉⵔⵜ",image:"images/cactus.jpg"},
- {title:"المرحلة 7",answer:"ⵜⵉⵙⵉⵔⵜ",image:"images/insect.jpg"}
+ {title:"المرحلة 1",answer:"ⵜⴰⴼⵓⵢⵜ",showWord:true, word:"ⵜⴰⴼⵓⵢⵜ", image:"images/sun.jpg"},
+ {title:"المرحلة 2",answer:"ⴰⵢⵢⵓⵔ",showWord:false,word:"", image:"images/moon.jpg"},
+ {title:"المرحلة 3",answer:"ⵉⵜⵔⵉ",showWord:true, word:"ⵉⵜⵔⵉ", image:"images/flower.jpg"},
+ {title:"المرحلة 4",answer:"ⴰⴷⵔⴰⵔ",showWord:false,word:"", image:"images/mountain.jpg"},
+ {title:"المرحلة 5",answer:"ⴰⵙⵉⴼ",showWord:false,word:"", image:"images/river.jpg"}
 ];
 
 let currentStage=0;
-let unlockedStage=0;
+let unlockedStage=parseInt(localStorage.getItem("unlockedStage"))||0;
+let soundOn=true;
 
+/* ===== Navigation ===== */
 function showScreen(id){
- document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
- document.getElementById(id).classList.add("active");
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
 }
-
 function continueGame(){currentStage=unlockedStage;loadStage();showScreen("gameScreen");}
 function goToStages(){buildStagesButtons();showScreen("stageScreen");}
+function startStage(i){currentStage=i;loadStage();showScreen("gameScreen");}
 
+/* ===== UI ===== */
 function buildStagesButtons(){
- stagesButtons.innerHTML="";
- stages.forEach((s,i)=>{
-  const b=document.createElement("button");
-  b.textContent=s.title;
-  b.onclick=()=>{currentStage=i;loadStage();showScreen("gameScreen");};
-  stagesButtons.appendChild(b);
- });
+  stagesButtons.innerHTML="";
+  stages.forEach((s,i)=>{
+    const b=document.createElement("button");
+    b.textContent=i<=unlockedStage?s.title:s.title+" 🔒";
+    if(i<=unlockedStage) b.onclick=()=>startStage(i);
+    stagesButtons.appendChild(b);
+  });
 }
 
 function loadStage(){
- const s=stages[currentStage];
- stageTitle.innerText=s.title;
- questionImage.src=s.image;
- answerInput.value="";
- message.innerText="";
- buildKeyboard();
+  const s=stages[currentStage];
+  stageTitle.innerText=s.title;
+  answerInput.value="";
+  message.innerText="";
+  wordDisplay.style.display=s.showWord?"block":"none";
+  wordDisplay.innerText=s.word;
+  questionImage.src=s.image;
+  buildKeyboard();
 }
 
 function buildKeyboard(){
- keyboard.innerHTML="";
- [...new Set(stages[currentStage].answer.split(""))].forEach(l=>{
-  const k=document.createElement("div");
-  k.className="key";
-  k.innerText=l;
-  k.onclick=()=>answerInput.value+=l;
-  keyboard.appendChild(k);
- });
+  keyboard.innerHTML="";
+  [...new Set(stages[currentStage].answer.split(""))].forEach(l=>{
+    const d=document.createElement("div");
+    d.className="key";
+    d.innerText=l;
+    d.onclick=()=>answerInput.value+=l;
+    keyboard.appendChild(d);
+  });
 }
-
 function clearInput(){answerInput.value="";}
 
+/* ===== Game Logic ===== */
 function checkAnswer(){
- if(answerInput.value===stages[currentStage].answer){
-  message.innerText="✔️ صحيح";
-  message.className="success";
-  if(currentStage<stages.length-1){
-   currentStage++;
-   loadStage();
+  if(answerInput.value===stages[currentStage].answer){
+    message.innerText="✔️ أحسنت";
+    message.className="success";
+    if(currentStage===unlockedStage && unlockedStage<stages.length-1){
+      unlockedStage++;
+      localStorage.setItem("unlockedStage",unlockedStage);
+    }
+    setTimeout(()=>{
+      currentStage<stages.length-1 && loadStage(++currentStage);
+    },1000);
+  }else{
+    message.innerText="❌ حاول مرة أخرى";
+    message.className="error";
+    clearInput();
   }
- }else{
-  message.innerText="❌ حاول مرة أخرى";
-  message.className="error";
-  clearInput();
- }
 }
 
-function resetGame(){
- currentStage=0;
- unlockedStage=0;
- showScreen("startScreen");
+/* ===== Modals ===== */
+function openInfo(){infoModal.classList.add("active");}
+function openSettings(){settingsModal.classList.add("active");}
+function closeModals(){
+  infoModal.classList.remove("active");
+  settingsModal.classList.remove("active");
+}
+function toggleSound(){
+  soundOn=!soundOn;
+  soundBtn.innerText=soundOn?"🔊 مفعل":"🔇 صامت";
 }
 </script>
 
