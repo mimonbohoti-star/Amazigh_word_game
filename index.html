@@ -100,17 +100,31 @@ button{
   margin-bottom:20px;
 }
 
-/* ===== Image ===== */
-#questionImage{
-  width:260px;
-  max-width:90%;
-  margin:20px auto;
-  border-radius:18px;
+/* ===== Improved Image Card ===== */
+.image-box{
+  width:90%;
+  max-width:320px;
   background:#fff;
   padding:8px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.35);
-  min-height:200px;
+  border-radius:20px;
+  box-shadow:0 18px 40px rgba(0,0,0,0.35);
+  margin:20px auto;
+  animation:zoomIn .6s ease;
+}
+.image-box img{
+  width:100%;
+  height:320px;
   object-fit:cover;
+  border-radius:16px;
+  transition:transform .3s ease;
+}
+.image-box img:active{
+  transform:scale(1.05);
+}
+
+@keyframes zoomIn{
+  from{transform:scale(.85);opacity:0}
+  to{transform:scale(1);opacity:1}
 }
 
 /* ===== Input & Keyboard ===== */
@@ -188,7 +202,11 @@ input{
 
 <div class="screen" id="gameScreen">
   <h2 id="stageTitle"></h2>
-  <img id="questionImage">
+
+  <div class="image-box">
+    <img id="questionImage">
+  </div>
+
   <h1 id="wordDisplay"></h1>
   <div id="message"></div>
   <input id="answerInput" readonly>
@@ -198,7 +216,6 @@ input{
 </div>
 
 <script>
-/* ===== Data ===== */
 const stages=[
  {title:"المرحلة 1",answer:"ⵜⴰⴼⵓⵢⵜ",showWord:true, word:"ⵜⴰⴼⵓⵢⵜ", image:"sun.jpg"},
  {title:"المرحلة 2",answer:"ⴰⵢⵢⵓⵔ",showWord:false,word:"", image:"moon.jpg"},
@@ -211,7 +228,6 @@ let currentStage=0;
 let unlockedStage=parseInt(localStorage.getItem("unlockedStage"))||0;
 let soundOn=true;
 
-/* ===== Navigation ===== */
 function showScreen(id){
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
@@ -220,7 +236,6 @@ function continueGame(){currentStage=unlockedStage;loadStage();showScreen("gameS
 function goToStages(){buildStagesButtons();showScreen("stageScreen");}
 function startStage(i){currentStage=i;loadStage();showScreen("gameScreen");}
 
-/* ===== UI ===== */
 function buildStagesButtons(){
   stagesButtons.innerHTML="";
   stages.forEach((s,i)=>{
@@ -254,7 +269,6 @@ function buildKeyboard(){
 }
 function clearInput(){answerInput.value="";}
 
-/* ===== Game Logic ===== */
 function checkAnswer(){
   if(answerInput.value===stages[currentStage].answer){
     message.innerText="✔️ أحسنت";
@@ -273,7 +287,6 @@ function checkAnswer(){
   }
 }
 
-/* ===== Modals ===== */
 function openInfo(){infoModal.classList.add("active");}
 function openSettings(){settingsModal.classList.add("active");}
 function closeModals(){
