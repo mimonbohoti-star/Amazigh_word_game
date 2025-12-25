@@ -7,16 +7,21 @@
 
 <style>
 :root{--accent:#facc15}
+*{box-sizing:border-box}
 body{
  margin:0;font-family:sans-serif;
  background:radial-gradient(circle at top,#1e293b,#020617);
- color:#fff;display:flex;justify-content:center;align-items:center;min-height:100vh;
+ color:#fff;display:flex;justify-content:center;align-items:center;
+ min-height:100vh;
 }
 .card{
  width:95%;max-width:420px;background:#020617;border-radius:26px;
- padding:22px;box-shadow:0 0 0 2px var(--accent),0 30px 60px rgba(0,0,0,.7);
+ padding:20px;
+ box-shadow:0 0 0 2px var(--accent),0 30px 60px rgba(0,0,0,.7);
 }
-h1{text-align:center;color:var(--accent)}
+h1{text-align:center;color:var(--accent);margin:6px 0}
+img{width:100%;border-radius:16px;margin:10px 0}
+
 .section{display:none}
 .section.active{display:block}
 
@@ -25,17 +30,7 @@ h1{text-align:center;color:var(--accent)}
  font-size:18px;font-weight:700;cursor:pointer
 }
 .btn-main{background:var(--accent);color:#000}
-.btn-ok{background:#22c55e;color:#000}
 .btn-back{background:#0f172a;color:#fff;border:1px solid #334155}
-.btn-del{background:#ef4444;color:#fff}
-
-.map{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.stage{
- background:#111827;border-radius:16px;padding:20px;text-align:center;
- font-weight:bold
-}
-.stage.locked{opacity:.3}
-.stage.active{background:var(--accent);color:#000;cursor:pointer}
 
 .answer-boxes{
  display:flex;justify-content:center;gap:8px;margin:12px 0;
@@ -48,42 +43,49 @@ h1{text-align:center;color:var(--accent)}
 .answer-box.ok{background:#22c55e}
 .answer-box.bad{background:#ef4444;color:#fff}
 
-/* ===== KEYBOARD ===== */
+/* BOARDS */
 .keyboard{
- display:grid;grid-template-columns:repeat(6,1fr);gap:8px;
- direction:ltr;
+ display:grid;grid-template-columns:repeat(4,1fr);gap:10px;
+ touch-action:none;
+}
+.triangle{
+ display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+ justify-items:center;touch-action:none;
 }
 .key{
- background:#1e293b;padding:12px;border-radius:12px;
- text-align:center;font-size:20px;cursor:pointer
+ background:#1e293b;padding:14px;border-radius:14px;
+ text-align:center;font-size:22px;font-weight:bold;
+ user-select:none;
 }
-.key.used{opacity:.3;pointer-events:none}
+.key.used{opacity:.25}
 
-/* ===== SWIPE ===== */
-.swipe{
- width:260px;height:260px;margin:20px auto;
+.wheel{
+ width:260px;height:260px;margin:16px auto;
  border-radius:50%;border:3px solid var(--accent);
  position:relative;touch-action:none;
 }
-.swipe .key{
+.wheel .key{
  width:52px;height:52px;border-radius:50%;
  background:var(--accent);color:#000;
  position:absolute;display:flex;
  align-items:center;justify-content:center;
- font-weight:bold;font-size:22px
 }
-.swipe .key.active{background:#22c55e}
-svg{position:absolute;inset:0}
 
-/* ===== WIN ===== */
+/* CELEBRATION */
 .overlay{
- position:fixed;inset:0;background:rgba(0,0,0,.95);
- display:none;justify-content:center;align-items:center
+ position:fixed;inset:0;background:rgba(0,0,0,.9);
+ display:none;justify-content:center;align-items:center;
 }
 .overlay.active{display:flex}
 .win{
- background:#020617;padding:28px;border-radius:24px;
+ background:#020617;padding:26px;border-radius:22px;
  box-shadow:0 0 60px var(--accent);
+ text-align:center;
+ animation:pulse .6s infinite alternate;
+}
+@keyframes pulse{
+ from{box-shadow:0 0 20px var(--accent)}
+ to{box-shadow:0 0 80px #fff}
 }
 </style>
 </head>
@@ -99,20 +101,19 @@ svg{position:absolute;inset:0}
 
 <div id="map" class="section">
  <h1>⭐ المراحل</h1>
- <div class="map" id="mapGrid"></div>
+ <div id="mapGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px"></div>
  <button class="btn btn-back" onclick="show('menu')">⬅️ رجوع</button>
 </div>
 
 <div id="game" class="section">
  <h1 id="levelTitle"></h1>
- <div id="question"></div>
+ <img id="questionImg">
  <div class="answer-boxes" id="boxes"></div>
 
- <div id="swipeArea"></div>
+ <div id="wheel" class="wheel"></div>
  <div id="keyboard" class="keyboard"></div>
 
- <button class="btn btn-del" onclick="del()">⌫ حذف</button>
- <button class="btn btn-ok" onclick="check()">✔️ تأكيد</button>
+ <button class="btn btn-back" onclick="show('map')">⬅️ رجوع</button>
 </div>
 
 </div>
@@ -120,21 +121,22 @@ svg{position:absolute;inset:0}
 <div id="overlay" class="overlay">
  <div class="win">
   <h2>🔥 أحسنت 🔥</h2>
-  <button class="btn btn-main" onclick="next()">➡️ التالي</button>
  </div>
 </div>
 
 <script>
+/* ========= DATA ========= */
 const levels=[
- {img:"images/sun.jpg",a:"ⵜⴰⴼⵓⵢⵜ",c:"#facc15",swipe:true},
- {img:"images/moon.jpg",a:"ⴰⵢⵓⵔ",c:"#60a5fa"},
- {img:"images/stars.jpg",a:"ⵉⵜⵔⴰⵏ",c:"#e9d5ff"},
- {img:"images/mountain.jpg",a:"ⴰⴷⵔⴰⵔ",c:"#34d399"},
- {img:"images/river.jpg",a:"ⴰⵙⵉⴼ",c:"#38bdf8"}
+ {a:"ⵜⴰⴼⵓⵢⵜ",shape:"circle",img:"images/sun.jpg"},
+ {a:"ⴰⵢⵓⵔ",shape:"triangle",img:"images/moon.jpg"},
+ {a:"ⵉⵜⵔⴰⵏ",shape:"grid",img:"images/stars.jpg"},
+ {a:"ⴰⴷⵔⴰⵔ",shape:"circle",img:"images/mountain.jpg"}
 ];
 
-let cur=0,input=[],used=[];
+let unlocked=+localStorage.getItem("amazighUnlocked")||0;
+let cur=0,input=[],drag=false;
 
+/* ========= NAV ========= */
 function show(id){
  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
  document.getElementById(id).classList.add("active");
@@ -143,104 +145,122 @@ function show(id){
 function openMap(){
  mapGrid.innerHTML="";
  levels.forEach((_,i)=>{
-  let d=document.createElement("div");
-  d.className="stage active";
-  d.innerText="مرحلة "+(i+1);
-  d.onclick=()=>start(i);
+  const d=document.createElement("div");
+  d.className="key"+(i>unlocked?" used":"");
+  d.textContent="مرحلة "+(i+1);
+  if(i<=unlocked)d.onclick=()=>start(i);
   mapGrid.appendChild(d);
  });
  show("map");
 }
 
+/* ========= GAME ========= */
 function start(i){
- cur=i;input=[];used=[];
- document.documentElement.style.setProperty("--accent",levels[i].c);
- levelTitle.innerText="المرحلة "+(i+1);
- question.innerHTML=`<img src="${levels[i].img}" width="100%">`;
- boxes.innerHTML="";keyboard.innerHTML="";swipeArea.innerHTML="";
- [...levels[i].a].forEach(()=>boxes.innerHTML+=`<div class="answer-box"></div>`);
-
- if(levels[i].swipe) buildSwipe();
- else buildKeyboard();
-
+ cur=i;resetInput();
+ levelTitle.textContent="المرحلة "+(i+1);
+ questionImg.src=levels[i].img;
+ renderBoxes();
+ renderBoard();
  show("game");
 }
 
-function buildKeyboard(){
- keyboard.style.display="grid";
- swipeArea.style.display="none";
- [...levels[cur].a].sort(()=>Math.random()-.5).forEach(ch=>{
-  let k=document.createElement("div");
-  k.className="key";k.innerText=ch;
-  k.onclick=()=>add(ch,k);
-  keyboard.appendChild(k);
- });
+function renderBoxes(){
+ boxes.innerHTML="";
+ for(let i=0;i<levels[cur].a.length;i++)
+  boxes.innerHTML+=`<div class="answer-box"></div>`;
 }
 
-function buildSwipe(){
- keyboard.style.display="none";
- swipeArea.style.display="block";
+function renderBoard(){
+ keyboard.innerHTML="";wheel.innerHTML="";
+ keyboard.style.display="none";wheel.style.display="none";
+ keyboard.className="keyboard";
 
- let wrap=document.createElement("div");
- wrap.className="swipe";
- wrap.innerHTML=`<svg><path stroke="white" stroke-width="6" fill="none"/></svg>`;
- let path=wrap.querySelector("path");
- let r=100,d="",drawing=false;
+ const letters=[...levels[cur].a].sort(()=>Math.random()-.5);
 
- [...levels[cur].a].forEach((ch,n)=>{
-  let k=document.createElement("div");
-  k.className="key";k.innerText=ch;
-  let a=n/levels[cur].a.length*2*Math.PI;
-  k.style.left=130+r*Math.cos(a)-26+"px";
-  k.style.top =130+r*Math.sin(a)-26+"px";
-  wrap.appendChild(k);
- });
-
- wrap.addEventListener("touchstart",e=>{
-  drawing=true;d="";path.setAttribute("d","");
-  input=[];used=[];
-  wrap.querySelectorAll(".key").forEach(k=>k.classList.remove("active"));
- });
-
- wrap.addEventListener("touchmove",e=>{
-  if(!drawing)return;
-  let t=e.touches[0],rct=wrap.getBoundingClientRect();
-  let x=t.clientX-rct.left,y=t.clientY-rct.top;
-  d+=d===""?`M${x},${y}`:` L${x},${y}`;
-  path.setAttribute("d",d);
-
-  wrap.querySelectorAll(".key").forEach(k=>{
-   let b=k.getBoundingClientRect();
-   if(t.clientX>b.left&&t.clientX<b.right&&t.clientY>b.top&&t.clientY<b.bottom&&!used.includes(k)){
-    used.push(k);k.classList.add("active");
-    input.push(k.innerText);refresh();
-   }
+ if(levels[cur].shape==="circle"){
+  wheel.style.display="block";
+  const r=110,c=130;
+  letters.forEach((ch,j)=>{
+   const a=2*Math.PI*j/letters.length;
+   const k=makeKey(ch);
+   k.style.left=c+r*Math.cos(a)-26+"px";
+   k.style.top =c+r*Math.sin(a)-26+"px";
+   wheel.appendChild(k);
   });
- });
-
- wrap.addEventListener("touchend",()=>drawing=false);
- swipeArea.appendChild(wrap);
-}
-
-function add(ch,key){
- if(input.length<levels[cur].a.length){
-  input.push(ch);key.classList.add("used");refresh();
+ }else{
+  keyboard.style.display="grid";
+  if(levels[cur].shape==="triangle") keyboard.className="triangle";
+  letters.forEach(ch=>keyboard.appendChild(makeKey(ch)));
  }
 }
 
-function del(){input.pop();refresh();}
+function makeKey(ch){
+ const k=document.createElement("div");
+ k.className="key";
+ k.textContent=ch;
+ k.dataset.ch=ch;
+ return k;
+}
+
+/* ========= DRAG ENGINE ========= */
+document.addEventListener("pointerdown",e=>{
+ drag=true;
+ handlePoint(e);
+});
+document.addEventListener("pointermove",e=>{
+ if(drag) handlePoint(e);
+});
+document.addEventListener("pointerup",()=>{
+ drag=false;
+ check();
+});
+
+function handlePoint(e){
+ const el=document.elementFromPoint(e.clientX,e.clientY);
+ if(!el || !el.classList.contains("key")) return;
+ if(el.classList.contains("used")) return;
+ if(input.length>=levels[cur].a.length) return;
+
+ el.classList.add("used");
+ input.push(el);
+ refresh();
+}
 
 function refresh(){
- document.querySelectorAll(".answer-box").forEach((b,i)=>b.innerText=input[i]||"");
+ document.querySelectorAll(".answer-box").forEach((b,i)=>{
+  b.textContent=input[i]?.dataset.ch||"";
+  b.className="answer-box";
+ });
 }
 
+function resetInput(){
+ input=[];
+}
+
+/* ========= CHECK ========= */
 function check(){
- if(input.join("")===levels[cur].a)overlay.classList.add("active");
-}
+ if(input.length!==levels[cur].a.length) return;
+ const ok=input.map(k=>k.dataset.ch).join("")===levels[cur].a;
+ document.querySelectorAll(".answer-box")
+  .forEach(b=>b.classList.add(ok?"ok":"bad"));
 
-function next(){
- overlay.classList.remove("active");
- show("menu");
+ if(ok){
+  if(cur===unlocked){
+   unlocked++;
+   localStorage.setItem("amazighUnlocked",unlocked);
+  }
+  overlay.classList.add("active");
+  setTimeout(()=>{
+   overlay.classList.remove("active");
+   cur+1<levels.length?start(cur+1):show("menu");
+  },800);
+ }else{
+  setTimeout(()=>{
+   renderBoard();
+   resetInput();
+   renderBoxes();
+  },700);
+ }
 }
 </script>
 
