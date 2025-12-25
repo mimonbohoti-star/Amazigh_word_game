@@ -33,6 +33,13 @@ img{width:100%;border-radius:16px;margin:10px 0}
 .btn-main{background:var(--accent);color:#000}
 .btn-back{background:#0f172a;color:#fff;border:1px solid #334155}
 
+.sound-btn{
+ position:absolute;top:14px;left:14px;
+ width:44px;height:44px;border-radius:50%;
+ background:#0f172a;border:1px solid #334155;
+ color:#fff;font-size:20px;cursor:pointer;
+}
+
 .answer-boxes{
  display:flex;justify-content:center;gap:8px;margin:12px 0;
  direction:ltr;
@@ -76,7 +83,6 @@ img{width:100%;border-radius:16px;margin:10px 0}
  font-size:20px;font-weight:bold;cursor:pointer;
 }
 
-/* OVERLAY */
 .overlay{
  position:fixed;inset:0;background:rgba(0,0,0,.8);
  display:none;justify-content:center;align-items:center;
@@ -94,10 +100,9 @@ img{width:100%;border-radius:16px;margin:10px 0}
  to{box-shadow:0 0 90px #fff}
 }
 
-/* CONFETTI */
 .confetti{
  position:fixed;top:-20px;
- font-size:24px;
+ font-size:26px;
  animation:fall linear forwards;
  pointer-events:none;
  z-index:10;
@@ -111,6 +116,7 @@ img{width:100%;border-radius:16px;margin:10px 0}
 <body>
 
 <div class="card">
+<button class="sound-btn" id="soundBtn">🔊</button>
 
 <div id="menu" class="section active">
  <h1>ⵣ لعبة الكلمات الأمازيغية</h1>
@@ -127,35 +133,84 @@ img{width:100%;border-radius:16px;margin:10px 0}
  <h1 id="levelTitle"></h1>
  <img id="questionImg">
  <div class="answer-boxes" id="boxes"></div>
-
  <div id="wheel" class="wheel"></div>
  <div id="keyboard" class="keyboard"></div>
-
  <button class="btn btn-back" onclick="show('map')">⬅️ رجوع</button>
 </div>
-
 </div>
 
 <div id="overlay" class="overlay">
- <div class="win">
-  <h2>🔥 أحسنت 🔥</h2>
- </div>
+ <div class="win"><h2>🔥 أحسنت 🔥</h2></div>
 </div>
 
-<audio id="clap" src="sounds/clap.mp3"></audio>
-
 <script>
-const levels=[
- {a:"ⵜⴰⴼⵓⵢⵜ",shape:"circle",img:"images/sun.jpg"},
- {a:"ⴰⵢⵓⵔ",shape:"triangle",img:"images/moon.jpg"},
- {a:"ⵉⵜⵔⴰⵏ",shape:"grid",img:"images/stars.jpg"},
- {a:"ⴰⴷⵔⴰⵔ",shape:"circle",img:"images/mountain.jpg"}
+/* ===== SOUND (FIXED) ===== */
+let soundOn=true;
+let ctx=null;
+const soundBtn=document.getElementById("soundBtn");
+
+function initAudio(){
+ if(!ctx){
+  ctx=new (window.AudioContext||window.webkitAudioContext)();
+ }
+ if(ctx.state==="suspended") ctx.resume();
+}
+
+function clap(){
+ if(!soundOn) return;
+ initAudio();
+ for(let i=0;i<8;i++){
+  const o=ctx.createOscillator();
+  const g=ctx.createGain();
+  o.type="square";
+  o.frequency.value=180+Math.random()*500;
+  g.gain.setValueAtTime(0.6,ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.18);
+  o.connect(g).connect(ctx.destination);
+  o.start();
+  o.stop(ctx.currentTime+0.18);
+ }
+ if(navigator.vibrate) navigator.vibrate([100,50,100]);
+}
+
+soundBtn.onclick=()=>{
+ soundOn=!soundOn;
+ soundBtn.textContent=soundOn?"🔊":"🔇";
+ if(soundOn) initAudio();
+};
+
+/* ===== DATA ===== */
+const stages=[
+ {qs:[
+  {a:"ⵜⴰⴼⵓⵢⵜ",shape:"circle",img:"sun.jpg"},
+  {a:"ⴰⵢⵓⵔ",shape:"triangle",img:"moon.jpg"},
+  {a:"ⵉⵜⵔⴰⵏ",shape:"grid",img:"stars.jpg"}
+ ]},
+ {qs:[
+  {a:"ⴰⴷⵔⴰⵔ",shape:"circle",img:"mountain.jpg"},
+  {a:"ⴰⵙⵉⴼ",shape:"triangle",img:"river.jpg"},
+  {a:"ⵜⴰⵎⴰⵣⵉⵔⵜ",shape:"grid",img:"images/flag.jpg"}
+ ]},
+ {qs:[
+  {a:"ⴰⵣⵣⵓ",shape:"circle",img:"flower.jpg"},
+  {a:"ⴰⵣⴳⴳⵯⴰⵖ",shape:"triangle",img:"cactus.jpg"},
+  {a:"ⴰⵣⴳⵣⴰⵡ",shape:"grid",img:"flowers.jpg"}
+ ]},
+ {qs:[
+  {a:"ⴰⵎⴰⵏ",shape:"circle",img:"river.jpg"},
+  {a:"ⴰⴼⴰⵙ",shape:"triangle",img:"insect.jpg"},
+  {a:"ⴰⵎⵣⵣⵓⵖ",shape:"grid",img:"sun.jpg"}
+ ]},
+ {qs:[
+  {a:"ⴰⴽⴰⵍ",shape:"circle",img:"mountain.jpg"},
+  {a:"ⴰⵎⵣⴰⵔ",shape:"triangle",img:"rain.jpg"},
+  {a:"ⴰⴼⵓⵙ",shape:"grid",img:"flower.jpg"}
+ ]}
 ];
 
 let unlocked=+localStorage.getItem("amazighUnlocked")||0;
-let cur=0,input=[],drag=false;
-
-const symbols=["🌸","🌹","🌺","❤️","💖","💐","ⵣ","ⵉ","ⵜ","ⴰ"];
+let stage=0,q=0,input=[],drag=false;
+const symbols=["🌸","🌺","🌹","❤️","💖","💐","ⵣ","ⵉ","ⵜ","ⴰ"];
 
 function show(id){
  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
@@ -164,35 +219,37 @@ function show(id){
 
 function openMap(){
  mapGrid.innerHTML="";
- levels.forEach((_,i)=>{
+ stages.forEach((_,i)=>{
   const d=document.createElement("div");
   d.className="key"+(i>unlocked?" used":"");
   d.textContent="مرحلة "+(i+1);
-  if(i<=unlocked)d.onclick=()=>start(i);
+  if(i<=unlocked)d.onclick=()=>startStage(i);
   mapGrid.appendChild(d);
  });
  show("map");
 }
 
-function start(i){
- cur=i;resetInput();
- levelTitle.textContent="المرحلة "+(i+1);
- questionImg.src=levels[i].img;
- renderBoxes();renderBoard();show("game");
+function startStage(i){ stage=i; q=0; startQuestion(); }
+
+function startQuestion(){
+ input=[];
+ const L=stages[stage].qs[q];
+ levelTitle.textContent=`المرحلة ${stage+1} — سؤال ${q+1}/3`;
+ questionImg.src=L.img;
+ renderBoxes(L); renderBoard(L); show("game");
 }
 
-function renderBoxes(){
+function renderBoxes(L){
  boxes.innerHTML="";
- for(let i=0;i<levels[cur].a.length;i++)
-  boxes.innerHTML+=`<div class="answer-box"></div>`;
+ for(let i=0;i<L.a.length;i++) boxes.innerHTML+=`<div class="answer-box"></div>`;
 }
 
-function renderBoard(){
- keyboard.innerHTML="";wheel.innerHTML="";
- keyboard.style.display="none";wheel.style.display="none";
- const letters=[...levels[cur].a].sort(()=>Math.random()-.5);
+function renderBoard(L){
+ keyboard.innerHTML=""; wheel.innerHTML="";
+ keyboard.style.display="none"; wheel.style.display="none";
+ const letters=[...L.a].sort(()=>Math.random()-.5);
 
- if(levels[cur].shape==="circle"){
+ if(L.shape==="circle"){
   wheel.style.display="block";
   const r=110,c=130;
   letters.forEach((ch,j)=>{
@@ -204,66 +261,54 @@ function renderBoard(){
   });
  }else{
   keyboard.style.display="grid";
-  if(levels[cur].shape==="triangle") keyboard.className="triangle";
+  if(L.shape==="triangle") keyboard.className="triangle";
   letters.forEach(ch=>{
-   const k=makeKey(ch);
-   k.onclick=()=>pick(k);
-   keyboard.appendChild(k);
+   const k=makeKey(ch); k.onclick=()=>pick(k,L); keyboard.appendChild(k);
   });
   const del=document.createElement("div");
-  del.className="delete";
-  del.textContent="⌫";
-  del.onclick=removeLast;
+  del.className="delete"; del.textContent="⌫"; del.onclick=removeLast;
   keyboard.appendChild(del);
  }
 }
 
 function makeKey(ch){
  const k=document.createElement("div");
- k.className="key";
- k.textContent=ch;
- k.dataset.ch=ch;
+ k.className="key"; k.textContent=ch; k.dataset.ch=ch;
  return k;
 }
 
-function pick(el){
+function pick(el,L){
  if(el.classList.contains("used"))return;
- if(input.length>=levels[cur].a.length)return;
- el.classList.add("used");
- input.push(el);
- refresh();
- if(input.length===levels[cur].a.length && levels[cur].shape!=="circle") check();
+ if(input.length>=L.a.length)return;
+ el.classList.add("used"); input.push(el); refresh();
+ if(input.length===L.a.length && L.shape!=="circle") check(L);
 }
 
 function removeLast(){
- const last=input.pop();
- if(last) last.classList.remove("used");
- refresh();
+ if(!input.length)return;
+ const last=input.pop(); if(last) last.classList.remove("used"); refresh();
 }
 
 wheel.addEventListener("pointerdown",e=>{
- if(levels[cur].shape!=="circle")return;
- drag=true;dragPick(e);
+ const L=stages[stage].qs[q];
+ if(L.shape!=="circle")return; drag=true; dragPick(e,L);
 });
-wheel.addEventListener("pointermove",e=>{if(drag)dragPick(e)});
-document.addEventListener("pointerup",()=>{if(drag){drag=false;check()}});
+wheel.addEventListener("pointermove",e=>{ if(drag) dragPick(e,stages[stage].qs[q]); });
+document.addEventListener("pointerup",()=>{ if(drag){drag=false; check(stages[stage].qs[q]);} });
 
-function dragPick(e){
+function dragPick(e,L){
  const el=document.elementFromPoint(e.clientX,e.clientY);
- if(!el || !el.classList.contains("key"))return;
- pick(el);
+ if(!el||!el.classList.contains("key"))return; pick(el,L);
 }
 
 function refresh(){
  document.querySelectorAll(".answer-box").forEach((b,i)=>{
-  b.textContent=input[i]?.dataset.ch||"";
-  b.className="answer-box";
+  b.textContent=input[i]?.dataset.ch||""; b.className="answer-box";
  });
 }
-function resetInput(){input=[]}
 
 function celebrate(){
- document.getElementById("clap").play();
+ clap();
  for(let i=0;i<40;i++){
   const c=document.createElement("div");
   c.className="confetti";
@@ -275,30 +320,26 @@ function celebrate(){
  }
 }
 
-function check(){
- if(input.length!==levels[cur].a.length)return;
- const ok=input.map(k=>k.dataset.ch).join("")===levels[cur].a;
- document.querySelectorAll(".answer-box")
-  .forEach(b=>b.classList.add(ok?"ok":"bad"));
+function check(L){
+ if(input.length!==L.a.length)return;
+ const ok=input.map(k=>k.dataset.ch).join("")===L.a;
+ document.querySelectorAll(".answer-box").forEach(b=>b.classList.add(ok?"ok":"bad"));
 
  if(ok){
-  celebrate();
-  if(cur===unlocked){
-   unlocked++;
-   localStorage.setItem("amazighUnlocked",unlocked);
-  }
-  overlay.classList.add("active");
+  celebrate(); overlay.classList.add("active");
   setTimeout(()=>{
    overlay.classList.remove("active");
-   cur+1<levels.length?start(cur+1):show("menu");
+   q++;
+   if(q<3) startQuestion();
+   else{
+    if(stage===unlocked){ unlocked++; localStorage.setItem("amazighUnlocked",unlocked); }
+    show("map");
+   }
   },1200);
  }else{
-  setTimeout(()=>{
-   renderBoard();resetInput();renderBoxes();
-  },700);
+  setTimeout(()=>{ startQuestion(); },700);
  }
 }
 </script>
-
 </body>
 </html>
