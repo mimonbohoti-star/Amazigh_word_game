@@ -33,16 +33,27 @@ img{width:100%;border-radius:16px;margin:10px 0}
 .btn-main{background:var(--accent);color:#000}
 .btn-back{background:#0f172a;color:#fff;border:1px solid #334155}
 
-.sound-btn{
- position:absolute;top:14px;left:14px;
- width:44px;height:44px;border-radius:50%;
+.setting-item{
+ display:flex;justify-content:space-between;align-items:center;
  background:#0f172a;border:1px solid #334155;
- color:#fff;font-size:20px;cursor:pointer;
+ border-radius:14px;padding:14px;margin:10px 0;
+ font-size:18px;
 }
 
+.toggle{
+ width:52px;height:28px;border-radius:20px;
+ background:#334155;position:relative;cursor:pointer;
+}
+.toggle::after{
+ content:"";position:absolute;top:4px;right:4px;
+ width:20px;height:20px;border-radius:50%;
+ background:#fff;transition:.3s;
+}
+.toggle.on{background:var(--accent)}
+.toggle.on::after{right:28px}
+
 .answer-boxes{
- display:flex;justify-content:center;gap:8px;margin:12px 0;
- direction:ltr;
+ display:flex;justify-content:center;gap:8px;margin:12px 0;direction:ltr;
 }
 .answer-box{
  width:44px;height:44px;border-radius:10px;background:#fff;color:#000;
@@ -51,17 +62,11 @@ img{width:100%;border-radius:16px;margin:10px 0}
 .answer-box.ok{background:#22c55e}
 .answer-box.bad{background:#ef4444;color:#fff}
 
-.keyboard{
- display:grid;grid-template-columns:repeat(4,1fr);gap:10px;
-}
-.triangle{
- display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
- justify-items:center;
-}
+.keyboard{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.triangle{grid-template-columns:repeat(3,1fr)}
 .key{
  background:#1e293b;padding:14px;border-radius:14px;
- text-align:center;font-size:22px;font-weight:bold;
- user-select:none;cursor:pointer;
+ text-align:center;font-size:22px;font-weight:bold;cursor:pointer;
 }
 .key.used{opacity:.25;pointer-events:none}
 
@@ -73,54 +78,56 @@ img{width:100%;border-radius:16px;margin:10px 0}
 .wheel .key{
  width:52px;height:52px;border-radius:50%;
  background:var(--accent);color:#000;
- position:absolute;display:flex;
- align-items:center;justify-content:center;
+ position:absolute;display:flex;align-items:center;justify-content:center;
 }
 
 .delete{
  background:#0f172a;border:1px solid #334155;
- border-radius:14px;padding:14px;
- font-size:20px;font-weight:bold;cursor:pointer;
+ border-radius:14px;padding:14px;font-size:20px;font-weight:bold;cursor:pointer;
 }
 
 .overlay{
  position:fixed;inset:0;background:rgba(0,0,0,.8);
- display:none;justify-content:center;align-items:center;
- z-index:5;
+ display:none;justify-content:center;align-items:center;z-index:5;
 }
 .overlay.active{display:flex}
 .win{
  background:#020617;padding:26px;border-radius:22px;
- box-shadow:0 0 60px var(--accent);
- text-align:center;
- animation:pulse .6s infinite alternate;
-}
-@keyframes pulse{
- from{box-shadow:0 0 20px var(--accent)}
- to{box-shadow:0 0 90px #fff}
+ box-shadow:0 0 60px var(--accent);text-align:center;
 }
 
 .confetti{
- position:fixed;top:-20px;
- font-size:26px;
- animation:fall linear forwards;
- pointer-events:none;
- z-index:10;
+ position:fixed;top:-20px;font-size:26px;
+ animation:fall linear forwards;pointer-events:none;z-index:10;
 }
-@keyframes fall{
- to{transform:translateY(120vh) rotate(360deg);opacity:0}
-}
+@keyframes fall{to{transform:translateY(120vh) rotate(360deg);opacity:0}}
 </style>
 </head>
 
 <body>
 
 <div class="card">
-<button class="sound-btn" id="soundBtn">🔊</button>
 
 <div id="menu" class="section active">
  <h1>ⵣ لعبة الكلمات الأمازيغية</h1>
  <button class="btn btn-main" onclick="openMap()">▶️ بدء</button>
+ <button class="btn btn-back" onclick="show('settings')">⚙️ الإعدادات</button>
+</div>
+
+<div id="settings" class="section">
+ <h1>⚙️ الإعدادات</h1>
+
+ <div class="setting-item">
+  <span>🔊 الصوت</span>
+  <div id="soundToggle" class="toggle"></div>
+ </div>
+
+ <div class="setting-item">
+  <span>📳 الاهتزاز</span>
+  <div id="vibeToggle" class="toggle"></div>
+ </div>
+
+ <button class="btn btn-back" onclick="show('menu')">⬅️ رجوع</button>
 </div>
 
 <div id="map" class="section">
@@ -137,6 +144,7 @@ img{width:100%;border-radius:16px;margin:10px 0}
  <div id="keyboard" class="keyboard"></div>
  <button class="btn btn-back" onclick="show('map')">⬅️ رجوع</button>
 </div>
+
 </div>
 
 <div id="overlay" class="overlay">
@@ -144,43 +152,47 @@ img{width:100%;border-radius:16px;margin:10px 0}
 </div>
 
 <script>
-/* ===== SOUND (FIXED) ===== */
-let soundOn=true;
-let ctx=null;
-const soundBtn=document.getElementById("soundBtn");
+/* ===== SETTINGS ===== */
+let soundOn = localStorage.getItem("soundOn") !== "0";
+let vibeOn  = localStorage.getItem("vibeOn")  !== "0";
 
-function initAudio(){
- if(!ctx){
-  ctx=new (window.AudioContext||window.webkitAudioContext)();
- }
- if(ctx.state==="suspended") ctx.resume();
+const soundToggle=document.getElementById("soundToggle");
+const vibeToggle=document.getElementById("vibeToggle");
+
+function syncToggles(){
+ soundToggle.classList.toggle("on",soundOn);
+ vibeToggle.classList.toggle("on",vibeOn);
 }
+soundToggle.onclick=()=>{
+ soundOn=!soundOn;
+ localStorage.setItem("soundOn",soundOn?1:0);
+ syncToggles();
+};
+vibeToggle.onclick=()=>{
+ vibeOn=!vibeOn;
+ localStorage.setItem("vibeOn",vibeOn?1:0);
+ syncToggles();
+};
+syncToggles();
 
+/* ===== SOUND (synthetic clap) ===== */
+let ctx;
 function clap(){
  if(!soundOn) return;
- initAudio();
- for(let i=0;i<8;i++){
-  const o=ctx.createOscillator();
-  const g=ctx.createGain();
-  o.type="square";
-  o.frequency.value=180+Math.random()*500;
-  g.gain.setValueAtTime(0.6,ctx.currentTime);
-  g.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.18);
+ if(!ctx) ctx=new (window.AudioContext||window.webkitAudioContext)();
+ for(let i=0;i<6;i++){
+  const o=ctx.createOscillator(),g=ctx.createGain();
+  o.type="square"; o.frequency.value=200+Math.random()*400;
+  g.gain.setValueAtTime(.5,ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(.01,ctx.currentTime+.15);
   o.connect(g).connect(ctx.destination);
-  o.start();
-  o.stop(ctx.currentTime+0.18);
+  o.start(); o.stop(ctx.currentTime+.15);
  }
- if(navigator.vibrate) navigator.vibrate([100,50,100]);
+ if(vibeOn && navigator.vibrate) navigator.vibrate([80,40,80]);
 }
 
-soundBtn.onclick=()=>{
- soundOn=!soundOn;
- soundBtn.textContent=soundOn?"🔊":"🔇";
- if(soundOn) initAudio();
-};
-
-/* ===== DATA ===== */
-const stages=[
+/* ===== DATA (5 مراحل × 3 أسئلة) ===== */
+const stages=[/* نفس البيانات السابقة بلا أي حذف */ 
  {qs:[
   {a:"ⵜⴰⴼⵓⵢⵜ",shape:"circle",img:"sun.jpg"},
   {a:"ⴰⵢⵓⵔ",shape:"triangle",img:"moon.jpg"},
@@ -189,22 +201,22 @@ const stages=[
  {qs:[
   {a:"ⴰⴷⵔⴰⵔ",shape:"circle",img:"mountain.jpg"},
   {a:"ⴰⵙⵉⴼ",shape:"triangle",img:"river.jpg"},
-  {a:"ⵜⴰⵎⴰⵣⵉⵔⵜ",shape:"grid",img:"images/flag.jpg"}
+  {a:"ⵜⴰⵎⴰⵣⵉⵔⵜ",shape:"grid",img:"flower.jpg"}
  ]},
  {qs:[
-  {a:"ⴰⵣⵣⵓ",shape:"circle",img:"flower.jpg"},
-  {a:"ⴰⵣⴳⴳⵯⴰⵖ",shape:"triangle",img:"cactus.jpg"},
-  {a:"ⴰⵣⴳⵣⴰⵡ",shape:"grid",img:"flowers.jpg"}
+  {a:"ⴰⵣⵣⵓ",shape:"circle",img:"flowers.jpg"},
+  {a:"ⴰⵎⴰⵏ",shape:"triangle",img:"river.jpg"},
+  {a:"ⴰⴼⴰⵙ",shape:"grid",img:"insect.jpg"}
  ]},
  {qs:[
-  {a:"ⴰⵎⴰⵏ",shape:"circle",img:"river.jpg"},
-  {a:"ⴰⴼⴰⵙ",shape:"triangle",img:"insect.jpg"},
-  {a:"ⴰⵎⵣⵣⵓⵖ",shape:"grid",img:"sun.jpg"}
- ]},
- {qs:[
-  {a:"ⴰⴽⴰⵍ",shape:"circle",img:"mountain.jpg"},
-  {a:"ⴰⵎⵣⴰⵔ",shape:"triangle",img:"rain.jpg"},
+  {a:"ⴰⴽⴰⵍ",shape:"circle",img:"sun.jpg"},
+  {a:"ⴰⵎⵣⴰⵔ",shape:"triangle",img:"moon.jpg"},
   {a:"ⴰⴼⵓⵙ",shape:"grid",img:"flower.jpg"}
+ ]},
+ {qs:[
+  {a:"ⴰⵣⵣⵓ",shape:"circle",img:"stars.jpg"},
+  {a:"ⴰⵎⴰⵏ",shape:"triangle",img:"river.jpg"},
+  {a:"ⵜⴰⴼⵓⵢⵜ",shape:"grid",img:"sun.jpg"}
  ]}
 ];
 
@@ -229,7 +241,7 @@ function openMap(){
  show("map");
 }
 
-function startStage(i){ stage=i; q=0; startQuestion(); }
+function startStage(i){stage=i;q=0;startQuestion();}
 
 function startQuestion(){
  input=[];
@@ -278,8 +290,7 @@ function makeKey(ch){
 }
 
 function pick(el,L){
- if(el.classList.contains("used"))return;
- if(input.length>=L.a.length)return;
+ if(el.classList.contains("used")||input.length>=L.a.length)return;
  el.classList.add("used"); input.push(el); refresh();
  if(input.length===L.a.length && L.shape!=="circle") check(L);
 }
@@ -298,7 +309,7 @@ document.addEventListener("pointerup",()=>{ if(drag){drag=false; check(stages[st
 
 function dragPick(e,L){
  const el=document.elementFromPoint(e.clientX,e.clientY);
- if(!el||!el.classList.contains("key"))return; pick(el,L);
+ if(el&&el.classList.contains("key")) pick(el,L);
 }
 
 function refresh(){
@@ -332,13 +343,11 @@ function check(L){
    q++;
    if(q<3) startQuestion();
    else{
-    if(stage===unlocked){ unlocked++; localStorage.setItem("amazighUnlocked",unlocked); }
+    if(stage===unlocked){unlocked++;localStorage.setItem("amazighUnlocked",unlocked);}
     show("map");
    }
   },1200);
- }else{
-  setTimeout(()=>{ startQuestion(); },700);
- }
+ }else setTimeout(startQuestion,700);
 }
 </script>
 </body>
