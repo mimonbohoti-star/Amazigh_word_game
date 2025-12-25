@@ -58,7 +58,6 @@ h1{text-align:center;color:var(--accent)}
 }
 .key.used{opacity:.3;pointer-events:none}
 
-/* ===== WHEEL ===== */
 .wheel{
  width:260px;height:260px;margin:20px auto;
  border-radius:50%;border:3px solid var(--accent);
@@ -72,7 +71,6 @@ h1{text-align:center;color:var(--accent)}
  font-weight:bold
 }
 
-/* ===== WIN ===== */
 .overlay{
  position:fixed;inset:0;background:rgba(0,0,0,.95);
  display:none;justify-content:center;align-items:center
@@ -126,20 +124,15 @@ h1{text-align:center;color:var(--accent)}
 </div>
 
 <script>
-/* ===== DOM REFERENCES (الإضافة الوحيدة) ===== */
-const mapGrid   = document.getElementById("mapGrid");
-const boxes     = document.getElementById("boxes");
-const wheel     = document.getElementById("wheel");
-const keyboard  = document.getElementById("keyboard");
-const levelTitle= document.getElementById("levelTitle");
-const question  = document.getElementById("question");
-const overlay   = document.getElementById("overlay");
-
-/* LEVELS */
 const levels=[
- {img:"images/argan.jpg",a:"ⴰⵔⴳⴰⵏ",c:"#f59e0b"},
+ {img:"images/sun.jpg",a:"ⵜⴰⴼⵓⵢⵜ",c:"#facc15"},
  {img:"images/moon.jpg",a:"ⴰⵢⵓⵔ",c:"#60a5fa"},
- {q:"الجبل",a:"ⴰⴷⵔⴰⵔ",c:"#34d399"}
+ {img:"images/stars.jpg",a:"ⵉⵜⵔⴰⵏ",c:"#e9d5ff"},
+ {img:"images/mountain.jpg",a:"ⴰⴷⵔⴰⵔ",c:"#34d399"},
+ {img:"images/river.jpg",a:"ⴰⵙⵉⴼ",c:"#38bdf8"},
+ {img:"images/cactus.jpg",a:"ⴰⴳⴰⴼⴰⵢ",c:"#4ade80"},
+ {img:"images/flower.jpg",a:"ⵜⴰⵣⵓⵔⵉⵜ",c:"#fb7185"},
+ {img:"images/insect.jpg",a:"ⵜⴰⵣⵣⵓⵍⵜ",c:"#f97316"}
 ];
 
 let unlocked=+localStorage.getItem("amazighUnlocked")||0;
@@ -166,31 +159,17 @@ function start(i){
  cur=i;input=[];
  document.documentElement.style.setProperty("--accent",levels[i].c);
  levelTitle.innerText="المرحلة "+(i+1);
- question.innerHTML=levels[i].img?`<img src="${levels[i].img}" width="100%">`:levels[i].q;
+ question.innerHTML=`<img src="${levels[i].img}" width="100%">`;
  boxes.innerHTML="";wheel.innerHTML="";keyboard.innerHTML="";
  [...levels[i].a].forEach(()=>boxes.innerHTML+=`<div class="answer-box"></div>`);
 
- if(i===0){
-  keyboard.style.display="none";wheel.style.display="block";
-  const r=100;
-  [...levels[i].a].forEach((ch,n)=>{
-   let k=document.createElement("div");
-   k.className="key";k.innerText=ch;
-   let ang=n/levels[i].a.length*2*Math.PI;
-   k.style.left=130+r*Math.cos(ang)-26+"px";
-   k.style.top =130+r*Math.sin(ang)-26+"px";
-   k.onclick=()=>add(ch,k);
-   wheel.appendChild(k);
-  });
- }else{
-  wheel.style.display="none";keyboard.style.display="grid";
-  [...levels[i].a].sort(()=>Math.random()-.5).forEach(ch=>{
-   let k=document.createElement("div");
-   k.className="key";k.innerText=ch;
-   k.onclick=()=>add(ch,k);
-   keyboard.appendChild(k);
-  });
- }
+ wheel.style.display="none";keyboard.style.display="grid";
+ [...levels[i].a].sort(()=>Math.random()-.5).forEach(ch=>{
+  let k=document.createElement("div");
+  k.className="key";k.innerText=ch;
+  k.onclick=()=>add(ch,k);
+  keyboard.appendChild(k);
+ });
  show("game");
 }
 
