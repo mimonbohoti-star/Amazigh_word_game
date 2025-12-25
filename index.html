@@ -12,12 +12,13 @@ body{
  margin:0;font-family:sans-serif;
  background:radial-gradient(circle at top,#1e293b,#020617);
  color:#fff;display:flex;justify-content:center;align-items:center;
- min-height:100vh;
+ min-height:100vh;overflow:hidden;
 }
 .card{
  width:95%;max-width:420px;background:#020617;border-radius:26px;
  padding:20px;
  box-shadow:0 0 0 2px var(--accent),0 30px 60px rgba(0,0,0,.7);
+ position:relative;z-index:2;
 }
 h1{text-align:center;color:var(--accent);margin:6px 0}
 img{width:100%;border-radius:16px;margin:10px 0}
@@ -43,26 +44,24 @@ img{width:100%;border-radius:16px;margin:10px 0}
 .answer-box.ok{background:#22c55e}
 .answer-box.bad{background:#ef4444;color:#fff}
 
-/* BOARDS */
 .keyboard{
  display:grid;grid-template-columns:repeat(4,1fr);gap:10px;
- touch-action:none;
 }
 .triangle{
  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
- justify-items:center;touch-action:none;
+ justify-items:center;
 }
 .key{
  background:#1e293b;padding:14px;border-radius:14px;
  text-align:center;font-size:22px;font-weight:bold;
- user-select:none;
+ user-select:none;cursor:pointer;
 }
-.key.used{opacity:.25}
+.key.used{opacity:.25;pointer-events:none}
 
 .wheel{
  width:260px;height:260px;margin:16px auto;
  border-radius:50%;border:3px solid var(--accent);
- position:relative;touch-action:none;
+ position:relative;
 }
 .wheel .key{
  width:52px;height:52px;border-radius:50%;
@@ -71,10 +70,17 @@ img{width:100%;border-radius:16px;margin:10px 0}
  align-items:center;justify-content:center;
 }
 
-/* CELEBRATION */
+.delete{
+ background:#0f172a;border:1px solid #334155;
+ border-radius:14px;padding:14px;
+ font-size:20px;font-weight:bold;cursor:pointer;
+}
+
+/* OVERLAY */
 .overlay{
- position:fixed;inset:0;background:rgba(0,0,0,.9);
+ position:fixed;inset:0;background:rgba(0,0,0,.8);
  display:none;justify-content:center;align-items:center;
+ z-index:5;
 }
 .overlay.active{display:flex}
 .win{
@@ -85,7 +91,19 @@ img{width:100%;border-radius:16px;margin:10px 0}
 }
 @keyframes pulse{
  from{box-shadow:0 0 20px var(--accent)}
- to{box-shadow:0 0 80px #fff}
+ to{box-shadow:0 0 90px #fff}
+}
+
+/* CONFETTI */
+.confetti{
+ position:fixed;top:-20px;
+ font-size:24px;
+ animation:fall linear forwards;
+ pointer-events:none;
+ z-index:10;
+}
+@keyframes fall{
+ to{transform:translateY(120vh) rotate(360deg);opacity:0}
 }
 </style>
 </head>
@@ -124,8 +142,9 @@ img{width:100%;border-radius:16px;margin:10px 0}
  </div>
 </div>
 
+<audio id="clap" src="sounds/clap.mp3"></audio>
+
 <script>
-/* ========= DATA ========= */
 const levels=[
  {a:"ⵜⴰⴼⵓⵢⵜ",shape:"circle",img:"images/sun.jpg"},
  {a:"ⴰⵢⵓⵔ",shape:"triangle",img:"images/moon.jpg"},
@@ -136,7 +155,8 @@ const levels=[
 let unlocked=+localStorage.getItem("amazighUnlocked")||0;
 let cur=0,input=[],drag=false;
 
-/* ========= NAV ========= */
+const symbols=["🌸","🌹","🌺","❤️","💖","💐","ⵣ","ⵉ","ⵜ","ⴰ"];
+
 function show(id){
  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
  document.getElementById(id).classList.add("active");
@@ -154,14 +174,11 @@ function openMap(){
  show("map");
 }
 
-/* ========= GAME ========= */
 function start(i){
  cur=i;resetInput();
  levelTitle.textContent="المرحلة "+(i+1);
  questionImg.src=levels[i].img;
- renderBoxes();
- renderBoard();
- show("game");
+ renderBoxes();renderBoard();show("game");
 }
 
 function renderBoxes(){
@@ -173,8 +190,6 @@ function renderBoxes(){
 function renderBoard(){
  keyboard.innerHTML="";wheel.innerHTML="";
  keyboard.style.display="none";wheel.style.display="none";
- keyboard.className="keyboard";
-
  const letters=[...levels[cur].a].sort(()=>Math.random()-.5);
 
  if(levels[cur].shape==="circle"){
@@ -190,7 +205,16 @@ function renderBoard(){
  }else{
   keyboard.style.display="grid";
   if(levels[cur].shape==="triangle") keyboard.className="triangle";
-  letters.forEach(ch=>keyboard.appendChild(makeKey(ch)));
+  letters.forEach(ch=>{
+   const k=makeKey(ch);
+   k.onclick=()=>pick(k);
+   keyboard.appendChild(k);
+  });
+  const del=document.createElement("div");
+  del.className="delete";
+  del.textContent="⌫";
+  del.onclick=removeLast;
+  keyboard.appendChild(del);
  }
 }
 
@@ -202,28 +226,32 @@ function makeKey(ch){
  return k;
 }
 
-/* ========= DRAG ENGINE ========= */
-document.addEventListener("pointerdown",e=>{
- drag=true;
- handlePoint(e);
-});
-document.addEventListener("pointermove",e=>{
- if(drag) handlePoint(e);
-});
-document.addEventListener("pointerup",()=>{
- drag=false;
- check();
-});
-
-function handlePoint(e){
- const el=document.elementFromPoint(e.clientX,e.clientY);
- if(!el || !el.classList.contains("key")) return;
- if(el.classList.contains("used")) return;
- if(input.length>=levels[cur].a.length) return;
-
+function pick(el){
+ if(el.classList.contains("used"))return;
+ if(input.length>=levels[cur].a.length)return;
  el.classList.add("used");
  input.push(el);
  refresh();
+ if(input.length===levels[cur].a.length && levels[cur].shape!=="circle") check();
+}
+
+function removeLast(){
+ const last=input.pop();
+ if(last) last.classList.remove("used");
+ refresh();
+}
+
+wheel.addEventListener("pointerdown",e=>{
+ if(levels[cur].shape!=="circle")return;
+ drag=true;dragPick(e);
+});
+wheel.addEventListener("pointermove",e=>{if(drag)dragPick(e)});
+document.addEventListener("pointerup",()=>{if(drag){drag=false;check()}});
+
+function dragPick(e){
+ const el=document.elementFromPoint(e.clientX,e.clientY);
+ if(!el || !el.classList.contains("key"))return;
+ pick(el);
 }
 
 function refresh(){
@@ -232,19 +260,29 @@ function refresh(){
   b.className="answer-box";
  });
 }
+function resetInput(){input=[]}
 
-function resetInput(){
- input=[];
+function celebrate(){
+ document.getElementById("clap").play();
+ for(let i=0;i<40;i++){
+  const c=document.createElement("div");
+  c.className="confetti";
+  c.textContent=symbols[Math.floor(Math.random()*symbols.length)];
+  c.style.left=Math.random()*100+"vw";
+  c.style.animationDuration=2+Math.random()*2+"s";
+  document.body.appendChild(c);
+  setTimeout(()=>c.remove(),4000);
+ }
 }
 
-/* ========= CHECK ========= */
 function check(){
- if(input.length!==levels[cur].a.length) return;
+ if(input.length!==levels[cur].a.length)return;
  const ok=input.map(k=>k.dataset.ch).join("")===levels[cur].a;
  document.querySelectorAll(".answer-box")
   .forEach(b=>b.classList.add(ok?"ok":"bad"));
 
  if(ok){
+  celebrate();
   if(cur===unlocked){
    unlocked++;
    localStorage.setItem("amazighUnlocked",unlocked);
@@ -253,12 +291,10 @@ function check(){
   setTimeout(()=>{
    overlay.classList.remove("active");
    cur+1<levels.length?start(cur+1):show("menu");
-  },800);
+  },1200);
  }else{
   setTimeout(()=>{
-   renderBoard();
-   resetInput();
-   renderBoxes();
+   renderBoard();resetInput();renderBoxes();
   },700);
  }
 }
