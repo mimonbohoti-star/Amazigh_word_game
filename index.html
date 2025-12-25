@@ -2,361 +2,232 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<title>ⵣ لعبة الكلمات الأمازيغية</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>لعبة الكلمات الأمازيغية</title>
 
 <style>
+:root{--accent:#facc15}
 body{
-  margin:0;
-  font-family:sans-serif;
-  color:#fff;
-  text-align:center;
-  overflow:hidden;
-  background:linear-gradient(
-    180deg,
-    #1e90ff 0%,
-    #1e90ff 33%,
-    #2ecc71 33%,
-    #2ecc71 66%,
-    #f1c40f 66%,
-    #f1c40f 100%
-  );
+ margin:0;font-family:sans-serif;
+ background:radial-gradient(circle at top,#1e293b,#020617);
+ color:#fff;display:flex;justify-content:center;align-items:center;min-height:100vh;
 }
-body::before{
-  content:"ⵣ";
-  position:fixed;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  font-size:320px;
-  color:rgba(192,57,43,0.12);
-  pointer-events:none;
+.card{
+ width:95%;max-width:420px;background:#020617;border-radius:26px;
+ padding:22px;box-shadow:0 0 0 2px var(--accent),0 30px 60px rgba(0,0,0,.7);
 }
+h1{text-align:center;color:var(--accent)}
+.section{display:none}
+.section.active{display:block}
 
-/* ===== Top Bar ===== */
-.topbar{
-  position:fixed;
-  top:0; left:0;
-  width:100%;
-  display:flex;
-  justify-content:space-between;
-  padding:10px 15px;
-  z-index:1000;
+.btn{
+ width:100%;min-height:52px;margin:8px 0;border:none;border-radius:16px;
+ font-size:18px;font-weight:700;cursor:pointer
 }
-.topbar button{
-  background:rgba(0,0,0,0.45);
-  border:none;
-  color:#fff;
-  font-size:20px;
-  padding:8px 14px;
-  border-radius:12px;
-}
+.btn-main{background:var(--accent);color:#000}
+.btn-ok{background:#22c55e;color:#000}
+.btn-back{background:#0f172a;color:#fff;border:1px solid #334155}
+.btn-del{background:#ef4444;color:#fff}
 
-/* ===== Modal ===== */
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.65);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:2000;
+.map{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.stage{
+ background:#111827;border-radius:16px;padding:20px;text-align:center;
+ font-weight:bold
 }
-.modal.active{display:flex;}
-.modal-content{
-  background:#12263a;
-  padding:22px;
-  border-radius:18px;
-  width:85%;
-  max-width:360px;
-  box-shadow:0 15px 35px rgba(0,0,0,0.6);
-}
+.stage.locked{opacity:.3}
+.stage.active{background:var(--accent);color:#000;cursor:pointer}
 
-/* ===== Screens ===== */
-.screen{
-  display:none;
-  min-height:100vh;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-  padding-top:70px;
+.answer-boxes{
+ display:flex;justify-content:center;gap:8px;margin:12px 0;
+ direction:ltr;
 }
-.screen.active{display:flex;}
+.answer-box{
+ width:44px;height:44px;border-radius:10px;background:#fff;color:#000;
+ display:flex;align-items:center;justify-content:center;font-size:22px
+}
+.answer-box.ok{background:#22c55e}
+.answer-box.bad{background:#ef4444;color:#fff}
 
-button{
-  background:#c0392b;
-  border:none;
-  color:#fff;
-  padding:14px 30px;
-  font-size:18px;
-  border-radius:12px;
-  cursor:pointer;
-  margin:10px;
-}
-
-.logo{
-  font-size:90px;
-  color:#c0392b;
-  margin-bottom:20px;
-}
-
-/* ===== Image Card ===== */
-.image-box{
-  width:90%;
-  max-width:320px;
-  background:#fff;
-  padding:8px;
-  border-radius:20px;
-  box-shadow:0 18px 40px rgba(0,0,0,0.35);
-  margin:20px auto;
-  animation:zoomIn .6s ease;
-}
-.image-box img{
-  width:100%;
-  height:320px;
-  object-fit:cover;
-  border-radius:16px;
-}
-@keyframes zoomIn{
-  from{transform:scale(.85);opacity:0}
-  to{transform:scale(1);opacity:1}
-}
-
-/* ===== Input & Keyboard ===== */
-input{
-  padding:12px;
-  font-size:22px;
-  width:80%;
-  max-width:300px;
-  text-align:left;
-  direction:ltr;
-  border-radius:10px;
-  border:none;
-}
 .keyboard{
-  display:grid;
-  grid-template-columns:repeat(4,70px);
-  gap:10px;
-  justify-content:center;
-  margin-top:15px;
+ display:grid;grid-template-columns:repeat(6,1fr);gap:8px;
+ direction:ltr;
 }
 .key{
-  background:rgba(14,22,36,0.85);
-  padding:18px;
-  font-size:24px;
-  border-radius:14px;
-  cursor:pointer;
+ background:#1e293b;padding:12px;border-radius:12px;
+ text-align:center;font-size:20px;cursor:pointer
+}
+.key.used{opacity:.3;pointer-events:none}
+
+/* ===== WHEEL ===== */
+.wheel{
+ width:260px;height:260px;margin:20px auto;
+ border-radius:50%;border:3px solid var(--accent);
+ position:relative;direction:ltr
+}
+.wheel .key{
+ width:52px;height:52px;border-radius:50%;
+ background:var(--accent);color:#000;
+ position:absolute;display:flex;
+ align-items:center;justify-content:center;
+ font-weight:bold
 }
 
-/* ===== Messages ===== */
-#message{
-  min-height:30px;
-  font-size:20px;
-  margin:10px;
+/* ===== WIN ===== */
+.overlay{
+ position:fixed;inset:0;background:rgba(0,0,0,.95);
+ display:none;justify-content:center;align-items:center
 }
-.success{color:#00ff88;}
-.error{color:#ff4c4c;}
-
-/* ===== Celebration (HARD 🔥) ===== */
-.celebration{
-  position:fixed;
-  inset:0;
-  display:none;
-  justify-content:center;
-  align-items:center;
-  background:rgba(0,0,0,0.75);
-  z-index:3000;
+.overlay.active{display:flex}
+.win{
+ background:#020617;padding:28px;border-radius:24px;
+ box-shadow:0 0 60px var(--accent);
+ animation:pulse .6s infinite alternate
 }
-.celebration.active{display:flex;}
-
-.celebration-box{
-  background:#12263a;
-  padding:30px;
-  border-radius:22px;
-  box-shadow:0 20px 45px rgba(0,0,0,0.8);
-  animation:pop .5s ease;
-}
-.celebration-box h1{
-  font-size:70px;
-  margin:0;
-}
-.celebration-box p{
-  font-size:26px;
-  margin:10px 0;
-}
-
-@keyframes pop{
-  from{transform:scale(.7);opacity:0}
-  to{transform:scale(1);opacity:1}
+@keyframes pulse{
+ from{box-shadow:0 0 20px var(--accent)}
+ to{box-shadow:0 0 80px #fff}
 }
 </style>
 </head>
 
 <body>
 
-<!-- Sound -->
-<audio id="successSound" src="success.mp3"></audio>
+<div class="card">
 
-<div class="celebration" id="celebration">
-  <div class="celebration-box">
-    <h1>🎉 ⵣ 🎉</h1>
-    <p>🌸 ⭐ ❤️ ⵣ ⭐ 🌸</p>
-    <p>👏 أحسنت 👏</p>
-    <button onclick="backToStart()">العودة للبداية</button>
-  </div>
+<div id="menu" class="section active">
+ <h1>ⵣ لعبة الكلمات الأمازيغية</h1>
+ <button class="btn btn-main" onclick="openMap()">▶️ بدء</button>
 </div>
 
-<div class="topbar">
-  <button onclick="goBack()">⬅️</button>
-  <div>
-    <button onclick="openInfo()">ℹ️</button>
-    <button onclick="openSettings()">⚙️</button>
-  </div>
+<div id="map" class="section">
+ <h1>⭐ المراحل</h1>
+ <div class="map" id="mapGrid"></div>
+ <button class="btn btn-back" onclick="show('menu')">⬅️ رجوع</button>
 </div>
 
-<div class="modal" id="infoModal">
-  <div class="modal-content">
-    <h2>كيفية اللعب</h2>
-    <p>انظر إلى الصورة، ثم كوّن الكلمة بالأمازيغية.</p>
-    <button onclick="closeModals()">إغلاق</button>
-  </div>
+<div id="game" class="section">
+ <h1 id="levelTitle"></h1>
+ <div id="question"></div>
+ <div class="answer-boxes" id="boxes"></div>
+ <div id="wheel" class="wheel"></div>
+ <div id="keyboard" class="keyboard"></div>
+
+ <button class="btn btn-del" onclick="del()">⌫ حذف</button>
+ <button class="btn btn-ok" onclick="check()">✔️ تأكيد</button>
 </div>
 
-<div class="modal" id="settingsModal">
-  <div class="modal-content">
-    <h2>الإعدادات</h2>
-    <button onclick="toggleSound()" id="soundBtn">🔊 مفعل</button>
-    <button onclick="closeModals()">إغلاق</button>
-  </div>
 </div>
 
-<div class="screen active" id="startScreen">
-  <div class="logo">ⵣ</div>
-  <button onclick="continueGame()">متابعة</button>
-  <button onclick="goToStages()">اختيار المراحل</button>
-</div>
-
-<div class="screen" id="stageScreen">
-  <h2>المراحل</h2>
-  <div id="stagesButtons"></div>
-</div>
-
-<div class="screen" id="gameScreen">
-  <h2 id="stageTitle"></h2>
-  <div class="image-box">
-    <img id="questionImage">
-  </div>
-  <h1 id="wordDisplay"></h1>
-  <div id="message"></div>
-  <input id="answerInput" readonly>
-  <button onclick="clearInput()">مسح</button>
-  <div class="keyboard" id="keyboard"></div>
-  <button onclick="checkAnswer()">تحقق</button>
+<div id="overlay" class="overlay">
+ <div class="win">
+  <h2>🔥 أحسنت 🔥</h2>
+  <button class="btn btn-main" onclick="next()">➡️ التالي</button>
+ </div>
 </div>
 
 <script>
-const stages=[
- {title:"المرحلة 1",answer:"ⵜⴰⴼⵓⵢⵜ",showWord:true, word:"ⵜⴰⴼⵓⵢⵜ", image:"sun.jpg"},
- {title:"المرحلة 2",answer:"ⴰⵢⵢⵓⵔ",showWord:false,word:"", image:"moon.jpg"},
- {title:"المرحلة 3",answer:"ⵉⵜⵔⵉ",showWord:true, word:"ⵉⵜⵔⵉ", image:"flower.jpg"},
- {title:"المرحلة 4",answer:"ⴰⴷⵔⴰⵔ",showWord:false,word:"", image:"mountain.jpg"},
- {title:"المرحلة 5",answer:"ⴰⵙⵉⴼ",showWord:false,word:"", image:"river.jpg"}
+/* ===== DOM REFERENCES (الإضافة الوحيدة) ===== */
+const mapGrid   = document.getElementById("mapGrid");
+const boxes     = document.getElementById("boxes");
+const wheel     = document.getElementById("wheel");
+const keyboard  = document.getElementById("keyboard");
+const levelTitle= document.getElementById("levelTitle");
+const question  = document.getElementById("question");
+const overlay   = document.getElementById("overlay");
+
+/* LEVELS */
+const levels=[
+ {img:"images/argan.jpg",a:"ⴰⵔⴳⴰⵏ",c:"#f59e0b"},
+ {img:"images/moon.jpg",a:"ⴰⵢⵓⵔ",c:"#60a5fa"},
+ {q:"الجبل",a:"ⴰⴷⵔⴰⵔ",c:"#34d399"}
 ];
 
-let currentStage=0;
-let unlockedStage=parseInt(localStorage.getItem("unlockedStage"))||0;
-let soundOn=true;
-let lastScreen="startScreen";
+let unlocked=+localStorage.getItem("amazighUnlocked")||0;
+let cur=0,input=[];
 
-function showScreen(id){
-  lastScreen=document.querySelector(".screen.active")?.id||"startScreen";
-  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
+function show(id){
+ document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
 }
 
-function goBack(){ showScreen(lastScreen); }
-function backToStart(){
-  celebration.classList.remove("active");
-  showScreen("startScreen");
+function openMap(){
+ mapGrid.innerHTML="";
+ levels.forEach((_,i)=>{
+  let d=document.createElement("div");
+  d.className="stage"+(i>unlocked?" locked":" active");
+  d.innerText="مرحلة "+(i+1);
+  if(i<=unlocked)d.onclick=()=>start(i);
+  mapGrid.appendChild(d);
+ });
+ show("map");
 }
 
-function continueGame(){currentStage=unlockedStage;loadStage();showScreen("gameScreen");}
-function goToStages(){buildStagesButtons();showScreen("stageScreen");}
-function startStage(i){currentStage=i;loadStage();showScreen("gameScreen");}
+function start(i){
+ cur=i;input=[];
+ document.documentElement.style.setProperty("--accent",levels[i].c);
+ levelTitle.innerText="المرحلة "+(i+1);
+ question.innerHTML=levels[i].img?`<img src="${levels[i].img}" width="100%">`:levels[i].q;
+ boxes.innerHTML="";wheel.innerHTML="";keyboard.innerHTML="";
+ [...levels[i].a].forEach(()=>boxes.innerHTML+=`<div class="answer-box"></div>`);
 
-function buildStagesButtons(){
-  stagesButtons.innerHTML="";
-  stages.forEach((s,i)=>{
-    const b=document.createElement("button");
-    b.textContent=i<=unlockedStage?s.title:s.title+" 🔒";
-    if(i<=unlockedStage) b.onclick=()=>startStage(i);
-    stagesButtons.appendChild(b);
+ if(i===0){
+  keyboard.style.display="none";wheel.style.display="block";
+  const r=100;
+  [...levels[i].a].forEach((ch,n)=>{
+   let k=document.createElement("div");
+   k.className="key";k.innerText=ch;
+   let ang=n/levels[i].a.length*2*Math.PI;
+   k.style.left=130+r*Math.cos(ang)-26+"px";
+   k.style.top =130+r*Math.sin(ang)-26+"px";
+   k.onclick=()=>add(ch,k);
+   wheel.appendChild(k);
   });
-}
-
-function loadStage(){
-  const s=stages[currentStage];
-  stageTitle.innerText=s.title;
-  answerInput.value="";
-  message.innerText="";
-  wordDisplay.style.display=s.showWord?"block":"none";
-  wordDisplay.innerText=s.word;
-  questionImage.src=s.image;
-  buildKeyboard();
-}
-
-function buildKeyboard(){
-  keyboard.innerHTML="";
-  [...new Set(stages[currentStage].answer.split(""))].forEach(l=>{
-    const d=document.createElement("div");
-    d.className="key";
-    d.innerText=l;
-    d.onclick=()=>answerInput.value+=l;
-    keyboard.appendChild(d);
+ }else{
+  wheel.style.display="none";keyboard.style.display="grid";
+  [...levels[i].a].sort(()=>Math.random()-.5).forEach(ch=>{
+   let k=document.createElement("div");
+   k.className="key";k.innerText=ch;
+   k.onclick=()=>add(ch,k);
+   keyboard.appendChild(k);
   });
+ }
+ show("game");
 }
 
-function clearInput(){answerInput.value="";}
-
-function celebrate(final=false){
-  celebration.classList.add("active");
-  if(soundOn) successSound.play();
-  if(!final){
-    setTimeout(()=>celebration.classList.remove("active"),1000);
-  }
+function add(ch,key){
+ if(input.length<levels[cur].a.length){
+  input.push({ch,key});
+  key.classList.add("used");
+  refresh();
+ }
 }
 
-function checkAnswer(){
-  if(answerInput.value===stages[currentStage].answer){
-    message.innerText="✔️ أحسنت";
-    message.className="success";
-
-    if(currentStage===stages.length-1){
-      celebrate(true);
-    }else{
-      celebrate(false);
-      if(currentStage===unlockedStage){
-        unlockedStage++;
-        localStorage.setItem("unlockedStage",unlockedStage);
-      }
-      setTimeout(()=>{currentStage++;loadStage();},1000);
-    }
-  }else{
-    message.innerText="❌ حاول مرة أخرى";
-    message.className="error";
-    clearInput();
-  }
+function del(){
+ if(!input.length) return;
+ let last=input.pop();
+ last.key.classList.remove("used");
+ refresh();
 }
 
-function openInfo(){infoModal.classList.add("active");}
-function openSettings(){settingsModal.classList.add("active");}
-function closeModals(){
-  infoModal.classList.remove("active");
-  settingsModal.classList.remove("active");
+function refresh(){
+ document.querySelectorAll(".answer-box").forEach((b,i)=>{
+  b.classList.remove("ok","bad");
+  b.innerText=input[i]?.ch||"";
+ });
 }
-function toggleSound(){
-  soundOn=!soundOn;
-  soundBtn.innerText=soundOn?"🔊 مفعل":"🔇 صامت";
+
+function check(){
+ let ok=input.map(o=>o.ch).join("")===levels[cur].a;
+ document.querySelectorAll(".answer-box").forEach(b=>b.classList.add(ok?"ok":"bad"));
+ if(ok){
+  if(cur===unlocked){unlocked++;localStorage.setItem("amazighUnlocked",unlocked)}
+  overlay.classList.add("active");
+ }
+}
+
+function next(){
+ overlay.classList.remove("active");
+ cur+1<levels.length?start(cur+1):show("menu");
 }
 </script>
 
