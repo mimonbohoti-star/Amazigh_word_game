@@ -94,9 +94,6 @@ img{width:100%;border-radius:16px;margin:10px 0}
  justify-content:center;
  font-size:26px;
 }
- background:#1e293b;padding:14px;border-radius:14px;
- text-align:center;font-size:22px;font-weight:bold;cursor:pointer;
-}
 .key.used{opacity:.25;pointer-events:none}
 
 .wheel{
@@ -204,6 +201,13 @@ img{width:100%;border-radius:16px;margin:10px 0}
 </div>
 
 <script>
+const boxes = document.getElementById("boxes");
+const keyboard = document.getElementById("keyboard");
+const wheel = document.getElementById("wheel");
+const mapGrid = document.getElementById("mapGrid");
+const levelTitle = document.getElementById("levelTitle");
+const questionImg = document.getElementById("questionImg");
+const overlay = document.getElementById("overlay");
 /* ===== SETTINGS ===== */
 let soundOn = localStorage.getItem("soundOn") !== "0";
 let vibeOn  = localStorage.getItem("vibeOn")  !== "0";
@@ -304,13 +308,7 @@ function startStage(i){
 }
 let hintsLeft = 3;
 let hintsUsed = 0;
-let hints = 3;
 
-function updateHintCount(){
-  document.getElementById("hintCount").textContent = hints;
-}
-
-updateHintCount();
 function startQuestion(){
  input=[];
  hintsLeft = 3; // إعادة 3 تلميحات لكل سؤال
@@ -382,6 +380,7 @@ document.getElementById("hintBtn").onclick = () => {
    pick(k, L);
    hintsLeft--; // 3 → 2 → 1 → 0
 hintsUsed++;
+updateHintCount();
    break;
   }
  }
@@ -393,7 +392,6 @@ wheel.addEventListener("pointerdown",e=>{
 });
 wheel.addEventListener("pointermove",e=>{ if(drag) dragPick(e,stages[stage].qs[q]); });
 document.addEventListener("pointerup",()=>{ if(drag){drag=false;
-let hintsLeft = 3; // عدد التلميحات المتبقية
 updateHintCount();
  check(stages[stage].qs[q]);} });
 
