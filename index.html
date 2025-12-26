@@ -147,6 +147,7 @@ img{width:100%;border-radius:16px;margin:10px 0}
  <div class="answer-boxes" id="boxes"></div>
 <!-- START HINT BUTTON -->
 <button class="btn btn-back" id="hintBtn">💡 تلميح</button>
+<div id="hintCount">3</div>
 <!-- END HINT BUTTON -->
  <div id="wheel" class="wheel"></div>
  <div id="keyboard" class="keyboard"></div>
@@ -164,8 +165,11 @@ img{width:100%;border-radius:16px;margin:10px 0}
 let soundOn = localStorage.getItem("soundOn") !== "0";
 let vibeOn  = localStorage.getItem("vibeOn")  !== "0";
 
-const soundToggle=document.getElementById("soundToggle");
-const vibeToggle=document.getElementById("vibeToggle");
+/* 🔊 صوت التصفيق */
+const applauseSound = new Audio("applause.mp3");
+
+const soundToggle = document.getElementById("soundToggle");
+const vibeToggle  = document.getElementById("vibeToggle");
 
 function syncToggles(){
  soundToggle.classList.toggle("on",soundOn);
@@ -248,9 +252,22 @@ function openMap(){
  });
  show("map");
 }
+function startStage(i){
+ stage=i;
+ q=0;
+ hintsLeft = 3;
+ hintsUsed = 0;
+ startQuestion();
+}
+let hintsLeft = 3;
+let hintsUsed = 0;
+let hints = 3;
 
-function startStage(i){stage=i;q=0;startQuestion();}
+function updateHintCount(){
+  document.getElementById("hintCount").textContent = hints;
+}
 
+updateHintCount();
 function startQuestion(){
  input=[];
  hintsLeft = 3; // إعادة 3 تلميحات لكل سؤال
@@ -321,6 +338,7 @@ document.getElementById("hintBtn").onclick = () => {
   if (k.dataset.ch === ch && !k.classList.contains("used")) {
    pick(k, L);
    hintsLeft--; // 3 → 2 → 1 → 0
+hintsUsed++;
    break;
   }
  }
@@ -333,11 +351,16 @@ wheel.addEventListener("pointerdown",e=>{
 wheel.addEventListener("pointermove",e=>{ if(drag) dragPick(e,stages[stage].qs[q]); });
 document.addEventListener("pointerup",()=>{ if(drag){drag=false;
 let hintsLeft = 3; // عدد التلميحات المتبقية
+updateHintCount();
  check(stages[stage].qs[q]);} });
 
 function dragPick(e,L){
  const el=document.elementFromPoint(e.clientX,e.clientY);
  if(el&&el.classList.contains("key")) pick(el,L);
+}
+
+function updateHintCount(){
+ document.getElementById("hintCount").textContent = hintsLeft;
 }
 
 function refresh(){
@@ -372,10 +395,17 @@ function check(L){
    if(q<3) startQuestion();
    else{
     if(stage===unlocked){unlocked++;localStorage.setItem("amazighUnlocked",unlocked);}
+const stars = getStars();
+alert("⭐".repeat(stars));
     show("map");
    }
   },1200);
  }else setTimeout(startQuestion,700);
+ }
+function getStars(){
+ if(hintsUsed === 0) return 3;
+ if(hintsUsed === 1) return 2;
+ return 1;
 }
 </script>
 </body>
