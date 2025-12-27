@@ -28,8 +28,26 @@ body{
 h1{text-align:center;color:var(--accent);margin:6px 0}
 img{width:100%;border-radius:16px;margin:10px 0}
 
-.section{display:none}
-.section.active{display:block}
+.section{
+ display:none;
+ opacity:0;
+ transform:translateY(12px) scale(.98);
+ pointer-events:none;
+ transition:opacity .35s ease, transform .35s ease;
+}
+
+.section.active{
+ display:block;
+ opacity:1;
+ transform:translateY(0) scale(1);
+ pointer-events:auto;
+}
+
+.section.active{
+ opacity:1;
+ transform:translateY(0) scale(1);
+ pointer-events:auto;
+}
 
 .btn{
  width:100%;min-height:52px;margin:8px 0;border:none;border-radius:16px;
@@ -137,6 +155,13 @@ img{width:100%;border-radius:16px;margin:10px 0}
 
 .key.shake{
  animation:shake .3s;
+}
+.key:active{
+ transform:scale(0.92);
+}
+
+.key{
+ transition:transform .08s ease;
 }
 @keyframes fall{to{transform:translateY(120vh) rotate(360deg);opacity:0}}
 </style>
@@ -284,8 +309,17 @@ let stage=0,q=0,input=[],drag=false;
 const symbols=["🌸","🌺","🌹","❤️","💖","💐","ⵣ","ⵉ","ⵜ","ⴰ"];
 
 function show(id){
- document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
- document.getElementById(id).classList.add("active");
+ document.querySelectorAll(".section").forEach(s=>{
+  s.classList.remove("active");
+  s.style.display = "none";
+ });
+
+ const el = document.getElementById(id);
+ el.style.display = "block";
+
+ requestAnimationFrame(()=>{
+  el.classList.add("active");
+ });
 }
 
 function openMap(){
@@ -358,7 +392,9 @@ function makeKey(ch){
 
 function pick(el,L){
  if(el.classList.contains("used")||input.length>=L.a.length)return;
- el.classList.add("used"); input.push(el); refresh();
+ el.classList.add("used");
+if(vibeOn && navigator.vibrate) navigator.vibrate(20);
+ input.push(el); refresh();
  if(input.length===L.a.length && L.shape!=="circle") check(L);
 }
 
@@ -399,7 +435,6 @@ function dragPick(e,L){
  const el=document.elementFromPoint(e.clientX,e.clientY);
  if(el&&el.classList.contains("key")) pick(el,L);
 }
-
 function updateHintCount(){
  document.getElementById("hintCount").textContent = hintsLeft;
 }
