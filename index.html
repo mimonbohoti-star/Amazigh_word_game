@@ -547,16 +547,15 @@ function check(L){
    overlay.classList.remove("active");
    q++;
    if(q<3) startQuestion();
-   else{
+  else{
  if(stage === stages.length - 1){
-  // 🏆 آخر مرحلة → شاشة الفوز النهائية
   document.getElementById("finalOverlay").classList.add("active");
  }else{
   if(stage === unlocked){
    unlocked++;
    localStorage.setItem("amazighUnlocked", unlocked);
   }
-  show("map");
+  startStage(stage + 1); // ⬅️ انتقال تلقائي
  }
 }
   },1200);
