@@ -45,12 +45,6 @@ img{width:100%;border-radius:16px;margin:10px 0}
  pointer-events:auto;
 }
 
-.section.active{
- opacity:1;
- transform:translateY(0) scale(1);
- pointer-events:auto;
-}
-
 .btn{
  width:100%;min-height:52px;margin:8px 0;border:none;border-radius:16px;
  font-size:18px;font-weight:700;cursor:pointer
@@ -97,6 +91,7 @@ img{width:100%;border-radius:16px;margin:10px 0}
  font-size:22px;
  font-weight:bold;
  cursor:pointer;
+touch-action:none; 
 }
 
 .key.locked{
@@ -235,6 +230,7 @@ const wheel = document.getElementById("wheel");
 const mapGrid = document.getElementById("mapGrid");
 const levelTitle = document.getElementById("levelTitle");
 const questionImg = document.getElementById("questionImg");
+const questionText = document.getElementById("questionText");
 const overlay = document.getElementById("overlay");
 /* ===== SETTINGS ===== */
 let soundOn = localStorage.getItem("soundOn") !== "0";
@@ -365,6 +361,42 @@ const stages=[/* نفس البيانات السابقة بلا أي حذف */
     text:"الكتابة الأمازيغية"
   }
 ]}
+,
+{qs:[
+  {
+    a:"ⵎⴰⵙⵉⵏⵉⵙⴰ",
+    shape:"grid",
+    text:"ملك أمازيغي وحّد نوميديا وقاوم الرومان",
+  },
+  {
+    a:"ⵢⵓⴳⵓⵔⵜⴰ",
+    shape:"triangle",
+    img:"jugurtha.jpg"
+  },
+  {
+    a:"ⵜⴰⵎⴰⵣⵉⵖⵜ",
+    shape:"circle",
+    text:"اسم اللغة الأمازيغية"
+  }
+]}
+,
+{qs:[
+  {
+    a:"ⴽⴰⵀⵉⵏⴰ",
+    shape:"circle",
+    img:"kahina.jpg"
+  },
+  {
+    a:"ⵏⵓⵎⵉⴷⵢⴰ",
+    shape:"grid",
+    text:"مملكة أمازيغية قديمة في شمال إفريقيا"
+  },
+  {
+    a:"ⵣ",
+    shape:"triangle",
+    text:"رمز الحرية عند الأمازيغ"
+  }
+]}
 ];
 
 let unlocked=+localStorage.getItem("amazighUnlocked")||0;
@@ -400,31 +432,37 @@ function openMap(){
  });
  show("map");
 }
+let hintsLeft = 3;
+let hintsUsed = 0;
+
 function startStage(i){
- stage=i;
- q=0;
+ stage = i;
+ q = 0;
  hintsLeft = 3;
  hintsUsed = 0;
  startQuestion();
 }
-let hintsLeft = 3;
-let hintsUsed = 0;
 
 function startQuestion(){
- input=[];
+ input = [];
  hintsLeft = 3; // إعادة 3 تلميحات لكل سؤال
- const L=stages[stage].qs[q];
- levelTitle.textContent=`المرحلة ${stage+1} — سؤال ${q+1}/3`;
-if(L.img){
- questionImg.style.display = "block";
- questionImg.src = L.img;
- questionText.style.display = "none";
-}else{
- questionImg.style.display = "none";
- questionText.style.display = "block";
- questionText.textContent = L.text || "";
-}
- renderBoxes(L); renderBoard(L); show("game");
+updateHintCount();
+ const L = stages[stage].qs[q];
+ levelTitle.textContent = `المرحلة ${stage+1} — سؤال ${q+1}/3`;
+
+ if(L.img){
+  questionImg.style.display = "block";
+  questionImg.src = L.img;
+  questionText.style.display = "none";
+ }else{
+  questionImg.style.display = "none";
+  questionText.style.display = "block";
+  questionText.textContent = L.text || "";
+ }
+
+ renderBoxes(L);
+ renderBoard(L);
+ show("game");
 }
 
 function renderBoxes(L){
@@ -447,21 +485,31 @@ function renderBoard(L){
    k.style.top =c+r*Math.sin(a)-26+"px";
    wheel.appendChild(k);
   });
+
  }else{
   keyboard.style.display="grid";
-  if(L.shape==="triangle") keyboard.className="triangle";
+  keyboard.className = L.shape === "triangle" ? "triangle" : "keyboard";
+
   letters.forEach(ch=>{
-   const k=makeKey(ch); k.onclick=()=>pick(k,L); keyboard.appendChild(k);
+    const k = makeKey(ch);
+    k.addEventListener("click", ()=>{
+      pick(k, L);   // نقر فقط
+    });
+    keyboard.appendChild(k);
   });
-  const del=document.createElement("div");
-  del.className="delete"; del.textContent="⌫"; del.onclick=removeLast;
+
+  const del = document.createElement("div");
+  del.className = "delete";
+  del.textContent = "⌫";
+  del.onclick = removeLast;
   keyboard.appendChild(del);
  }
 }
-
 function makeKey(ch){
- const k=document.createElement("div");
- k.className="key"; k.textContent=ch; k.dataset.ch=ch;
+ const k = document.createElement("div");
+ k.className = "key";
+ k.textContent = ch;
+ k.dataset.ch = ch;
  return k;
 }
 
