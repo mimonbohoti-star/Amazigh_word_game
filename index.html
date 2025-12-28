@@ -6,28 +6,85 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
+:root{--accent:#facc15}
+*{box-sizing:border-box}
+
+/* ===== BODY & BACKGROUND (ألوان العلم الأمازيغي) ===== */
+body {
+  margin: 0;
+  font-family: 'Almarai', sans-serif;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  overflow: hidden;
+  position: relative;
+
+  /* خلفية متدرجة بألوان العلم الأمازيغي */
+  background: linear-gradient(180deg, #0055A4 0%, #FFD700 50%, #008A00 100%);
+  background-size: 200% 200%;
+  animation: bgMove 20s linear infinite, bgColorShift 40s ease-in-out infinite alternate;
+  z-index:0;
+}
+
+/* حركة الخلفية */
+@keyframes bgMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* تدرج ديناميكي لألوان العلم الأمازيغي */
+@keyframes bgColorShift {
+  0% { background: linear-gradient(180deg, #0055A4 0%, #FFD700 50%, #008A00 100%); }
+  25% { background: linear-gradient(180deg, #0060B0 0%, #FFDE00 50%, #009000 100%); }
+  50% { background: linear-gradient(180deg, #004C99 0%, #FFCC00 50%, #007700 100%); }
+  75% { background: linear-gradient(180deg, #0055A4 0%, #FFD700 50%, #008A00 100%); }
+  100% { background: linear-gradient(180deg, #0055A4 0%, #FFD700 50%, #008A00 100%); }
+}
+
+/* ===== AMAZIGH LETTERS IN BACKGROUND ===== */
+body::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 200%; height: 200%;
+  background: transparent url('data:image/svg+xml;utf8,\
+<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12">\
+<text x="0" y="12" font-size="12" fill="white">ⴰⴱⴷⴹⴻⴼⴽⵀⵃⵄⵅⵇⵉⵊⵋ</text>\
+</svg>') repeat;
+  background-size: 40px 40px;
+  animation: lettersMove 60s linear infinite;
+  pointer-events: none;
+  z-index:1;
+  opacity:0.5;
+}
+
+@keyframes lettersMove {
+  0% { transform: translate(0,0); }
+  100% { transform: translate(-50%, -50%); }
+}
+
+/* ===== CARD & MENU ===== */
 #menu{
  background:linear-gradient(135deg,#1d4ed8,#16a34a,#facc15,#dc2626);
  border-radius:22px;
  padding:18px;
-}
-:root{--accent:#facc15}
-*{box-sizing:border-box}
-body{
- margin:0;font-family:sans-serif;
- background:radial-gradient(circle at top,#1e293b,#020617);
- color:#fff;display:flex;justify-content:center;align-items:center;
- min-height:100vh;overflow:hidden;
+ position: relative;
+ z-index:2;
 }
 .card{
  width:95%;max-width:420px;background:#020617;border-radius:26px;
  padding:20px;
  box-shadow:0 0 0 2px var(--accent),0 30px 60px rgba(0,0,0,.7);
- position:relative;z-index:2;
+ position:relative;
+ z-index:2;
 }
 h1{text-align:center;color:var(--accent);margin:6px 0}
 img{width:100%;border-radius:16px;margin:10px 0}
 
+/* ===== SECTIONS ===== */
 .section{
  display:none;
  opacity:0;
@@ -37,7 +94,6 @@ img{width:100%;border-radius:16px;margin:10px 0}
   opacity .35s ease,
   transform .35s cubic-bezier(.4,0,.2,1);
 }
-
 .section.active{
  display:block;
  opacity:1;
@@ -45,6 +101,7 @@ img{width:100%;border-radius:16px;margin:10px 0}
  pointer-events:auto;
 }
 
+/* ===== BUTTONS ===== */
 .btn{
  width:100%;min-height:52px;margin:8px 0;border:none;border-radius:16px;
  font-size:18px;font-weight:700;cursor:pointer
@@ -52,13 +109,13 @@ img{width:100%;border-radius:16px;margin:10px 0}
 .btn-main{background:var(--accent);color:#000}
 .btn-back{background:#0f172a;color:#fff;border:1px solid #334155}
 
+/* ===== SETTINGS ===== */
 .setting-item{
  display:flex;justify-content:space-between;align-items:center;
  background:#0f172a;border:1px solid #334155;
  border-radius:14px;padding:14px;margin:10px 0;
  font-size:18px;
 }
-
 .toggle{
  width:52px;height:28px;border-radius:20px;
  background:#334155;position:relative;cursor:pointer;
@@ -71,6 +128,7 @@ img{width:100%;border-radius:16px;margin:10px 0}
 .toggle.on{background:var(--accent)}
 .toggle.on::after{right:28px}
 
+/* ===== ANSWER BOXES ===== */
 .answer-boxes{
  display:flex;justify-content:center;gap:8px;margin:12px 0;direction:ltr;
 }
@@ -81,6 +139,7 @@ img{width:100%;border-radius:16px;margin:10px 0}
 .answer-box.ok{background:#22c55e}
 .answer-box.bad{background:#ef4444;color:#fff}
 
+/* ===== KEYBOARD ===== */
 .keyboard{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 .triangle{grid-template-columns:repeat(3,1fr)}
 .key{
@@ -91,15 +150,14 @@ img{width:100%;border-radius:16px;margin:10px 0}
  font-size:22px;
  font-weight:bold;
  cursor:pointer;
-touch-action:none; 
+ touch-action:none; 
+ transition:transform .08s ease;
 }
-
 .key.locked{
  position:relative;
  opacity:.35;
  pointer-events:none;
 }
-
 .key.locked::after{
  content:"🔒";
  position:absolute;
@@ -110,7 +168,21 @@ touch-action:none;
  font-size:26px;
 }
 .key.used{opacity:.25;pointer-events:none}
+.key.shake{
+ animation:shake .3s;
+}
+.key:active{
+ transform:scale(0.92);
+}
+@keyframes shake{
+ 0%{transform:translateX(0)}
+ 25%{transform:translateX(-4px)}
+ 50%{transform:translateX(4px)}
+ 75%{transform:translateX(-4px)}
+ 100%{transform:translateX(0)}
+}
 
+/* ===== WHEEL ===== */
 .wheel{
  width:260px;height:260px;margin:16px auto;
  border-radius:50%;border:3px solid var(--accent);
@@ -122,11 +194,13 @@ touch-action:none;
  position:absolute;display:flex;align-items:center;justify-content:center;
 }
 
+/* ===== DELETE BUTTON ===== */
 .delete{
  background:#0f172a;border:1px solid #334155;
  border-radius:14px;padding:14px;font-size:20px;font-weight:bold;cursor:pointer;
 }
 
+/* ===== OVERLAY & WIN ===== */
 .overlay{
  position:fixed;inset:0;background:rgba(0,0,0,.8);
  display:none;justify-content:center;align-items:center;z-index:5;
@@ -137,28 +211,10 @@ touch-action:none;
  box-shadow:0 0 60px var(--accent);text-align:center;
 }
 
+/* ===== CONFETTI ===== */
 .confetti{
  position:fixed;top:-20px;font-size:26px;
  animation:fall linear forwards;pointer-events:none;z-index:10;
-}
-
-@keyframes shake{
- 0%{transform:translateX(0)}
- 25%{transform:translateX(-4px)}
- 50%{transform:translateX(4px)}
- 75%{transform:translateX(-4px)}
- 100%{transform:translateX(0)}
-}
-
-.key.shake{
- animation:shake .3s;
-}
-.key:active{
- transform:scale(0.92);
-}
-
-.key{
- transition:transform .08s ease;
 }
 @keyframes fall{to{transform:translateY(120vh) rotate(360deg);opacity:0}}
 </style>
