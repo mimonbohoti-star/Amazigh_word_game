@@ -9,7 +9,7 @@
 :root{--accent:#facc15}
 *{box-sizing:border-box}
 
-/* ===== BODY & BACKGROUND (ألوان العلم الأمازيغي) ===== */
+/* ===== BODY & BACKGROUND ===== */
 body {
   margin: 0;
   font-family: 'Almarai', sans-serif;
@@ -20,22 +20,18 @@ body {
   min-height: 100vh;
   overflow: hidden;
   position: relative;
-
-  /* خلفية متدرجة بألوان العلم الأمازيغي */
   background: linear-gradient(180deg, #0055A4 0%, #FFD700 50%, #008A00 100%);
   background-size: 200% 200%;
   animation: bgMove 20s linear infinite, bgColorShift 40s ease-in-out infinite alternate;
   z-index:0;
 }
 
-/* حركة الخلفية */
 @keyframes bgMove {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
 
-/* تدرج ديناميكي لألوان العلم الأمازيغي */
 @keyframes bgColorShift {
   0% { background: linear-gradient(180deg, #0055A4 0%, #FFD700 50%, #008A00 100%); }
   25% { background: linear-gradient(180deg, #0060B0 0%, #FFDE00 50%, #009000 100%); }
@@ -60,7 +56,6 @@ body::before {
   z-index:1;
   opacity:0.5;
 }
-
 @keyframes lettersMove {
   0% { transform: translate(0,0); }
   100% { transform: translate(-50%, -50%); }
@@ -90,9 +85,7 @@ img{width:100%;border-radius:16px;margin:10px 0}
  opacity:0;
  transform:translateY(16px) scale(.97);
  pointer-events:none;
- transition:
-  opacity .35s ease,
-  transform .35s cubic-bezier(.4,0,.2,1);
+ transition: opacity .35s ease, transform .35s cubic-bezier(.4,0,.2,1);
 }
 .section.active{
  display:block;
@@ -104,10 +97,22 @@ img{width:100%;border-radius:16px;margin:10px 0}
 /* ===== BUTTONS ===== */
 .btn{
  width:100%;min-height:52px;margin:8px 0;border:none;border-radius:16px;
- font-size:18px;font-weight:700;cursor:pointer
+ font-size:18px;font-weight:700;cursor:pointer;
+ transition:all .3s ease;
 }
-.btn-main{background:var(--accent);color:#000}
-.btn-back{background:#0f172a;color:#fff;border:1px solid #334155}
+.btn-main{
+ background:linear-gradient(135deg,#facc15,#ffea00);
+ color:#000;
+}
+.btn-back{
+ background:linear-gradient(135deg,#0f172a,#334155);
+ color:#fff;
+ border:1px solid #334155;
+}
+.btn:hover{
+ box-shadow:0 4px 15px rgba(0,0,0,0.4);
+ transform:scale(1.03);
+}
 
 /* ===== SETTINGS ===== */
 .setting-item{
@@ -133,11 +138,19 @@ img{width:100%;border-radius:16px;margin:10px 0}
  display:flex;justify-content:center;gap:8px;margin:12px 0;direction:ltr;
 }
 .answer-box{
- width:44px;height:44px;border-radius:10px;background:#fff;color:#000;
- display:flex;align-items:center;justify-content:center;font-size:22px
+ width:44px;height:44px;border-radius:10px;
+ background:#fff;color:#000;
+ display:flex;align-items:center;justify-content:center;font-size:22px;
+ transition:all .3s ease;
 }
-.answer-box.ok{background:#22c55e}
-.answer-box.bad{background:#ef4444;color:#fff}
+.answer-box.ok{
+ background:linear-gradient(135deg,#22c55e,#4ade80);
+ color:#fff;
+}
+.answer-box.bad{
+ background:linear-gradient(135deg,#ef4444,#f87171);
+ color:#fff;
+}
 
 /* ===== KEYBOARD ===== */
 .keyboard{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
@@ -151,7 +164,7 @@ img{width:100%;border-radius:16px;margin:10px 0}
  font-weight:bold;
  cursor:pointer;
  touch-action:none; 
- transition:transform .08s ease;
+ transition:transform .08s ease, box-shadow .3s ease, background .3s ease;
 }
 .key.locked{
  position:relative;
@@ -173,6 +186,11 @@ img{width:100%;border-radius:16px;margin:10px 0}
 }
 .key:active{
  transform:scale(0.92);
+ box-shadow:0 4px 10px rgba(0,0,0,0.3);
+}
+.key:hover:not(.locked){
+ background:linear-gradient(135deg,#334155,#1e293b);
+ box-shadow:0 4px 12px rgba(0,0,0,0.4);
 }
 @keyframes shake{
  0%{transform:translateX(0)}
@@ -185,19 +203,36 @@ img{width:100%;border-radius:16px;margin:10px 0}
 /* ===== WHEEL ===== */
 .wheel{
  width:260px;height:260px;margin:16px auto;
- border-radius:50%;border:3px solid var(--accent);
+ border-radius:50%;
+ border:3px solid var(--accent);
  position:relative;
+ background: conic-gradient(from 0deg, #facc15, #ffea00, #22c55e, #4ade80, #facc15);
+ animation: wheelRotate 10s linear infinite;
+}
+@keyframes wheelRotate {
+  0%{transform:rotate(0deg);}
+  100%{transform:rotate(360deg);}
 }
 .wheel .key{
  width:52px;height:52px;border-radius:50%;
  background:var(--accent);color:#000;
  position:absolute;display:flex;align-items:center;justify-content:center;
+ transition:all .3s ease, transform .2s ease;
+}
+.wheel .key:hover{
+ transform:scale(1.2);
+ box-shadow:0 6px 15px rgba(0,0,0,0.4);
 }
 
 /* ===== DELETE BUTTON ===== */
 .delete{
  background:#0f172a;border:1px solid #334155;
  border-radius:14px;padding:14px;font-size:20px;font-weight:bold;cursor:pointer;
+ transition:all .3s ease;
+}
+.delete:hover{
+ box-shadow:0 4px 12px rgba(0,0,0,0.3);
+ transform:scale(1.05);
 }
 
 /* ===== OVERLAY & WIN ===== */
@@ -215,8 +250,16 @@ img{width:100%;border-radius:16px;margin:10px 0}
 .confetti{
  position:fixed;top:-20px;font-size:26px;
  animation:fall linear forwards;pointer-events:none;z-index:10;
+ color: #facc15;
 }
-@keyframes fall{to{transform:translateY(120vh) rotate(360deg);opacity:0}}
+.confetti:nth-child(odd){color:#22c55e;}
+.confetti:nth-child(even){color:#ff4444;}
+@keyframes fall{
+ to{
+  transform:translateY(120vh) rotate(720deg) rotateX(360deg);
+  opacity:0;
+ }
+}
 </style>
 </head>
 
