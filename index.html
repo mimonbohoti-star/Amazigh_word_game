@@ -321,7 +321,14 @@ img{width:100%;border-radius:16px;margin:10px 0}
   <button class="btn btn-main" onclick="finalOverlay.classList.remove('active'); show('menu');">🏠 القائمة</button>
  </div>
 </div>
-
+<div id="stageOverlay" class="overlay">
+ <div class="win">
+  <h2>✨ نهاية المرحلة ✨</h2>
+  <div id="starsView" style="font-size:32px;margin:12px 0"></div>
+  <button class="btn btn-main" id="nextStageBtn">▶️ المرحلة التالية</button>
+  <button class="btn btn-back" onclick="show('map'); stageOverlay.classList.remove('active')">🗺️ الخريطة</button>
+ </div>
+</div>
 <script>
 let stars = JSON.parse(localStorage.getItem("amazighStars") || "[]");
 const boxes = document.getElementById("boxes");
@@ -332,6 +339,9 @@ const levelTitle = document.getElementById("levelTitle");
 const questionImg = document.getElementById("questionImg");
 const questionText = document.getElementById("questionText");
 const overlay = document.getElementById("overlay");
+const stageOverlay = document.getElementById("stageOverlay");
+const starsView = document.getElementById("starsView");
+const nextStageBtn = document.getElementById("nextStageBtn");
 /* ===== SETTINGS ===== */
 let soundOn = localStorage.getItem("soundOn") !== "0";
 let vibeOn  = localStorage.getItem("vibeOn")  !== "0";
@@ -701,19 +711,26 @@ function check(L){
    q++;
    if(q<3) startQuestion();
   else{
- if(stage === stages.length - 1){
-  document.getElementById("finalOverlay").classList.add("active");
- }else{
  const s = getStars();
  stars[stage] = Math.max(stars[stage] || 0, s);
  localStorage.setItem("amazighStars", JSON.stringify(stars));
+
+ starsView.textContent = "⭐".repeat(s) + "☆".repeat(3 - s);
+ stageOverlay.classList.add("active");
 
  if(stage === unlocked){
   unlocked++;
   localStorage.setItem("amazighUnlocked", unlocked);
  }
- startStage(stage + 1);
-}
+
+ nextStageBtn.onclick = ()=>{
+  stageOverlay.classList.remove("active");
+  if(stage === stages.length - 1){
+   document.getElementById("finalOverlay").classList.add("active");
+  }else{
+   startStage(stage + 1);
+  }
+ };
 }
   },1200);
  }else setTimeout(startQuestion,700);
