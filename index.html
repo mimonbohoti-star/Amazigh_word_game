@@ -706,33 +706,37 @@ function check(L){
 
  if(ok){
   celebrate(); overlay.classList.add("active");
-  setTimeout(()=>{
-   overlay.classList.remove("active");
-   q++;
-   if(q<3) startQuestion();
-  else{
- const s = getStars();
- stars[stage] = Math.max(stars[stage] || 0, s);
- localStorage.setItem("amazighStars", JSON.stringify(stars));
+setTimeout(()=>{
+  overlay.classList.remove("active");
+  q++;
+  if(q<3) {
+    startQuestion();
+  } else {
+    const s = getStars();
+    stars[stage] = Math.max(stars[stage] || 0, s);
+    localStorage.setItem("amazighStars", JSON.stringify(stars));
 
- starsView.textContent = "⭐".repeat(s) + "☆".repeat(3 - s);
- stageOverlay.classList.add("active");
+    starsView.textContent = "⭐".repeat(s) + "☆".repeat(3 - s);
+    stageOverlay.classList.add("active");
 
- if(stage === unlocked){
-  unlocked++;
-  localStorage.setItem("amazighUnlocked", unlocked);
- }
+    if(stage === unlocked){
+      unlocked++;
+      localStorage.setItem("amazighUnlocked", unlocked);
+    }
 
- nextStageBtn.onclick = ()=>{
-  stageOverlay.classList.remove("active");
-  if(stage === stages.length - 1){
-   document.getElementById("finalOverlay").classList.add("active");
-  }else{
-   startStage(stage + 1);
+    nextStageBtn.onclick = ()=>{
+      stageOverlay.classList.remove("active");
+      if(stage === stages.length - 1){
+        document.getElementById("finalOverlay").classList.add("active");
+      } else {
+        startStage(stage + 1);
+      }
+    };
+
+    // ✅ استدعاء تلقائي للمرحلة التالية
+    nextStageBtn.click();
   }
- };
-}
-  },1200);
+},1200);
  }else setTimeout(startQuestion,700);
  }
 function getStars(){
