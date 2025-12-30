@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>ⵣ لعبة الكلمات الأمازيغية</title>
+<title> ⵣلعبة الكلمات و الألغاز الأمازيغيةⵣ</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -14,16 +14,15 @@ body {
   margin: 0;
   font-family: 'Almarai', sans-serif;
   color: #fff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+
   min-height: 100vh;
-  overflow: hidden;
+  /* 👇 نسمح بالتمرير إذا احتجنا */
+  overflow: auto;
   position: relative;
+
   background: linear-gradient(180deg, #0055A4 0%, #FFD700 50%, #008A00 100%);
   background-size: 200% 200%;
   animation: bgMove 20s linear infinite, bgColorShift 40s ease-in-out infinite alternate;
-  z-index:0;
 }
 
 @keyframes bgMove {
@@ -43,7 +42,7 @@ body {
 /* ===== AMAZIGH LETTERS IN BACKGROUND ===== */
 body::before {
   content: '';
-  position: absolute;
+  position: fixed; /* 👈 ثابت على الشاشة */
   top: 0; left: 0;
   width: 200%; height: 200%;
   background: transparent url('data:image/svg+xml;utf8,\
@@ -56,25 +55,26 @@ body::before {
   z-index:1;
   opacity:0.5;
 }
+
 @keyframes lettersMove {
   0% { transform: translate(0,0); }
   100% { transform: translate(-50%, -50%); }
 }
 
 /* ===== CARD & MENU ===== */
-#menu{
- background:linear-gradient(135deg,#1d4ed8,#16a34a,#facc15,#dc2626);
- border-radius:22px;
- padding:18px;
- position: relative;
- z-index:2;
-}
 .card{
- width:95%;max-width:420px;background:#020617;border-radius:26px;
+ width:95%;
+ max-width:420px;
+ background:#020617;
+ border-radius:26px;
  padding:20px;
  box-shadow:0 0 0 2px var(--accent),0 30px 60px rgba(0,0,0,.7);
- position:relative;
- z-index:2;
+ position: fixed;
+ top: 50%;
+ left: 50%;
+ transform: translate(-50%, -50%);
+ z-index: 10; /* أعلى من كل شيء لضمان الثبات */
+ transition: transform 0.35s cubic-bezier(.4,0,.2,1), opacity 0.35s ease;
 }
 h1{text-align:center;color:var(--accent);margin:6px 0}
 img{width:100%;border-radius:16px;margin:10px 0}
@@ -268,9 +268,9 @@ img{width:100%;border-radius:16px;margin:10px 0}
 <div class="card">
 
 <div id="menu" class="section active">
- <h1>ⵣ لعبة الكلمات الأمازيغية</h1>
- <button class="btn btn-main" onclick="openMap()">▶️ بدء</button>
- <button class="btn btn-back" onclick="show('settings')">⚙️ الإعدادات</button>
+ <h1>ⵣلعبة الكلمات و الألغاز الأمازيغيةⵣ</h1>
+ <button class="btn btn-main" onclick="openMap()">▶️ ⴱⴷⴰ بدء</button>
+ <button class="btn btn-back" onclick="show('settings')">⚙️ settings</button>
 </div>
 
 <div id="settings" class="section">
@@ -511,7 +511,7 @@ const stages=[/* نفس البيانات السابقة بلا أي حذف */
 
 let unlocked=+localStorage.getItem("amazighUnlocked")||0;
 let stage=0,q=0,input=[],drag=false;
-const symbols=["🌸","🌺","🌹","❤️","💖","💐","ⵣ","ⵉ","ⵜ","ⴰ"];
+const symbols=["🤗","🤩","👍","👏","👏","ayuuz","ⴰⵢⵢⵓⵣ","🌸","🌺","🌹","❤️","💖","💐","ⵣ","ⵉ","ⵜ","ⴰ","🌸","🌺","🌹","🍃","🍃","🌷","🌼","🌻","⚘","🎈","🎈","💵","💶","💸","✔","✅"];
 
 function show(id){
 
