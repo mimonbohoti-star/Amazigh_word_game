@@ -660,18 +660,35 @@ updateHintCount();
  }
 };
 
-wheel.addEventListener("pointerdown",e=>{
- const L=stages[stage].qs[q];
- if(L.shape!=="circle")return; drag=true; dragPick(e,L);
+wheel.addEventListener("pointerdown", e => {
+  const L = stages[stage].qs[q];
+  if(L.shape !== "circle") return;
+  input = [];          // إعادة السحب عند كل محاولة
+  drag = true;
+  dragPick(e, L);      // إضافة الحرف الأول فور الضغط
 });
-wheel.addEventListener("pointermove",e=>{ if(drag) dragPick(e,stages[stage].qs[q]); });
-document.addEventListener("pointerup",()=>{ if(drag){drag=false;
-updateHintCount();
- check(stages[stage].qs[q]);} });
 
-function dragPick(e,L){
- const el=document.elementFromPoint(e.clientX,e.clientY);
- if(el&&el.classList.contains("key")) pick(el,L);
+wheel.addEventListener("pointermove", e => {
+  if(!drag) return;
+  const L = stages[stage].qs[q];
+  dragPick(e, L);      // إضافة أي حرف جديد أثناء السحب
+});
+
+document.addEventListener("pointerup", () => {
+  if(!drag) return;
+  drag = false;
+  const L = stages[stage].qs[q];
+  // ✅ إذا لم يكتمل السحب، نعيد السؤال
+  if(input.length !== L.a.length){
+    setTimeout(()=>startQuestion(), 100); // إعادة المرحلة بسرعة
+  } else {
+    check(L); // التحقق من الإجابة إذا اكتمل السحب
+  }
+});
+
+function dragPick(e, L){
+  const el = document.elementFromPoint(e.clientX, e.clientY);
+  if(el && el.classList.contains("key")) pick(el, L);
 }
 function updateHintCount(){
  document.getElementById("hintCount").textContent = hintsLeft;
