@@ -237,8 +237,13 @@ img{width:100%;border-radius:16px;margin:10px 0}
 
 /* ===== OVERLAY & WIN ===== */
 .overlay{
- position:fixed;inset:0;background:rgba(0,0,0,.8);
- display:none;justify-content:center;align-items:center;z-index:5;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.8);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:999;
 }
 .overlay.active{display:flex}
 .win{
@@ -259,6 +264,25 @@ img{width:100%;border-radius:16px;margin:10px 0}
   transform:translateY(120vh) rotate(720deg) rotateX(360deg);
   opacity:0;
  }
+}
+#finalOverlay .win{
+  width:90%;
+  max-width:420px;
+  padding:36px;
+  border-radius:26px;
+  box-shadow:0 0 120px var(--accent);
+  animation:finalPop .6s ease-out;
+}
+
+@keyframes finalPop{
+  from{
+    transform:scale(.6);
+    opacity:0;
+  }
+  to{
+    transform:scale(1);
+    opacity:1;
+  }
 }
 </style>
 </head>
@@ -319,7 +343,7 @@ img{width:100%;border-radius:16px;margin:10px 0}
   <h2>🏆 مبروك! 🏆</h2>
   <p>أنهيت جميع المراحل بنجاح</p>
   <button class="btn btn-main" onclick="finalOverlay.classList.remove('active'); show('menu');">🏠 القائمة</button>
- </div>
+</div>
 </div>
 <div id="stageOverlay" class="overlay">
  <div class="win">
@@ -340,8 +364,10 @@ const questionImg = document.getElementById("questionImg");
 const questionText = document.getElementById("questionText");
 const overlay = document.getElementById("overlay");
 const stageOverlay = document.getElementById("stageOverlay");
+const finalOverlay = document.getElementById("finalOverlay");
 const starsView = document.getElementById("starsView");
 const nextStageBtn = document.getElementById("nextStageBtn");
+
 /* ===== SETTINGS ===== */
 let soundOn = localStorage.getItem("soundOn") !== "0";
 let vibeOn  = localStorage.getItem("vibeOn")  !== "0";
@@ -700,66 +726,89 @@ function refresh(){
  });
 }
 
-function celebrate(){
+function celebrate(final = false){
  if(soundOn){
- applauseSound.currentTime = 0;
- applauseSound.play();
-}
- for(let i=0;i<40;i++){
+  applauseSound.currentTime = 0;
+  applauseSound.play();
+ }
+
+ const count = final ? 120 : 40;        // 🎉 أكثر في النهاية
+ const size  = final ? 34  : 26;        // أكبر
+ const time  = final ? 6000 : 4000;     // أطول
+
+ for(let i=0;i<count;i++){
   const c=document.createElement("div");
   c.className="confetti";
   c.textContent=symbols[Math.floor(Math.random()*symbols.length)];
   c.style.left=Math.random()*100+"vw";
-  c.style.animationDuration=2+Math.random()*2+"s";
+  c.style.fontSize = size + "px";
+  c.style.animationDuration = (final ? 3+Math.random()*3 : 2+Math.random()*2) + "s";
   document.body.appendChild(c);
-  setTimeout(()=>c.remove(),4000);
+  setTimeout(()=>c.remove(), time);
  }
 }
 
 function check(L){
- if(input.length!==L.a.length)return;
- const ok=input.map(k=>k.dataset.ch).join("")===L.a;
- document.querySelectorAll(".answer-box").forEach(b=>b.classList.add(ok?"ok":"bad"));
+  if(input.length !== L.a.length) return;
 
- if(ok){
-  celebrate(); overlay.classList.add("active");
-setTimeout(()=>{
-  overlay.classList.remove("active");
-  q++;
-  if(q<3) {
-    startQuestion();
-  } else {
-    const s = getStars();
-    stars[stage] = Math.max(stars[stage] || 0, s);
-    localStorage.setItem("amazighStars", JSON.stringify(stars));
+  const ok = input.map(k => k.dataset.ch).join("") === L.a;
+  document.querySelectorAll(".answer-box").forEach(b => b.classList.add(ok ? "ok" : "bad"));
 
-    starsView.textContent = "⭐".repeat(s) + "☆".repeat(3 - s);
-    stageOverlay.classList.add("active");
+  if(ok){
+    celebrate();
+    overlay.classList.add("active"); // 🔥 أحسنت
 
-    if(stage === unlocked){
-      unlocked++;
-      localStorage.setItem("amazighUnlocked", unlocked);
+    setTimeout(() => {
+      overlay.classList.remove("active");
+      q++;
+
+    if(q < 3){
+          startQuestion(); // سؤال آخر في نفس المرحلة
+        } else {
+          // ===== نهاية المرحلة =====
+          const s = getStars();
+          stars[stage] = Math.max(stars[stage] || 0, s);
+          localStorage.setItem("amazighStars", JSON.stringify(stars));
+
+          starsView.textContent = "⭐".repeat(s) + "☆".repeat(3 - s);
+
+          if(stage === unlocked){
+            unlocked++;
+            localStorage.setItem("amazighUnlocked", unlocked);
+          }
+
+          // نعرض دائماً شاشة نهاية المرحلة
+          stageOverlay.classList.add("active");
+
+          // إعداد زر المتابعة
+          if(stage === stages.length - 1){
+            // آخر مرحلة → نهاية اللعبة
+            nextStageBtn.textContent = "🏆 النهاية";
+            nextStageBtn.onclick = () => {
+              stageOverlay.classList.remove("active");
+              celebrate();                 // 🎉 الاحتفال
+              finalOverlay.classList.add("active");
+            };
+          } else {
+            // مرحلة عادية
+            nextStageBtn.textContent = "▶️ المرحلة التالية";
+            nextStageBtn.onclick = () => {
+              stageOverlay.classList.remove("active");
+              startStage(stage + 1);
+            };
+          }
+        }
+
+      }, 1200);
+    } else {
+      setTimeout(startQuestion, 700); // محاولة جديدة إذا خطأ
     }
+}
 
-    nextStageBtn.onclick = ()=>{
-      stageOverlay.classList.remove("active");
-      if(stage === stages.length - 1){
-        document.getElementById("finalOverlay").classList.add("active");
-      } else {
-        startStage(stage + 1);
-      }
-    };
-
-    // ✅ استدعاء تلقائي للمرحلة التالية
-    nextStageBtn.click();
-  }
-},1200);
- }else setTimeout(startQuestion,700);
- }
 function getStars(){
- if(hintsUsed === 0) return 3;
- if(hintsUsed === 1) return 2;
- return 1;
+  if(hintsUsed === 0) return 3;
+  if(hintsUsed === 1) return 2;
+  return 1;
 }
 </script>
 </body>
