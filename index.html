@@ -252,9 +252,14 @@ img{width:100%;border-radius:16px;margin:10px 0}
 }
 
 /* ===== CONFETTI ===== */
+/* ===== CONFETTI ===== */
 .confetti{
- position:fixed;top:-20px;font-size:26px;
- animation:fall linear forwards;pointer-events:none;z-index:10;
+ position:fixed;
+ top:-20px;
+ font-size:26px;
+ animation:fall linear forwards;
+ pointer-events:none;
+ z-index:2000; /* فوق البطاقة والـ overlay */
  color: #facc15;
 }
 .confetti:nth-child(odd){color:#22c55e;}
