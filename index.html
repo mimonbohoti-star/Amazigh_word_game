@@ -113,7 +113,27 @@ img{width:100%;border-radius:16px;margin:10px 0}
  box-shadow:0 4px 15px rgba(0,0,0,0.4);
  transform:scale(1.03);
 }
+/* ===== TOP BAR ===== */
+#topBar{
+ position:absolute;
+ top:10px;
+ left:10px;
+ display:flex;
+ gap:8px;
+ z-index:20;
+}
 
+#topBar button{
+ width:40px;
+ height:40px;
+ border-radius:50%;
+ border:none;
+ font-size:18px;
+ cursor:pointer;
+ background:#020617;
+ color:#fff;
+ box-shadow:0 0 0 2px var(--accent);
+}
 /* ===== SETTINGS ===== */
 .setting-item{
  display:flex;justify-content:space-between;align-items:center;
@@ -295,7 +315,10 @@ img{width:100%;border-radius:16px;margin:10px 0}
 <body>
 
 <div class="card">
-
+<div id="topBar">
+  <button id="soundBtn">🔊</button>
+  <button id="vibeBtn">📳</button>
+</div>
 <div id="menu" class="section active">
  <h1>ⵣلعبة الكلمات و الألغاز الأمازيغيةⵣ</h1>
  <button class="btn btn-main" onclick="openMap()">▶️ ⴱⴷⴰ بدء</button>
@@ -382,7 +405,8 @@ const applauseSound = new Audio("applause.mp3");
 
 const soundToggle = document.getElementById("soundToggle");
 const vibeToggle  = document.getElementById("vibeToggle");
-
+const soundBtn = document.getElementById("soundBtn");
+const vibeBtn  = document.getElementById("vibeBtn");
 function syncToggles(){
  soundToggle.classList.toggle("on",soundOn);
  vibeToggle.classList.toggle("on",vibeOn);
@@ -397,9 +421,24 @@ vibeToggle.onclick=()=>{
  localStorage.setItem("vibeOn",vibeOn?1:0);
  syncToggles();
 };
-syncToggles();
+soundBtn.onclick = ()=>{
+ soundOn = !soundOn;
+ localStorage.setItem("soundOn", soundOn ? 1 : 0);
+ soundBtn.textContent = soundOn ? "🔊" : "🔇";
+ syncToggles();
+};
 
+vibeBtn.onclick = ()=>{
+ vibeOn = !vibeOn;
+ localStorage.setItem("vibeOn", vibeOn ? 1 : 0);
+ vibeBtn.textContent = vibeOn ? "📳" : "🚫";
+ syncToggles();
+};
+syncToggles();
+soundBtn.textContent = soundOn ? "🔊" : "🔇";
+vibeBtn.textContent  = vibeOn  ? "📳" : "🚫";
 /* ===== SOUND (synthetic clap) ===== */
+
 let ctx;
 function clap(){
  if(!soundOn) return;
