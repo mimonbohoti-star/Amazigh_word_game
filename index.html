@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <title> ⵣلعبة الكلمات و الألغاز الأمازيغيةⵣ</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--accent:#facc15}
 *{box-sizing:border-box}
@@ -12,10 +12,19 @@
 /* ===== BODY & BACKGROUND ===== */
 body {
   margin: 0;
-  font-family: 'Almarai', sans-serif;
+  font-family: 'Noto Sans Arabic', system-ui, sans-serif;
   color: #fff;
-
   min-height: 100vh;
+body{
+  font-family: 'Noto Sans Arabic', system-ui, sans-serif;
+}
+
+.question{
+  font-size: 18px;
+  line-height: 1.7;
+  font-weight: 600;
+  text-align: center;
+}
   /* 👇 نسمح بالتمرير إذا احتجنا */
   overflow: auto;
   position: relative;
@@ -38,7 +47,60 @@ body {
   75% { background: linear-gradient(180deg, #0055A4 0%, #FFD700 50%, #008A00 100%); }
   100% { background: linear-gradient(180deg, #0055A4 0%, #FFD700 50%, #008A00 100%); }
 }
+.secondary-btn{
+  background:transparent;
+  border:2px solid var(--accent);
+  color:var(--accent);
+  padding:10px 16px;
+  border-radius:14px;
+  font-weight:600;
+  cursor:pointer;
+  margin-top:10px;
+}
 
+.overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.65);
+  z-index:20;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.overlay-content{
+  background:#020617;
+  border-radius:20px;
+  padding:20px;
+  width:90%;
+  max-width:380px;
+  max-height:85vh;
+  overflow-y:auto;
+  box-shadow:0 0 0 2px var(--accent);
+}
+
+.overlay-content h2{
+  text-align:center;
+  color:var(--accent);
+  margin-bottom:10px;
+}
+
+.overlay-content p,
+.overlay-content li{
+  font-size:16px;
+  line-height:1.6;
+}
+
+.overlay-content ul{
+  padding-inline-start:18px;
+}
+
+.note{
+  margin-top:12px;
+  font-size:14px;
+  opacity:.7;
+  text-align:center;
+}
 /* ===== AMAZIGH LETTERS IN BACKGROUND ===== */
 body::before {
   content: '';
@@ -47,7 +109,7 @@ body::before {
   width: 200%; height: 200%;
   background: transparent url('data:image/svg+xml;utf8,\
 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12">\
-<text x="0" y="12" font-size="12" fill="white">ⴰⴱⴷⴹⴻⴼⴽⵀⵃⵄⵅⵇⵉⵊⵋ</text>\
+<text x="0" y="12" font-size="12" fill="white">ⵣⴳⴷⴹⴻⴼⴽⵀⵃⵄⵅⵇⵉⵊⵋ</text>\
 </svg>') repeat;
   background-size: 40px 40px;
   animation: lettersMove 60s linear infinite;
@@ -63,6 +125,8 @@ body::before {
 
 /* ===== CARD & MENU ===== */
 .card{
+  max-height:92vh;
+  overflow-y:auto;
  width:95%;
  max-width:420px;
  background:#020617;
@@ -73,13 +137,12 @@ body::before {
  top: 50%;
  left: 50%;
  transform: translate(-50%, -50%);
- z-index: 10;
+ z-index: 10; /* أعلى من كل شيء لضمان الثبات */
  transition: transform 0.35s cubic-bezier(.4,0,.2,1), opacity 0.35s ease;
-
- max-height: 92vh;
- overflow-y: auto;
- overscroll-behavior: contain;
 }
+h1{text-align:center;color:var(--accent);margin:6px 0}
+img{width:100%;border-radius:16px;margin:10px 0}
+
 /* ===== SECTIONS ===== */
 .section{
  display:none;
@@ -114,27 +177,7 @@ body::before {
  box-shadow:0 4px 15px rgba(0,0,0,0.4);
  transform:scale(1.03);
 }
-/* ===== TOP BAR ===== */
-#topBar{
- position:absolute;
- top:10px;
- left:10px;
- display:flex;
- gap:8px;
- z-index:20;
-}
 
-#topBar button{
- width:40px;
- height:40px;
- border-radius:50%;
- border:none;
- font-size:18px;
- cursor:pointer;
- background:#020617;
- color:#fff;
- box-shadow:0 0 0 2px var(--accent);
-}
 /* ===== SETTINGS ===== */
 .setting-item{
  display:flex;justify-content:space-between;align-items:center;
@@ -172,7 +215,14 @@ body::before {
  background:linear-gradient(135deg,#ef4444,#f87171);
  color:#fff;
 }
-
+.question-text{
+  display:none;
+  margin:12px 0;
+  font-size:18px;
+  line-height:1.7;
+  font-weight:600;
+  text-align:center;
+}
 /* ===== KEYBOARD ===== */
 .keyboard{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 .triangle{grid-template-columns:repeat(3,1fr)}
@@ -316,16 +366,13 @@ body::before {
 <body>
 
 <div class="card">
-<div id="topBar">
-  <button id="soundBtn">🔊</button>
-  <button id="vibeBtn">📳</button>
-</div>
 <div id="menu" class="section active">
  <h1>ⵣلعبة الكلمات و الألغاز الأمازيغيةⵣ</h1>
  <button class="btn btn-main" onclick="openMap()">▶️ ⴱⴷⴰ بدء</button>
- <button class="btn btn-back" onclick="show('settings')">⚙️ settings</button>
-</div>
 
+ <button class="btn btn-back" onclick="show('settings')">🔧 settings</button>
+<button class="secondary-btn" onclick="openHowTo()">ℹ كيفية اللعب</button>
+</div>
 <div id="settings" class="section">
  <h1>⚙️ الإعدادات</h1>
 
@@ -338,7 +385,6 @@ body::before {
   <span>📳 الاهتزاز</span>
   <div id="vibeToggle" class="toggle"></div>
  </div>
-
  <button class="btn btn-back" onclick="show('menu')">⬅️ رجوع</button>
 </div>
 
@@ -351,7 +397,7 @@ body::before {
 <div id="game" class="section">
  <h1 id="levelTitle"></h1>
  <img id="questionImg">
-<div id="questionText" style="display:none;margin:12px 0;font-size:18px;line-height:1.6"></div>
+<div id="questionText" class="question-text"></div>
  <div class="answer-boxes" id="boxes"></div>
 <!-- START HINT BUTTON -->
 <button class="btn btn-back" id="hintBtn">💡 تلميح</button>
@@ -382,7 +428,38 @@ body::before {
   <button class="btn btn-back" onclick="show('map'); stageOverlay.classList.remove('active')">🗺️ الخريطة</button>
  </div>
 </div>
+<div id="howToBox" class="overlay" style="display:none">
+  <div class="overlay-content">
+    <h2>كيفية اللعب</h2>
+
+    <p>
+      هذه لعبة كلمات وألغاز أمازيغية تهدف إلى اختبار معلوماتك
+      وتنمية رصيدك اللغوي بطريقة ممتعة.
+    </p>
+
+    <ul>
+      <li>اقرأ السؤال أو شاهد الصورة جيدًا.</li>
+      <li>اسحب الحروف لتكوين الكلمة الصحيحة.</li>
+      <li>كل إجابة صحيحة تمنحك نجوم ⭐.</li>
+      <li>يمكن استعمال النجوم لطلب تلميح.</li>
+      <li>تقدّمك يُحفظ تلقائيًا.</li>
+    </ul>
+
+    <p class="note">
+      ⵣ نسخة تجريبية – مسابقة رأس السنة ⵣ
+    </p>
+
+    <button onclick="closeHowTo()">إغلاق</button>
+  </div>
+</div>
 <script>
+function openHowTo(){
+  document.getElementById("howToBox").style.display = "flex";
+}
+
+function closeHowTo(){
+  document.getElementById("howToBox").style.display = "none";
+}
 let stars = JSON.parse(localStorage.getItem("amazighStars") || "[]");
 const boxes = document.getElementById("boxes");
 const keyboard = document.getElementById("keyboard");
@@ -406,8 +483,7 @@ const applauseSound = new Audio("applause.mp3");
 
 const soundToggle = document.getElementById("soundToggle");
 const vibeToggle  = document.getElementById("vibeToggle");
-const soundBtn = document.getElementById("soundBtn");
-const vibeBtn  = document.getElementById("vibeBtn");
+
 function syncToggles(){
  soundToggle.classList.toggle("on",soundOn);
  vibeToggle.classList.toggle("on",vibeOn);
@@ -422,24 +498,9 @@ vibeToggle.onclick=()=>{
  localStorage.setItem("vibeOn",vibeOn?1:0);
  syncToggles();
 };
-soundBtn.onclick = ()=>{
- soundOn = !soundOn;
- localStorage.setItem("soundOn", soundOn ? 1 : 0);
- soundBtn.textContent = soundOn ? "🔊" : "🔇";
- syncToggles();
-};
-
-vibeBtn.onclick = ()=>{
- vibeOn = !vibeOn;
- localStorage.setItem("vibeOn", vibeOn ? 1 : 0);
- vibeBtn.textContent = vibeOn ? "📳" : "🚫";
- syncToggles();
-};
 syncToggles();
-soundBtn.textContent = soundOn ? "🔊" : "🔇";
-vibeBtn.textContent  = vibeOn  ? "📳" : "🚫";
-/* ===== SOUND (synthetic clap) ===== */
 
+/* ===== SOUND (synthetic clap) ===== */
 let ctx;
 function clap(){
  if(!soundOn) return;
@@ -585,7 +646,6 @@ let stage=0,q=0,input=[],drag=false;
 const symbols=["🤗","🤩","👍","👏","👏","ayuuz","ⴰⵢⵢⵓⵣ","🌸","🌺","🌹","❤️","💖","💐","ⵣ","ⵉ","ⵜ","ⴰ","🌸","🌺","🌹","🍃","🍃","🌷","🌼","🌻","⚘","🎈","🎈","💵","💶","💸","✔","✅"];
 
 function show(id){
-
  document.querySelectorAll(".section").forEach(s=>{
   s.classList.remove("active");
   s.style.display = "none";
