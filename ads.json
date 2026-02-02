@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "title": "إعلان تجريبي 1",
+    "videoUrl": "https://example.com/video1.mp4",
+    "startTime": 5,
+    "duration": 15
+  },
+  {
+    "id": 2,
+    "title": "إعلان تجريبي 2",
+    "videoUrl": "https://example.com/video2.mp4",
+    "startTime": 10,
+    "duration": 20
+  }
+]
