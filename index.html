@@ -125,20 +125,19 @@ body::before {
   0% { transform: translate(0,0); }
   100% { transform: translate(-50%, -50%); }
 }
-
-/* ===== البطاقة Card ===== */
 .card {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   
-  width: 95%;
-  max-width: 420px;
-  height: auto;        /* ← السماح للارتفاع بالتوسع */
-  max-height: 85vh;    /* ← لا تتجاوز ارتفاع الشاشة */
+  width: 96%;
+  max-width: 560px;
 
-  padding: 16px;
+  min-height: 75vh;   /* ⬅️ هذا هو المفتاح: طول إضافي */
+  max-height: 90vh;   /* ⬅️ لا تلمس حواف الشاشة */
+
+  padding: 22px;
   border-radius: 26px;
   background: linear-gradient(to bottom, #0000ff, #008000, #ffff00);
 
@@ -446,6 +445,7 @@ body::before {
   padding: 10px;
 
   flex: 1;        /* ← هذا هو المفتاح */
+  flex-direction: row;
 }
 .key {
   flex: 0 0 calc((100% - 24px*2)/3); /* عرض كل مرحلة يعتمد على عدد المراحل في الشاشة */
@@ -668,6 +668,12 @@ if(vibeLabel) vibeLabel.textContent = t.vibe;
   if(typeof questionText !== "undefined" && questionText){
     questionText.textContent = t.question || "";
   }
+  /* ===== ⚡ ضبط اتجاه الصفحة بحسب اللغة ===== */
+  if(currentLang === "ar"){
+    document.body.dir = "rtl";
+  } else {
+    document.body.dir = "ltr";
+  }
 }
 const translations = {
   ar: {
@@ -677,11 +683,16 @@ const translations = {
     settingsBtn: "🔧 الإعدادات",
     howToBtn: "ℹ كيفية اللعب",
     langLabel: "🌍 اللغة",
+
     stage: "مرحلة",
     stagesTitle: "⭐ المراحل",
+    level: "المرحلة",
+    question: "سؤال",
+
     back: "⬅️ رجوع",
     win: "🔥 أحسنت 🔥",
     final: "🏆 مبروك! 🏆",
+
     sound: "🔊 الصوت",
     vibe: "📳 الاهتزاز",
   },
@@ -693,11 +704,16 @@ const translations = {
     settingsBtn: "🔧 Settings",
     howToBtn: "ℹ How to Play",
     langLabel: "🌍 Language",
+
     stage: "Stage",
     stagesTitle: "⭐ Stages",
+    level: "Stage",
+    question: "Question",
+
     back: "⬅️ Back",
     win: "🔥 Well done 🔥",
     final: "🏆 Congratulations! 🏆",
+
     sound: "🔊 Sound",
     vibe: "📳 Vibration",
   },
@@ -709,11 +725,16 @@ const translations = {
     settingsBtn: "🔧 ⵜⵉⵙⵎⵉⵍⵉⵏ",
     howToBtn: "ℹ ⵜⴰⵙⴽⴰⵡⵜ",
     langLabel: "🌍 ⵜⵉⵙⴽⵍⵓⵏ",
+
     stage: "ⵖⴰⵔⴰ",
     stagesTitle: "⭐ ⵉⵖⴰⵔⴰⵏ",
+    level: "ⵖⴰⵔⴰ",
+    question: "ⵜⵉⵙⴽⴰ",
+
     back: "⬅️ ⵔⵔⴰⵊⵓ",
     win: "🔥 ⴰⵢⵢⵓⵣ 🔥",
     final: "🏆 ⴰⵢⵢⵓⵣ! 🏆",
+
     sound: "🔊 ⴰⵙⵙⵓⵏ",
     vibe: "📳 ⴰⵏⵣⵣⵓⵣ",
   }
@@ -982,7 +1003,9 @@ function startQuestion(){
 
   const L = stages[stage].qs[q];
 hintCount.textContent = hintsLeft;
-  levelTitle.textContent = `المرحلة ${stage+1} — سؤال ${q+1}/${stages[stage].qs.length}`;
+  const t = translations[currentLang];
+levelTitle.textContent =
+  `${t.level} ${stage+1} — ${t.question} ${q+1}/${stages[stage].qs.length}`;
 
   if(L.img){
     questionImg.style.display = "block";
