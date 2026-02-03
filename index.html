@@ -1152,46 +1152,6 @@ function dragPick(e,L){
   const el = document.elementFromPoint(e.clientX,e.clientY);
   if(el && el.classList.contains("key")) pick(el,L);
 }
-
-function refresh(){
-  document.querySelectorAll(".answer-box").forEach((b,i)=>{
-    b.textContent = input[i]?.dataset.ch||"";
-    b.className="answer-box";
-  });
-}
-
-const ADS_URL = "https://raw.githubusercontent.com/MimounElbouhouti/amazigh-game/main/ads.json";
-
-// تحميل الإعلانات من GitHub
-fetch(ADS_URL)
-  .then(response => response.json())
-  .then(ads => {
-    console.log("تم تحميل الإعلانات:", ads);
-
-    ads.forEach(ad => {
-      // إنشاء عنصر فيديو لكل إعلان (تجريبي)
-      const video = document.createElement("video");
-      video.src = ad.videoUrl;
-      video.controls = true; // يمكنك إزالة التحكم إذا أردت
-      video.style.width = "300px";
-      video.style.display = "block";
-      video.style.margin = "10px auto";
-
-      // تشغيل الإعلان بعد وقت startTime
-      setTimeout(() => {
-        video.play();
-      }, ad.startTime * 1000);
-
-      // إيقاف الفيديو بعد مدة duration
-      setTimeout(() => {
-        video.pause();
-      }, (ad.startTime + ad.duration) * 1000);
-
-      // إضافته للصفحة
-      document.body.appendChild(video);
-    });
-  })
-  .catch(err => console.error("خطأ في تحميل الإعلانات:", err));
 applyLang();
 </script>
 </body>
