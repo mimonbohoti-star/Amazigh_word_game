@@ -1152,47 +1152,13 @@ function dragPick(e,L){
   const el = document.elementFromPoint(e.clientX,e.clientY);
   if(el && el.classList.contains("key")) pick(el,L);
 }
-
- // ===== REFRESH ANSWER BOXES =====
+// ===== REFRESH ANSWER BOXES =====
 function refresh(){
-  document.querySelectorAll(".answer-box").forEach((b,i)=>{
-    b.textContent = input[i]?.dataset.ch||"";
-    b.className="answer-box";
+  document.querySelectorAll(".answer-box").forEach((b, i) => {
+    b.textContent = input[i]?.dataset.ch || "";
+    b.className = "answer-box";
   });
 }
-
-// ===== ADS =====
-const adsContainer = document.createElement("div");
-adsContainer.id = "adsContainer";
-adsContainer.style.position = "fixed";
-adsContainer.style.bottom = "10px";
-adsContainer.style.left = "50%";
-adsContainer.style.transform = "translateX(-50%)";
-adsContainer.style.zIndex = "50";
-document.body.appendChild(adsContainer);
-
-const ADS_URL = "https://raw.githubusercontent.com/MimounElbouhouti/amazigh-game/main/ads.json";
-
-fetch(ADS_URL)
-  .then(response => response.json())
-  .then(ads => {
-    console.log("تم تحميل الإعلانات:", ads);
-
-    ads.forEach(ad => {
-      const video = document.createElement("video");
-      video.src = ad.videoUrl;
-      video.controls = true;
-      video.style.width = "300px";
-      video.style.display = "block";
-      video.style.margin = "10px auto";
-
-      adsContainer.appendChild(video);
-
-      setTimeout(() => video.play(), ad.startTime * 1000);
-      setTimeout(() => video.pause(), (ad.startTime + ad.duration) * 1000);
-    });
-  })
-  .catch(err => console.error("خطأ في تحميل الإعلانات:", err));
 applyLang();
 </script>
 </body>
