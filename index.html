@@ -438,42 +438,17 @@ body::before {
 #mapGrid {
   display: flex;
   gap: 12px;
-
   overflow-x: auto;
-  overflow-y: hidden;
-
   scroll-snap-type: x mandatory;
   padding: 10px;
 
-  flex: 1;        /* ← هذا هو المفتاح */
   flex-direction: row;
+  min-width: 0; /* مهم لتجنب مشكلة Flexbox على بعض المتصفحات */
 }
-.key {
-  flex: 0 0 calc((100% - 24px*2)/3); /* عرض كل مرحلة يعتمد على عدد المراحل في الشاشة */
-  height: 90px;
-  /* الباقي كما هو */
-}
-  
-  background: #1e293b;
-  color: #fff;
-  border-radius: 14px;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-weight: bold;
-  cursor: pointer;
-  scroll-snap-align: start;  /* الالتصاق عند التمرير */
-.map-container {
-  max-width: 1200px;
-  margin: auto;
-  padding: 20px;
-
-  background:
-    linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)),
-    url("map-bg.png") no-repeat center center;
-  background-size: cover;
+.stage-key {
+  flex: 0 0 200px; /* أو calc((100% - 24px*2)/3) كما عندك */
+  min-width: 150px; /* يضمن قابلية الضغط على الهاتف */
 }
 </style>
 </head>
@@ -1093,12 +1068,14 @@ function makeKey(ch){
 }
 
 function pick(el,L){
-  if(el.classList.contains("used") || input.length>=L.a.length) return;
+  if(el.classList.contains("used") || el.classList.contains("locked")) return;
+
   el.classList.add("used");
-  if(vibeOn && navigator.vibrate) navigator.vibrate(20);
   input.push(el);
+
   refresh();
-  if(input.length===L.a.length) check(L);
+
+  if(input.length === L.a.length) check(L);
 }
 
 function removeLast(){
