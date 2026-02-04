@@ -465,24 +465,15 @@ body::before {
   font-weight: bold;
   cursor: pointer;
   scroll-snap-align: start;  /* الالتصاق عند التمرير */
-}
-body {
-  margin: 0;
-  font-family: sans-serif;
-
-  background:
-    linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)),
-    url("map-bg.png");
-
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  min-height: 100vh;
-}
 .map-container {
   max-width: 1200px;
   margin: auto;
   padding: 20px;
+
+  background:
+    linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)),
+    url("map-bg.png") no-repeat center center;
+  background-size: cover;
 }
 </style>
 </head>
