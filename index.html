@@ -962,7 +962,7 @@ function openMap(){
 
   stages.forEach((_,i)=>{
     const d = document.createElement("div");
-  d.className = "stage-key" + (i > unlocked ? " locked" : "");
+    d.className = "stage-key" + (i > unlocked ? " locked" : "");
     const s = stars[i] || 0;
     d.innerHTML = `
      <div>${translations[currentLang].stage} ${i+1}</div>
@@ -974,7 +974,10 @@ function openMap(){
 
     mapGrid.appendChild(d);
   });
-document.getElementById("stageBackground").style.backgroundImage = 'url("mapBackground.jpg")'
+
+  // ← هنا فقط نغير خلفية صفحة الخريطة
+  document.getElementById("stageBackground").style.backgroundImage = 'url("map-bg.png")';
+  document.getElementById("stageBackground").style.opacity = 0.4; // الشفافية حسب الرغبة
 
   show("map");
 }
