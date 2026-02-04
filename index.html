@@ -466,7 +466,24 @@ body::before {
   cursor: pointer;
   scroll-snap-align: start;  /* الالتصاق عند التمرير */
 }
+body {
+  margin: 0;
+  font-family: sans-serif;
 
+  background:
+    linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)),
+    url("map-bg.png");
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+}
+.map-container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+}
 </style>
 </head>
 
@@ -502,7 +519,9 @@ body::before {
   </select>
 </div>
  <button class="btn btn-back" onclick="show('menu')">←</button>  
-</div>  <div id="map" class="section">  
+</div>  
+<div class="map-container">
+<div id="map" class="section">  
  <h1>⭐ المراحل</h1>  
 <div id="mapGrid"></div>
  <button class="btn btn-back" onclick="show('menu')">←</button>
