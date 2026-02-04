@@ -982,6 +982,8 @@ document.getElementById("stageBackground").style.backgroundImage = 'url("mapBack
 function startStage(i){
  stage = i;
  q = 0;
+ document.getElementById("stageBackground").style.backgroundImage =
+   stages[i].qs[0].img ? `url(${stages[i].qs[0].img})` : "none";
  hintsLeft = 3;
  hintsUsed = 0;
  startQuestion();
