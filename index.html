@@ -989,6 +989,7 @@ hintBtn.onclick = ()=>{
   if(hintsLeft <= 0) return alert("ليس لديك تلميحات متبقية!");
 
   const L = stages[stage].qs[q];
+document.getElementById("stageBackground").style.backgroundImage = L.img ? `url(${L.img})` : "none";
   const used = input.map(k=>k.dataset.ch);
   const next = [...L.a].find(ch=>!used.includes(ch));
   if(!next) return;
