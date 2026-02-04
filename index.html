@@ -7,7 +7,7 @@
 <link
  href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--accent:#facc15}
+:root{--accent:#f0eae2} 
 *{box-sizing:border-box}
 /* ===== BODY & BACKGROUND ===== */
 
@@ -198,12 +198,13 @@ body::before {
  transition:all .3s ease;
 }
 .btn-main {
-  background: linear-gradient(135deg, #ff0000, #ff8c00);
-  color: #fff;;
+  background: linear-gradient(135deg, #0f172a, #334155); /* نفس تدرج زر الإعدادات */
+  color: #f0eae2; /* خط أبيض */
+  border: 1px solid #334155; /* نفس الحدود */
 }
 .btn-back{
  background:linear-gradient(135deg,#0f172a,#334155);
- color:#fff;
+ color:#f0eae2;
  border:1px solid #334155;
 }
 .btn:hover{
@@ -474,7 +475,7 @@ body::before {
 <div class="card">
 <div id="menu" class="section active">
  <h1>ⵣلعبة الكلمات و الألغاز الأمازيغيةⵣ</h1>
- <button class="btn btn-main" onclick="openMap()">▶️ ⴱⴷⴰ بدء</button>
+ <button class="btn btn-main" onclick="openMap()">▶️ ⴱⴷⴰ</button>
 
  <button class="btn btn-back" onclick="show('settings')">🔧 settings</button>
 <button class="secondary-btn" onclick="openHowTo()">ℹ كيفية اللعب</button>
@@ -500,12 +501,11 @@ body::before {
     <option value="am">ⵜⴰⵎⴰⵣⵉⵖⵜ</option>
   </select>
 </div>
-
-<button class="btn btn-back" onclick="show('menu')">⬅️ رجوع</button>  
+ <button class="btn btn-back" onclick="show('menu')">←</button>  
 </div>  <div id="map" class="section">  
  <h1>⭐ المراحل</h1>  
 <div id="mapGrid"></div>
- <button class="btn btn-back" onclick="show('menu')">⬅️ رجوع</button>
+ <button class="btn btn-back" onclick="show('menu')">←</button>
 </div>
 
 <div id="game" class="section">
@@ -516,7 +516,7 @@ body::before {
  <div class="answer-boxes" id="boxes"></div>
 
  <!-- زر التلميح والعداد -->
- <button class="btn btn-back" id="hintBtn">💡 تلميح</button>
+ <button class="btn btn-back" id="hintBtn">💡</button>
  <div id="hintCount">3</div>
 
  <!-- عجلة الأحرف -->
@@ -526,7 +526,7 @@ body::before {
  <div id="keyboard" class="keyboard"></div>
 
  <!-- زر الرجوع للخريطة -->
- <button class="btn btn-back" onclick="show('map')">⬅️ رجوع</button>
+ <button class="btn btn-back" onclick="show('map')">←</button>
 </div>
 
 <div id="overlay" class="overlay">
@@ -647,7 +647,7 @@ if(vibeLabel) vibeLabel.textContent = t.vibe;
   }
 
   /* ===== ⬅️ جميع أزرار الرجوع ===== */
-  document.querySelectorAll(".btn-back").forEach(btn=>{
+  document.querySelectorAll('[data-action="back"]').forEach(btn=>{
     btn.textContent = t.back;
   });
 
@@ -690,6 +690,8 @@ const translations = {
     question: "سؤال",
 
     back: "⬅️ رجوع",
+    hint: "💡 تلميح",
+
     win: "🔥 أحسنت 🔥",
     final: "🏆 مبروك! 🏆",
 
@@ -711,6 +713,8 @@ const translations = {
     question: "Question",
 
     back: "⬅️ Back",
+    hint: "💡 Hint",
+
     win: "🔥 Well done 🔥",
     final: "🏆 Congratulations! 🏆",
 
@@ -732,6 +736,8 @@ const translations = {
     question: "ⵜⵉⵙⴽⴰ",
 
     back: "⬅️ ⵔⵔⴰⵊⵓ",
+    hint: "💡 ⵜⴰⵙⴽⴰ",
+
     win: "🔥 ⴰⵢⵢⵓⵣ 🔥",
     final: "🏆 ⴰⵢⵢⵓⵣ! 🏆",
 
