@@ -975,9 +975,13 @@ function openMap(){
     mapGrid.appendChild(d);
   });
 
-  // ← هنا فقط نغير خلفية صفحة الخريطة
-  document.getElementById("stageBackground").style.backgroundImage = 'url("map-bg.png")';
-  document.getElementById("stageBackground").style.opacity = 0.4; // الشفافية حسب الرغبة
+  // ← فقط عند صفحة الخريطة
+  const bg = document.getElementById("stageBackground");
+  bg.style.backgroundImage = 'url("map-bg.png")';
+  bg.style.opacity = 0.35;      // شفافية مناسبة
+  bg.style.pointerEvents = 'none'; 
+  bg.style.zIndex = '0';         // خلف كل المراحل
+  bg.style.display = 'block';    // تأكد أنها تظهر
 
   show("map");
 }
