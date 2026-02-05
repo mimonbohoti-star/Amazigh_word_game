@@ -525,7 +525,10 @@ body::before {
 <div class="map-container">
 <div id="map" class="section">  
  <h1>⭐ المراحل</h1>  
-<div id="mapGrid"></div>
+
+ <div id="mapBackground"></div>   <!-- هنا تضعه -->
+
+ <div id="mapGrid"></div>
  <button class="btn btn-back" onclick="show('menu')">←</button>
 </div>
 
@@ -960,10 +963,11 @@ function show(id){
     s.style.display = "none";
   });
 
-  document.body.offsetHeight; // ← مهم للـ animation
+  document.body.offsetHeight;
 
-  // إذا لم تكن صفحة map، أخفي الخلفية الخاصة
-  if(id !== "map") document.getElementById("mapBackground").style.display = "none";
+  // ⬅️ هذا السطر أضفه فقط
+  document.getElementById("mapBackground").style.display =
+    (id === "map") ? "block" : "none";
 
   const el = document.getElementById(id);
   el.style.display = "block";
