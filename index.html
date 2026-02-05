@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
- 
 <meta charset="UTF-8">
 <title> ⵣلعبة الكلمات و الألغاز الأمازيغيةⵣ</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,13 +10,16 @@
 :root{--accent:#f0eae2} 
 *{box-sizing:border-box}
 #mapStageBackground {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%;
-  height: 100%;
+  position: fixed;       /* بدل absolute */
+  top: 0;
+  left: 0;
+  width: 100vw;          /* يغطي كامل العرض */
+  height: 100vh;         /* يغطي كامل الارتفاع */
   background-size: cover;
   background-position: center;
-  z-index: 0;        /* خلف محتوى البطاقة */
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.35;
 }
  
 #map .card, #map h1, #map #mapGrid, #map button {
@@ -92,7 +94,7 @@ body {
   width: 90%;
   max-width: 380px;
   max-height: 85vh;
- overflow: hidden;
+  overflow-y: auto;
   box-shadow: 0 0 0 2px var(--accent);
 }
 
@@ -140,16 +142,17 @@ body::before {
   0% { transform: translate(0,0); }
   100% { transform: translate(-50%, -50%); }
 }
-#stageBackground{
-  position:absolute;
-  inset:0;              /* يغطي البطاقة كاملة */
-  width:100%;
-  height:100%;
-  background-size:cover;
-  background-position:center;
-  z-index:0;
-  pointer-events:none;
-  border-radius:26px;
+#stageBackground {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  z-index: 0; /* خلف كل العناصر */
+  pointer-events: none;
+  opacity: 0.35; /* يمكن تعديل الشفافية */
 }
 .card {
   position: fixed;
@@ -160,8 +163,8 @@ body::before {
   width: 96%;
   max-width: 560px;
 
-  min-height: 75vh;
-  max-height: 90vh;
+  min-height: 75vh;   /* ⬅️ هذا هو المفتاح: طول إضافي */
+  max-height: 90vh;   /* ⬅️ لا تلمس حواف الشاشة */
 
   padding: 22px;
   border-radius: 26px;
@@ -169,7 +172,9 @@ body::before {
 
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-y: auto;    /* ← إذا كان المحتوى طويل، يمكن التمرير */
+  overflow-x: hidden;
+
   z-index: 10;
 }
 .stage-key {
@@ -186,6 +191,11 @@ body::before {
   scroll-snap-align: start;
 }
 
+       
+  opacity: 0.35;       /* شفافية مناسبة */
+  pointer-events: none; /* لا تتداخل مع أي عنصر */
+  display: none;       /* افتراضيًا مخفية */
+}
 .stage-key.locked {
   opacity: .35;
   pointer-events: none;
@@ -475,6 +485,17 @@ body::before {
   flex: 0 0 200px; /* أو calc((100% - 24px*2)/3) كما عندك */
   min-width: 150px; /* يضمن قابلية الضغط على الهاتف */
 }
+#stageBackground {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  z-index: 0; /* تحت البطاقة وكل العناصر */
+  pointer-events: none; /* لا تتداخل مع أي عناصر */
+  opacity: 0.4; /* يمكن تعديل الشفافية حسب الرغبة */
+}
 #map{
   background-image: url("map-bg.png");
   background-size: cover;
@@ -490,8 +511,8 @@ body::before {
 
 <body>
 <div id="mapBackground"></div>
-<div class="card">
 <div id="stageBackground"></div>
+<div class="card">
 <div id="menu" class="section active">
  <h1>ⵣلعبة الكلمات و الألغاز الأمازيغيةⵣ</h1>
  <button class="btn btn-main" onclick="openMap()">▶️ ⴱⴷⴰ</button>
@@ -531,6 +552,7 @@ body::before {
 </div>
 
 <div id="game" class="section">
+<div id="stageBackground"></div>
  <h1 id="levelTitle"></h1>
  <img id="questionImg">
 <div id="questionText" class="question-text"></div>
