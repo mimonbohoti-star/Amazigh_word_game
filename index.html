@@ -18,8 +18,6 @@
   background-size: cover;
   background-position: center;
   z-index: 0;        /* خلف محتوى البطاقة */
-  pointer-events: none;
-  opacity: 0.35;     /* يمكن تعديل الشفافية */
 }
  
 #map .card, #map h1, #map #mapGrid, #map button {
@@ -162,8 +160,8 @@ body::before {
   width: 96%;
   max-width: 560px;
 
-  min-height: 75vh;   /* ⬅️ هذا هو المفتاح: طول إضافي */
-  max-height: 90vh;   /* ⬅️ لا تلمس حواف الشاشة */
+  min-height: 75vh;
+  max-height: 90vh;
 
   padding: 22px;
   border-radius: 26px;
@@ -171,9 +169,7 @@ body::before {
 
   display: flex;
   flex-direction: column;
-  overflow-y: auto;    /* ← إذا كان المحتوى طويل، يمكن التمرير */
-  overflow-x: hidden;
-
+  overflow: hidden;
   z-index: 10;
 }
 .stage-key {
@@ -190,11 +186,6 @@ body::before {
   scroll-snap-align: start;
 }
 
-       
-  opacity: 0.35;       /* شفافية مناسبة */
-  pointer-events: none; /* لا تتداخل مع أي عنصر */
-  display: none;       /* افتراضيًا مخفية */
-}
 .stage-key.locked {
   opacity: .35;
   pointer-events: none;
@@ -484,17 +475,6 @@ body::before {
   flex: 0 0 200px; /* أو calc((100% - 24px*2)/3) كما عندك */
   min-width: 150px; /* يضمن قابلية الضغط على الهاتف */
 }
-#stageBackground {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%;
-  height: 100%;
-  background-size: cover;
-  background-position: center;
-  z-index: 0; /* تحت البطاقة وكل العناصر */
-  pointer-events: none; /* لا تتداخل مع أي عناصر */
-  opacity: 0.4; /* يمكن تعديل الشفافية حسب الرغبة */
-}
 #map{
   background-image: url("map-bg.png");
   background-size: cover;
@@ -510,8 +490,8 @@ body::before {
 
 <body>
 <div id="mapBackground"></div>
-<div id="stageBackground"></div>
 <div class="card">
+<div id="stageBackground"></div>
 <div id="menu" class="section active">
  <h1>ⵣلعبة الكلمات و الألغاز الأمازيغيةⵣ</h1>
  <button class="btn btn-main" onclick="openMap()">▶️ ⴱⴷⴰ</button>
@@ -551,7 +531,6 @@ body::before {
 </div>
 
 <div id="game" class="section">
-<div id="stageBackground"></div>
  <h1 id="levelTitle"></h1>
  <img id="questionImg">
 <div id="questionText" class="question-text"></div>
