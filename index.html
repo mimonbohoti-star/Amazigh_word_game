@@ -7,53 +7,26 @@
 <link
  href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--accent:#f0eae2} 
-*{box-sizing:border-box}
-#mapStageBackground {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%;
-  height: 100%;
-  background-size: cover;
-  background-position: center;
-  z-index: 0;        /* خلف محتوى البطاقة */
-  pointer-events: none;
-  opacity: 0.35;     /* يمكن تعديل الشفافية */
-}
-#map .card, #map h1, #map #mapGrid, #map button {
-  position: relative; /* لضمان ظهور المحتوى فوق الخلفية */
-  z-index: 1;
-}
+/* ===== ROOT & BASIC ===== */
+:root { --accent: #f0eae2; }
+* { box-sizing: border-box; margin:0; padding:0; }
+
 /* ===== BODY & BACKGROUND ===== */
-
 body {
-  margin: 0;
   font-family: 'Noto Sans Arabic', system-ui, sans-serif;
+  height: 100vh;
+  overflow: hidden;
   color: #ff8c00;
-
-  height: 100vh;           /* ارتفاع الشاشة بالكامل */
-  overflow: hidden;        /* لا يسمح بالتمرير العمودي */
-  
-  /* خلفية متدرجة متحركة */
   background: linear-gradient(180deg, #0055A4 0%, #FFD700 50%, #008A00 100%);
   background-size: 200% 200%;
   animation: bgMove 20s linear infinite, bgColorShift 40s ease-in-out infinite alternate;
 }
 
-.question {
-  font-size: 16px;
-  line-height: 1.7;
-  font-weight: 600;
-  text-align: center;
-}
-
-/* ===== أنيميشن الخلفية ===== */
 @keyframes bgMove {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
-
 @keyframes bgColorShift {
   0%   { background: linear-gradient(180deg, #0055A4 0%, #FFD700 50%, #008A00 100%); }
   25%  { background: linear-gradient(180deg, #0060B0 0%, #FFDE00 50%, #009000 100%); }
@@ -62,126 +35,48 @@ body {
   100% { background: linear-gradient(180deg, #0055A4 0%, #FFD700 50%, #008A00 100%); }
 }
 
-/* ===== الأزرار الثانوية ===== */
-.secondary-btn {
-  background: transparent;
-  border: 2px solid var(--accent);
-  color: var(--accent);
-  padding: 10px 16px;
-  border-radius: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  margin-top: 10px;
-}
-
-/* ===== الواجهة العلوية Overlay ===== */
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.65);
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.overlay-content {
-  background: #000;
-  border-radius: 20px;
-  padding: 20px;
-  width: 90%;
-  max-width: 380px;
-  max-height: 85vh;
-  overflow-y: auto;
-  box-shadow: 0 0 0 2px var(--accent);
-}
-
-.overlay-content h2 {
-  text-align: center;
-  color: var(--accent);
-  margin-bottom: 10px;
-}
-
-.overlay-content p,
-.overlay-content li {
-  font-size: 16px;
-  line-height: 1.6;
-}
-
-.overlay-content ul {
-  padding-inline-start: 18px;
-}
-
-.note {
-  margin-top: 12px;
-  font-size: 14px;
-  opacity: .7;
-  text-align: center;
-}
-
-/* ===== حروف أمازيغية في الخلفية ===== */
-body::before {
-  content: '';
-  position: fixed; /* ثابت على الشاشة */
-  top: 0; left: 0;
-  width: 200%; height: 200%;
-  background: transparent url('data:image/svg+xml;utf8,\
-<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12">\
-<text x="0" y="12" font-size="12" fill="white">ⵣⴳⴷⴹⴻⴼⴽⵀⵃⵄⵅⵇⵉⵊⵋ</text>\
-</svg>') repeat;
-  background-size: 40px 40px;
-  animation: lettersMove 60s linear infinite;
-  pointer-events: none;
-  z-index: 1;
-  opacity: 0.5;
-}
-
-@keyframes lettersMove {
-  0% { transform: translate(0,0); }
-  100% { transform: translate(-50%, -50%); }
-}
-#stageBackground {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-size: cover;
-  background-position: center;
-  z-index: 0; /* خلف كل العناصر */
-  pointer-events: none;
-  opacity: 0.35; /* يمكن تعديل الشفافية */
-}
+/* ===== CARD ===== */
 .card {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  
   width: 96%;
   max-width: 560px;
-
-  min-height: 75vh;   /* ⬅️ هذا هو المفتاح: طول إضافي */
-  max-height: 90vh;   /* ⬅️ لا تلمس حواف الشاشة */
-
+  min-height: 75vh;
+  max-height: 90vh;
   padding: 22px;
   border-radius: 26px;
-  background: linear-gradient(to bottom, #0000ff, #008000, #ffff00);
-
+  background: none; /* الخلفية ستكون عبر #stageBackground أو صور */
   display: flex;
   flex-direction: column;
-  overflow-y: auto;    /* ← إذا كان المحتوى طويل، يمكن التمرير */
-  overflow-x: hidden;
-
+  overflow: hidden;
   z-index: 10;
 }
+
+/* ===== STAGE BACKGROUND INSIDE CARD ===== */
+#stageBackground {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.35;
+  border-radius: 26px;
+}
+
+/* ===== STAGE KEYS (MAP GRID) ===== */
 .stage-key {
-  flex: 0 0 calc((100% - 24px*2)/3); /* حجم كل مرحلة */
+  flex: 0 0 calc((100% - 24px*2)/3);
+  min-width: 150px;
   height: 90px;
   background: #1e293b;
   color: #fff;
   border-radius: 14px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   font-weight: bold;
@@ -189,60 +84,73 @@ body::before {
   scroll-snap-align: start;
 }
 
-       
-  opacity: 0.35;       /* شفافية مناسبة */
-  pointer-events: none; /* لا تتداخل مع أي عنصر */
-  display: none;       /* افتراضيًا مخفية */
-}
 .stage-key.locked {
-  opacity: .35;
+  opacity: 0.35;
   pointer-events: none;
   position: relative;
 }
 .stage-key.locked::after {
-  content:"🔒";
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:26px;
+  content: "🔒";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
 }
 
 /* ===== SECTIONS ===== */
-.section{
- display:none;
- opacity:0;
- transform:translateY(16px) scale(.97);
- pointer-events:none;
- transition: opacity .35s ease, transform .35s cubic-bezier(.4,0,.2,1);
+.section {
+  display: none;
+  opacity: 0;
+  transform: translateY(16px) scale(0.97);
+  pointer-events: none;
+  transition: opacity 0.35s ease, transform 0.35s cubic-bezier(.4,0,.2,1);
 }
-.section.active{
- display:block;
- opacity:1;
- transform:translateY(0) scale(1);
- pointer-events:auto;
+
+.section.active {
+  display: block;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+/* ===== MAP GRID ===== */
+#mapGrid {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 10px;
+  flex-direction: row;
+  min-width: 0;
 }
 
 /* ===== BUTTONS ===== */
-.btn{
- width:100%;min-height:52px;margin:8px 0;border:none;border-radius:16px;
- font-size:18px;font-weight:700;cursor:pointer;
- transition:all .3s ease;
+.btn {
+  width: 100%;
+  min-height: 52px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 16px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 .btn-main {
-  background: linear-gradient(135deg, #0f172a, #334155); /* نفس تدرج زر الإعدادات */
-  color: #f0eae2; /* خط أبيض */
-  border: 1px solid #334155; /* نفس الحدود */
+  background: linear-gradient(135deg, #0f172a, #334155);
+  color: #f0eae2;
+  border: 1px solid #334155;
 }
-.btn-back{
- background:linear-gradient(135deg,#0f172a,#334155);
- color:#f0eae2;
- border:1px solid #334155;
+.btn-back {
+  background: linear-gradient(135deg, #0f172a, #334155);
+  color: #f0eae2;
+  border: 1px solid #334155;
 }
-.btn:hover{
- box-shadow:0 4px 15px rgba(0,0,0,0.4);
- transform:scale(1.03);
+.btn:hover {
+  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+  transform: scale(1.03);
 }
 
 /* ===== SETTINGS ===== */
