@@ -129,7 +129,7 @@ body::before {
   width: 200%; height: 200%;
   background: transparent url('data:image/svg+xml;utf8,\
 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12">\
-<text x="0" y="12" font-size="12" fill="white">ⵣⴳⴷⴹⴻⴼⴽⵀⵃⵄⵅⵇⵉⵊⵋ</text>\
+<text x="0" y="12" font-size="12" fill="white">ⵣⴳⴷⴹⵋ</text>\
 </svg>') repeat;
   background-size: 40px 40px;
   animation: lettersMove 60s linear infinite;
@@ -181,37 +181,38 @@ body::before {
 aspect-ratio: 9 / 16;
 }
 .stage-key {
-  flex: 0 0 calc((100% - 24px*2)/3); /* حجم كل مرحلة */
+  position: relative;        /* ضروري للقفل */
+  flex: 0 0 200px;
+  min-width: 150px;
   height: 90px;
   background: #1e293b;
   color: #fff;
   border-radius: 14px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   font-weight: bold;
   cursor: pointer;
   scroll-snap-align: start;
 }
-
-       
   opacity: 0.35;       /* شفافية مناسبة */
   pointer-events: none; /* لا تتداخل مع أي عنصر */
   display: none;       /* افتراضيًا مخفية */
 }
+
 .stage-key.locked {
   opacity: .35;
   pointer-events: none;
-  position: relative;
 }
+
 .stage-key.locked::after {
-  content:"🔒";
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:26px;
+  content: "🔒";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 26px;
 }
 
 /* ===== SECTIONS ===== */
@@ -836,16 +837,17 @@ function clap(){
 }
 /* ===== DATA (10 مراحل × 3 أسئلة) ===== */
 const stages = [
+
   {qs:[
-    {a:"ⵜⴰⵎⵎⵓⵔⵜ", shape:"grid", img:null, text:{
+    {a:"ⵜⴰⵎⵓⵔⵜ", shape:"grid", img:null, text:{
       ar:"تعني الأرض أو الوطن",
       en:"Means land or homeland",
-      am:"ⵜⴰⵎⵎⵓⵔⵜ"
+      am:"ⵜⴰⵎⵓⵔⵜ"
     }},
-    {a:"ⴰⴽⴰⵍ", shape:"grid", img:null, text:{
+    {a:"ⴰⵛⴰⵍ", shape:"grid", img:null, text:{
       ar:"كل ما هو تراب وطبيعة",
       en:"Everything that is soil and nature",
-      am:"ⴰⴽⴰⵍ"
+      am:"ⴰⵛⴰⵍ"
     }},
     {a:"ⵜⴰⴼⵓⵛⵜ", shape:"circle", img:"thafucth.jpg"}
   ]},
@@ -871,10 +873,10 @@ const stages = [
   ]},
 
   {qs:[
-    {a:"ⴰⴽⴰⵍ", shape:"circle", img:null, text:{
+    {a:"ⵔⴰⴱⵙⴰⵔ", shape:"circle", img:null, text:{
       ar:"طعام",
       en:"Food",
-      am:"ⴰⴽⴰⵍ"
+      am:"ⵔⴰⴱⵙⴰⵔ"
     }},
     {a:"ⵜⴰⵣⵉⵔⵉ", shape:"hexagon", img:"thaziri.jpg"},
     {a:"ⴰⵢⵢⵓⵔ", shape:"grid", img:"ayur.jpg"}
@@ -950,9 +952,85 @@ const stages = [
       en:"Symbol of freedom among Amazigh",
       am:"ⴰⵣⴰ"
     }}
-  ]}
-];
+  ]},
+ {qs:[
+    {a:"ⵜⴰⵎⵎⵓⵔⵜ", shape:"grid", img:null, text:{
+      ar:"تعني الأرض أو الوطن",
+      en:"Means land or homeland",
+      am:"ⵜⴰⵎⵎⵓⵔⵜ"
+    }},
+    {a:"ⴰⴽⴰⵍ", shape:"grid", img:null, text:{
+      ar:"كل ما هو تراب وطبيعة",
+      en:"Everything that is soil and nature",
+      am:"ⴰⴽⴰⵍ"
+    }},
+    {a:"ⵜⴰⴼⵓⵢⵜ", shape:"circle", img:"thafucth.jpg"}
+  ]},
+ {qs:[
+    {a:"ⵜⴰⵎⵎⵓⵔⵜ", shape:"grid", img:null, text:{
+      ar:"تعني الأرض أو الوطن",
+      en:"Means land or homeland",
+      am:"ⵜⴰⵎⵎⵓⵔⵜ"
+    }},
+    {a:"ⴰⴽⴰⵍ", shape:"grid", img:null, text:{
+      ar:"كل ما هو تراب وطبيعة",
+      en:"Everything that is soil and nature",
+      am:"ⴰⴽⴰⵍ"
+    }},
+    {a:"ⵜⴰⴼⵓⴽⵜ", shape:"circle", img:"thafucth.jpg"}
+  ]},
+{qs:[
+    {a:"ⵜⵉⵀⵢⴰ", shape:"circle", img:"dihya.jpg"},
+    {a:"ⵏⵓⵎⵉⴷⵢⴰ", shape:"grid", img:null, text:{
+      ar:"مملكة أمازيغية قديمة في شمال إفريقيا",
+      en:"Ancient Amazigh kingdom in North Africa",
+      am:"ⵏⵓⵎⵉⴷⵢⴰ"
+    }},
+    {a:"ⴰⵣⴰ", shape:"hexagon", img:null, text:{
+      ar:"رمز الحرية عند الأمازيغ",
+      en:"Symbol of freedom among Amazigh",
+      am:"ⴰⵣⴰ"
+    }}
+  ]},
+ {qs:[
+    {a:"ⵜⴰⵎⵎⵓⵔⵜ", shape:"grid", img:null, text:{
+      ar:"تعني الأرض أو الوطن",
+      en:"Means land or homeland",
+      am:"ⵜⴰⵎⵎⵓⵔⵜ"
+    }},
+    {a:"ⴰⴽⴰⵍ", shape:"grid", img:null, text:{
+      ar:"كل ما هو تراب وطبيعة",
+      en:"Everything that is soil and nature",
+      am:"ⴰⴽⴰⵍ"
+    }},
+    {a:"ⵜⴰⴼⵓⵢⵜ", shape:"circle", img:"thafucth.jpg"}
+  ]},
+ {qs:[
+    {a:"ⵜⴰⵎⵎⵓⵔⵜ", shape:"grid", img:null, text:{
+      ar:"تعني الأرض أو الوطن",
+      en:"Means land or homeland",
+      am:"ⵜⴰⵎⵎⵓⵔⵜ"
+    }},
+    {a:"ⴰⴽⴰⵍ", shape:"grid", img:null, text:{
+      ar:"كل ما هو تراب وطبيعة",
+      en:"Everything that is soil and nature",
+      am:"ⴰⵛⴰⵍ"
+    }},
+    {a:"ⵜⴰⴼⵓⴽⵜ", shape:"circle", img:"thafucth.jpg"}
+  ]},
 
+{qs:[
+  {a:"ⴰⵢⵜ", shape:"circle", img:"mountain.jpg"},
+  {a:"ⴰⴳⴰⴷⵉⵔ", shape:"grid", img:"river.jpg"},
+  {a:"ⴰⵎⴰⵣⵉⵖ", shape:"grid", img:"flower.jpg"}
+]},
+
+{qs:[
+  {a:"ⵜⴰⴼⵓⴽⵜ", shape:"circle", img:"mountain.jpg"},
+  {a:"ⴰⴷⵍⵉⵙ", shape:"grid", img:"river.jpg"},
+  {a:"ⴰⵏⵙⵉ", shape:"grid", img:"flower.jpg"}
+]},
+];
 let unlocked=+localStorage.getItem("amazighUnlocked")||0;
 
 const symbols=["🤗","🤩","👍","👏","👏","ayuuz","ⴰⵢⵢⵓⵣ","🌸","🌺","❤️","💖","💐","ⵣ","ⵉ","ⵜ","ⴰ","🌸","🌺","🌹","🍃","🍃","🌷","🌼","🌻","⚘","🎈","🎈","💵","💶","💸","✔","✅"];
