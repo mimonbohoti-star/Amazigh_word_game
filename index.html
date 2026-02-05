@@ -148,8 +148,10 @@ body::before {
   left: 0;
   width: 100%;
   height: 100%;
-  background-size: cover;
+ background-size: contain;
+background-repeat: no-repeat;
   background-position: center;
+background-color: transparent;
   z-index: 0; /* خلف كل العناصر */
   pointer-events: none;
   opacity: 0.35; /* يمكن تعديل الشفافية */
@@ -176,6 +178,7 @@ body::before {
   overflow-x: hidden;
 
   z-index: 10;
+aspect-ratio: 9 / 16;
 }
 .stage-key {
   flex: 0 0 calc((100% - 24px*2)/3); /* حجم كل مرحلة */
