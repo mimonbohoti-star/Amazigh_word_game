@@ -977,16 +977,17 @@ function openMap(){
     d.className = "stage-key" + (i > unlocked ? " locked" : "");
     const s = stars[i] || 0;
     d.innerHTML = `
-      <div>${translations[currentLang].stage} ${i+1}</div>
+     <div>${translations[currentLang].stage} ${i+1}</div>
       <div style="font-size:16px">
         ${"⭐".repeat(s)}${"☆".repeat(3-s)}
       </div>
     `;
     if(i <= unlocked) d.onclick = ()=>startStage(i);
+
     mapGrid.appendChild(d);
   });
 
-  // عرض الخلفية الثانية للـ map فقط
+  // 👇 هنا تفعيل الخلفية الثانية
   document.getElementById("mapBackground").style.display = "block";
 
   show("map");
@@ -1005,7 +1006,7 @@ hintBtn.onclick = ()=>{
   if(hintsLeft <= 0) return alert("ليس لديك تلميحات متبقية!");
 
   const L = stages[stage].qs[q];
-document.getElementById("stageBackground").style.backgroundImage = L.img ? `url(${L.img})` : "none";
+
   const used = input.map(k=>k.dataset.ch);
   const next = [...L.a].find(ch=>!used.includes(ch));
   if(!next) return;
