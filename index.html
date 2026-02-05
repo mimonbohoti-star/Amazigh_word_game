@@ -9,6 +9,21 @@
 <style>
 :root{--accent:#f0eae2} 
 *{box-sizing:border-box}
+#mapStageBackground {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  z-index: 0;        /* خلف محتوى البطاقة */
+  pointer-events: none;
+  opacity: 0.35;     /* يمكن تعديل الشفافية */
+}
+#map .card, #map h1, #map #mapGrid, #map button {
+  position: relative; /* لضمان ظهور المحتوى فوق الخلفية */
+  z-index: 1;
+}
 /* ===== BODY & BACKGROUND ===== */
 
 body {
@@ -173,16 +188,8 @@ body::before {
   cursor: pointer;
   scroll-snap-align: start;
 }
-#mapBackground {
-  position: absolute; /* ليتمدد خلف كل محتوى البطاقة */
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%; /* يغطي كامل ارتفاع البطاقة */
-  background: linear-gradient(to bottom, blue, green, yellow);
-  z-index: -1; /* خلف كل الأزرار والمحتوى */
-}
-        /* خلف كل عناصر الخريطة */
+
+       
   opacity: 0.35;       /* شفافية مناسبة */
   pointer-events: none; /* لا تتداخل مع أي عنصر */
   display: none;       /* افتراضيًا مخفية */
@@ -536,12 +543,10 @@ body::before {
 </div>  
 <div class="map-container">
 <div id="map" class="section">  
- <h1>⭐ المراحل</h1>  
-
- <div id="mapBackground"></div>   <!-- هنا تضعه -->
-
- <div id="mapGrid"></div>
- <button class="btn btn-back" onclick="show('menu')">←</button>
+  <div id="mapStageBackground"></div> <!-- الخلفية الخاصة بالمراحل -->
+  <h1>⭐ المراحل</h1>  
+  <div id="mapGrid"></div>
+  <button class="btn btn-back" onclick="show('menu')">←</button>
 </div>
 
 <div id="game" class="section">
@@ -1003,8 +1008,9 @@ function openMap(){
     mapGrid.appendChild(d);
   });
 
-  // 👇 هنا تفعيل الخلفية الثانية
-  document.getElementById("mapBackground").style.display = "block";
+  // ضع صورة الخلفية للمراحل هنا
+  document.getElementById("mapStageBackground").style.backgroundImage = "url('map-bg.png')";
+  document.getElementById("mapStageBackground").style.display = "block";
 
   show("map");
 }
