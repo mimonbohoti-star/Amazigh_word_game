@@ -10,16 +10,21 @@
 :root{--accent:#f0eae2} 
 *{box-sizing:border-box}
 #mapStageBackground {
-  position: absolute;      /* يبقى داخل البطاقة */
-  inset: 0;                /* يغطي كامل مساحة البطاقة */
-  width: 100%;
-  height: 100%;
+  position: fixed;       /* بدل absolute */
+  top: 0;
+  left: 0;
+  width: 100vw;          /* يغطي كامل العرض */
+  height: 100vh;         /* يغطي كامل الارتفاع */
   background-size: cover;
   background-position: center;
-  background-repeat: no-repeat;
-  opacity: 0.35;
-  pointer-events: none;
   z-index: 0;
+  pointer-events: none;
+  opacity: 0.35;
+}
+ 
+#map .card, #map h1, #map #mapGrid, #map button {
+  position: relative; /* لضمان ظهور المحتوى فوق الخلفية */
+  z-index: 1;
 }
 /* ===== BODY & BACKGROUND ===== */
 
@@ -496,6 +501,7 @@ max-height:260px;    /* لا تتجاوز 40% من ارتفاع البطاقة *
 </head>
 
 <body>
+<div id="mapBackground"></div>
 <div class="card">
 <div id="menu" class="section active">
  <h1>ⵣلعبة الكلمات و الألغاز الأمازيغيةⵣ</h1>
