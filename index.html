@@ -180,6 +180,38 @@ body::before {
   z-index: 10;
 aspect-ratio: 9 / 16;
 }
+.card {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  
+  width: 96%;
+  max-width: 560px;
+  
+  min-height: 75vh;   /* ⬅️ هذا هو المفتاح: طول إضافي */
+  max-height: 90vh;   /* ⬅️ لا تلمس حواف الشاشة */
+  
+  padding: 22px;
+  border-radius: 26px;
+  background: linear-gradient(to bottom, #0000ff, #008000, #ffff00);
+  
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;    /* ← إذا كان المحتوى طويل، يمكن التمرير */
+  overflow-x: hidden;
+
+  z-index: 10;
+  aspect-ratio: 9 / 16;
+}
+
+#questionImg {
+  width: 100%;          /* تغطي كامل عرض البطاقة */
+  max-height: 40%;      /* لا تتجاوز 40% من ارتفاع البطاقة */
+  object-fit: contain;   /* تحافظ على نسبة العرض إلى الارتفاع */
+  border-radius: 16px;   /* حواف ناعمة */
+  margin-bottom: 12px;   /* مسافة أسفل الصورة قبل المحتوى التالي */
+}
 .stage-key {
   position: relative;        /* ضروري للقفل */
   flex: 0 0 200px;
