@@ -1,5 +1,5 @@
 {
-  "background_color": "#65e4e5",
+  "background_color": "#49edef",
   "dir": "auto",
   "display": "standalone",
   "name": "Amazighwordgame",
@@ -7,18 +7,8 @@
   "scope": "https://azdin/Amazigh_word_game/",
   "short_name": "AMWG",
   "start_url": "https://mimonbohoti-star.github.io/Amazigh_word_game/",
-  "theme_color": "#7eef9b",
-  "id": "/Amazigh_word_game/",
-  "description": "لعبة تعليمية للغة الأمازيغية",
-  "lang": "en",
-  "display_override": [
-    "window-controls-overlay",
-    "browser",
-    "standalone",
-    "fullscreen",
-    "minimal-ui"
-  ],
-  "iarc_rating_id": "1",
+  "theme_color": "#18fbae",
+  "iarc_rating_id": "/Amazigh_word_game/",
   "prefer_related_applications": false,
   "related_applications": [
     {
@@ -39,5 +29,15 @@
   ],
   "edge_side_panel": {
     "preferred_width": 1
-  }
+  },
+  "lang": "en",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "browser",
+    "fullscreen",
+    "minimal-ui"
+  ],
+  "id": "/Amazigh_word_game/",
+  "description": "لعبة تعليمية للغة ألأمأزيغية"
 }
