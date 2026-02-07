@@ -1,43 +1,14 @@
 {
-  "background_color": "#49edef",
-  "dir": "auto",
-  "display": "standalone",
   "name": "Amazighwordgame",
-  "orientation": "portrait",
-  "scope": "https://azdin/Amazigh_word_game/",
   "short_name": "AMWG",
   "start_url": "https://mimonbohoti-star.github.io/Amazigh_word_game/",
+  "scope": "https://mimonbohoti-star.github.io/Amazigh_word_game/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#49edef",
   "theme_color": "#18fbae",
-  "iarc_rating_id": "/Amazigh_word_game/",
-  "prefer_related_applications": false,
-  "related_applications": [
-    {
-      "platform": "play",
-      "url": "https://mimonbohoti-star.github.io/Amazigh_word_game/",
-      "id": "/Amazigh_word_game/"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "AMWG",
-      "url": "https://azdin/Amazigh_word_game/",
-      "description": "لعبة الكلمات الأمازيغية"
-    }
-  ],
-  "categories": [
-    "games"
-  ],
-  "edge_side_panel": {
-    "preferred_width": 1
-  },
-  "lang": "en",
-  "display_override": [
-    "window-controls-overlay",
-    "standalone",
-    "browser",
-    "fullscreen",
-    "minimal-ui"
-  ],
-  "id": "/Amazigh_word_game/",
-  "description": "لعبة تعليمية للغة ألأمأزيغية"
+  "description": "لعبة الكلمات الأمازيغية",
+  "lang": "ar",
+  "dir": "rtl",
+  "categories": ["games"]
 }
