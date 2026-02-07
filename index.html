@@ -151,10 +151,12 @@ body::before {
   left: 50%;
   transform: translate(-50%, -50%);
 
-  width: 90%;           /* بدل 96% */
-  max-width: 560px;     /* يظل الحد الأقصى */
-  height: 80vh;         /* بدل 88vh لتقليل الفروقات */
-  max-height: 90vh;     /* الحد الأقصى للارتفاع */
+  width: 90%;
+  max-width: 560px;
+
+  height: auto;          /* بدل height: 80vh; */
+  min-height: 50vh;      /* أقل ارتفاع ممكن */
+  max-height: 90vh;      /* لا يتجاوز 90% من الشاشة */
 
   padding: 22px;
   border-radius: 26px;
@@ -162,7 +164,8 @@ body::before {
 
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
+
+  overflow-y: auto;      /* يسمح بالتمرير داخل البطاقة فقط */
   overflow-x: hidden;
 
   z-index: 10;
