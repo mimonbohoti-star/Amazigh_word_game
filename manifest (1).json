@@ -1,0 +1,24 @@
+{
+  "background_color": "#0cfa7b",
+  "dir": "auto",
+  "display": "standalone",
+  "name": "mimonbohoti-star.github",
+  "orientation": "portrait",
+  "scope": "/Amazigh_word_game/",
+  "short_name": "mimonbohoti-star.github",
+  "start_url": "/https://mimonbohoti-star.github.io/Amazigh_word",
+  "theme_color": "#9586fb",
+  "id": "com.mimonbohoti.amazighwordgame",
+  "description": "لعبة ترفيهية تعليمية حول اللغة و الثقافة الأمازيغية",
+  "lang": "en",
+  "display_override": [
+    "standalone",
+    "minimal-ui",
+    "browser",
+    "fullscreen",
+    "window-controls-overlay"
+  ],
+  "categories": [
+    "games"
+  ]
+}
