@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -502,6 +504,17 @@ max-height:260px;    /* لا تتجاوز 40% من ارتفاع البطاقة *
  z-index: -1; /* تحت البطاقة وكل العناصر */
   pointer-events: none; /* لا تتداخل مع أي عناصر */
   opacity: 0.4; /* يمكن تعديل الشفافية حسب الرغبة */
+}
+body {
+  overscroll-behavior: none;
+}
+
+.card {
+  touch-action: pan-y;
+}
+
+.keyboard, .wheel {
+  touch-action: none;
 }
 </style>
 </head>
