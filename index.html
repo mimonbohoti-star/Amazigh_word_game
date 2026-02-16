@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -30,7 +28,7 @@
   position: relative; /* لضمان ظهور المحتوى فوق الخلفية */
   z-index: 1;
 }
-/* ===== BODY & BACKGROUND ===== */
+/*===== BODY & BACKGROUND ===== */
 
 body {
   margin: 0;
@@ -147,6 +145,7 @@ body::before {
   100% { transform: translate(-50%, -50%); }
 }
 
+/* ===== البطاقة العامة ===== */
 .card {
   position: fixed;
   top: 50%;
@@ -173,31 +172,64 @@ body::before {
   z-index: 10;
 }
 
+/* ===== صورة السؤال داخل البطاقة ===== */
 #questionImg {
   width: 100%;          /* تغطي كامل عرض البطاقة */
-  height:auto;
-max-height:260px;    /* لا تتجاوز 40% من ارتفاع البطاقة */
+  height: auto;
+  max-height: 260px;    /* لا تتجاوز 40% من ارتفاع البطاقة */
   object-fit: contain;   /* تحافظ على نسبة العرض إلى الارتفاع */
   border-radius: 16px;   /* حواف ناعمة */
   margin-bottom: 12px;   /* مسافة أسفل الصورة قبل المحتوى التالي */
 }
+
+/* ===== بطاقات المراحل ===== */
 .stage-key {
   position: relative;        /* ضروري للقفل */
   flex: 0 0 200px;
-  min-width: 150px;
-  height: 250px;
-  background: #1e293b;
-  color: #fff;
-  border-radius: 14px;
+  min-width: 250px;
+  height: 350px;
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start; /* الشبكة أعلى البطاقة */
+  padding: 6px;
+
+  border-radius: 14px;
+  background: #1e293b;
+  color: #fff;
   font-weight: bold;
   cursor: pointer;
   scroll-snap-align: start;
 }
 
+/* ===== الشبكة داخل البطاقة ===== */
+
+/* ------------------ تحديث .stage-grid ------------------ */
+/* ضع هذا مكان أي تعريف سابق لـ .stage-grid */
+.stage-grid {
+  display: grid;
+  gap: 2px;
+
+  width: 90%;          /* الشبكة تغطي 90% من عرض البطاقة */
+  max-width: 220px;    /* الحد الأقصى للشبكة */
+  margin: 6px auto;    /* توسيط الشبكة داخل البطاقة */
+  grid-auto-rows: minmax(20px, 1fr); /* ارتفاع الخانات يتكيف */
+}
+
+/* ------------------ تحديث .stage-grid .cell ------------------ */
+/* ضع هذا مكان أي تعريف سابق لـ .stage-grid .cell */
+.stage-grid .cell {
+  background: #334155;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: clamp(10px, 2vw, 16px); /* يتكيف مع حجم البطاقة */
+  width: 100%;
+  height: 100%;
+}
 .stage-key.locked {
   opacity: .35;
   pointer-events: none;
@@ -404,10 +436,12 @@ max-height:260px;    /* لا تتجاوز 40% من ارتفاع البطاقة *
 }
 .wheel .key{
  width:52px;height:52px;border-radius:50%;
- background:var(--accent);color:#000;
+ background: var(--accent);
+ color:#000;
  position:absolute;display:flex;align-items:center;justify-content:center;
  transition:all .3s ease, transform .2s ease;
 }
+
 .wheel .key:hover{
  transform:scale(1.2);
  box-shadow:0 6px 15px rgba(0,0,0,0.4);
@@ -505,16 +539,54 @@ max-height:260px;    /* لا تتجاوز 40% من ارتفاع البطاقة *
   pointer-events: none; /* لا تتداخل مع أي عناصر */
   opacity: 0.4; /* يمكن تعديل الشفافية حسب الرغبة */
 }
-body {
-  overscroll-behavior: none;
+.stage-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 مربعات لكل صف */
+  grid-template-rows: repeat(2, 1fr);    /* 2 صفوف */
+  gap: 4px;                              /* المسافة بين المربعات */
+  width: 100%;
+  height: 60%;                            /* ارتفاع الشبكة داخل العمود */
+  margin-bottom: 6px;
 }
 
-.card {
-  touch-action: pan-y;
+.stage-grid .cell {
+  background: #334155;
+  border-radius: 4px;
+  border: 1px solid #1e293b;
+}
+/* ===== STAGE GRID IMPROVEMENT ===== */
+.stage-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); /* عمود ديناميكي حسب حجم الشاشة */
+  grid-auto-rows: 80px; /* ارتفاع كل خلية */
+  gap: 6px; /* المسافة بين الخلايا */
+  width: 100%;
+  max-width: 400px; /* الحد الأقصى للعرض داخل البطاقة */
+  margin: 0 auto 12px auto; /* توسيط الشبكة داخل البطاقة */
 }
 
-.keyboard, .wheel {
-  touch-action: none;
+.stage-grid .cell {
+  background: #1e293b; /* لون الخلية */
+  border-radius: 6px;
+  border: 1px solid #334155;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 22px;
+  color: #fff;
+}
+.stage-grid{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.cell{
+  background: #eee;
+  border: 2px solid #999;
+  height: 60px;
 }
 </style>
 </head>
@@ -541,7 +613,6 @@ body {
  <span id="vibeLabel">📳 الاهتزاز</span>
   <div id="vibeToggle" class="toggle"></div>
 </div>
-
 <div class="setting-item">
   <span>🌍 اللغة</span>
   <select onchange="setLang(this.value)">
@@ -559,11 +630,12 @@ body {
   <div id="mapGrid"></div>
   <button class="btn btn-back" onclick="show('menu')">←</button>
 </div>
-
 <div id="game" class="section">
+
 <div id="stageBackground"></div>
  <h1 id="levelTitle"></h1>
 <img id="questionImg" src="path/to/your/image.jpg" alt="السؤال">
+
 <div id="questionText" class="question-text"></div>
  <!-- صناديق الإجابة -->
  <div class="answer-boxes" id="boxes"></div>
@@ -631,427 +703,378 @@ This Amazigh words and puzzles game aims to test your knowledge and enrich your 
 ⵣ ⵣنسخة تجريبية من إعداد عزالدين البحوتي – مسابقة رأس السنة ⵣ
     </p>
 
-    <button onclick="closeHowTo()">إغلاق</button>
+    <button 
+onclick="closeHowTo()">إغلاق</button>
   </div>
-</div>
 <script>
-function openHowTo(){
-  document.getElementById("howToBox").style.display = "flex";
-}
+/* ===== فتح وغلق How To ===== */
+function openHowTo(){ document.getElementById("howToBox").style.display="flex"; }
+function closeHowTo(){ document.getElementById("howToBox").style.display="none"; }
 
-function closeHowTo(){
-  document.getElementById("howToBox").style.display = "none";
-}
+/* ===== المتغيرات العامة ===== */
 let stars = JSON.parse(localStorage.getItem("amazighStars") || "[]");
 const boxes = document.getElementById("boxes");
 const keyboard = document.getElementById("keyboard");
 const wheel = document.getElementById("wheel");
 const mapGrid = document.getElementById("mapGrid");
+
+function createStageGridForCard(stageIndex) {
+  const stageCard = mapGrid.children[stageIndex];
+  if (!stageCard) return;
+
+  let oldGrid = stageCard.querySelector('.stage-grid');
+  if (oldGrid) oldGrid.remove();
+
+  const stageData = stages[stageIndex];
+  const layout = stageData.layout || [];
+
+  const grid = document.createElement('div');
+  grid.className = 'stage-grid';
+  stageCard.appendChild(grid);
+
+  /* حساب الحجم الحقيقي للشبكة */
+  const cols = Math.max(...layout.map(l => l.col + (l.dir === "horizontal" ? l.length : 1)));
+  const rows = Math.max(...layout.map(l => l.row + (l.dir === "vertical" ? l.length : 1)));
+
+  grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+
+  /* إنشاء الخلايا في أماكنها الصحيحة */
+  layout.forEach((l) => {
+    for (let i = 0; i < l.length; i++) {
+
+      const cell = document.createElement('div');
+      cell.className = 'cell column-cell';
+      cell.dataset.q = l.q;
+      cell.dataset.pos = i;
+
+      if (l.dir === "vertical") {
+        cell.style.gridColumn = l.col + 1;
+        cell.style.gridRow = l.row + i + 1;
+      } else {
+        cell.style.gridColumn = l.col + i + 1;
+        cell.style.gridRow = l.row + 1;
+      }
+
+      grid.appendChild(cell);
+    }
+  });
+
+  /* تفعيل النقر على العمود */
+  layout.forEach(l => {
+    const cells = grid.querySelectorAll(`.cell[data-q='${l.q}']`);
+    cells.forEach(cell => {
+      cell.addEventListener("click", () => startStage(stageIndex, l.q));
+    });
+  });
+}
+
 const levelTitle = document.getElementById("levelTitle");
 const questionImg = document.getElementById("questionImg");
 const questionText = document.getElementById("questionText");
-/* ===== LANGUAGE ===== */
-let currentLang = localStorage.getItem("lang") || "ar";
 
+let currentLang = localStorage.getItem("lang") || "ar";
+let stage = 0, q = 0, input = [], drag = false;
+let hintsLeft = 3, hintsUsed = 0;
+let unlocked = +localStorage.getItem("amazighUnlocked") || 0;
+
+/* ===== SETTINGS ===== */
+let soundOn = localStorage.getItem("soundOn") !== "0";
+let vibeOn = localStorage.getItem("vibeOn") !== "0";
+const soundToggle = document.getElementById("soundToggle");
+const vibeToggle = document.getElementById("vibeToggle");
+
+function syncToggles(){
+  soundToggle.classList.toggle("on", soundOn);
+  vibeToggle.classList.toggle("on", vibeOn);
+}
+soundToggle.onclick = () => { soundOn = !soundOn; localStorage.setItem("soundOn", soundOn?1:0); syncToggles(); };
+vibeToggle.onclick = () => { vibeOn = !vibeOn; localStorage.setItem("vibeOn", vibeOn?1:0); syncToggles(); };
+syncToggles();
+
+/* ===== صوت وإهتزاز (clap) ===== */
+let ctx;
+function clap(){
+  if(!soundOn) return;
+  if(!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+  for(let i=0; i<6; i++){
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type="square"; o.frequency.value = 200 + Math.random()*400;
+    g.gain.setValueAtTime(.5, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.01, ctx.currentTime+.15);
+    o.connect(g).connect(ctx.destination);
+    o.start(); o.stop(ctx.currentTime+.15);
+  }
+  if(vibeOn && navigator.vibrate) navigator.vibrate([80,40,80]);
+}
+
+/* ===== SHOW/HIDE SECTIONS ===== */
+function show(id){
+  document.querySelectorAll(".section").forEach(s => { s.classList.remove("active"); s.style.display="none"; });
+  document.body.offsetHeight;
+  document.getElementById("mapBackground").style.display = (id==="map")?"block":"none";
+  const el = document.getElementById(id);
+  el.style.display="block";
+  requestAnimationFrame(()=>el.classList.add("active"));
+}
+
+/* ===== تغيير اللغة ===== */
 function setLang(l){
   currentLang = l;
   localStorage.setItem("lang", l);
   applyLang();
 }
+const translations = {
+  ar:{title:"ⵣلعبة الكلمات و الألغاز الأمازيغيةⵣ",start:"▶️ بدء",settings:"⚙️ الإعدادات",settingsBtn:"🔧 الإعدادات",howToBtn:"ℹ كيفية اللعب",langLabel:"🌍 اللغة",stage:"مرحلة",stagesTitle:"⭐ المراحل",level:"المرحلة",question:"سؤال",back:"⬅️ رجوع",hint:"💡 تلميح",win:"🔥 أحسنت 🔥",final:"🏆 مبروك! 🏆",sound:"🔊 الصوت",vibe:"📳 الاهتزاز"},
+  en:{title:"ⵣ Amazigh Word Game ⵣ",start:"▶️ Start",settings:"⚙️ Settings",settingsBtn:"🔧 Settings",howToBtn:"ℹ How to Play",langLabel:"🌍 Language",stage:"Stage",stagesTitle:"⭐ Stages",level:"Stage",question:"Question",back:"⬅️ Back",hint:"💡 Hint",win:"🔥 Well done 🔥",final:"🏆 Congratulations! 🏆",sound:"🔊 Sound",vibe:"📳 Vibration"},
+  am:{title:"ⵣ ⵜⴰⵎⴰⵣⵉⵖⵜ ⵣ",start:"▶️ ⴱⴷⴰ",settings:"⚙️ ⵜⵉⵙⵎⵉⵍⵉⵏ",settingsBtn:"🔧 ⵜⵉⵙⵎⵉⵍⵉⵏ",howToBtn:"ℹ ⵜⴰⵙⴽⴰⵡⵜ",langLabel:"🌍 ⵜⵉⵙⴽⵍⵓⵏ",stage:"ⵖⴰⵔⴰ",stagesTitle:"⭐ ⵉⵖⴰⵔⴰⵏ",level:"ⵖⴰⵔⴰ",question:"ⵜⵉⵙⴽⴰ",back:"⬅️ ⵔⵔⴰⵊⵓ",hint:"💡 ⵜⴰⵙⴽⴰ",win:"🔥 ⴰⵢⵢⵓⵣ 🔥",final:"🏆 ⴰⵢⵢⵓⵣ! 🏆",sound:"🔊 ⴰⵙⵙⵓⵏ",vibe:"📳 ⴰⵏⵣⵣⵓⵣ"}
+};
 function applyLang(){
   const t = translations[currentLang];
+  document.querySelector("#menu h1").textContent = t.title;
+  document.querySelector("#settings h1").textContent = t.settings;
+  document.querySelector(".btn-main").textContent = t.start;
+  document.querySelector("button[onclick=\"show('settings')\"]").textContent = t.settingsBtn;
+  document.getElementById("soundLabel").textContent = t.sound;
+  document.getElementById("vibeLabel").textContent = t.vibe;
+  document.querySelector(".secondary-btn").textContent = t.howToBtn;
+  document.querySelector("#settings select")?.previousElementSibling && 
+    (document.querySelector("#settings select").previousElementSibling.textContent = t.langLabel);
+  document.querySelector("#map h1").textContent = t.stagesTitle;
+  document.querySelectorAll('[data-action="back"]').forEach(btn => btn.textContent = t.back);
+  document.querySelector("#overlay h2").textContent = t.win;
+  document.querySelector("#stageOverlay h2").textContent = t.win;
+  document.querySelector("#finalOverlay h2").textContent = t.final;
+  document.querySelector("#finalOverlay button") && 
+    (document.querySelector("#finalOverlay button").textContent = t.start);
+  document.body.dir = (currentLang==="ar")?"rtl":"ltr";
+}
+applyLang();
 
-  /* ===== العناوين الرئيسية ===== */
-  const menuTitle = document.querySelector("#menu h1");
-  if(menuTitle) menuTitle.textContent = t.title;
+/* ===== RENDER MAP BUTTONS ===== */
+function openMap() {
+  mapGrid.innerHTML = "";
 
-  const settingsTitle = document.querySelector("#settings h1");
-  if(settingsTitle) settingsTitle.textContent = t.settings;
+  stages.forEach((stageData, i) => {
+    const d = document.createElement("div");
+    d.className = "stage-key" + (i > unlocked ? " locked" : "");
 
-  /* ===== أزرار القائمة ===== */
-  const startBtn = document.querySelector(".btn-main");
-  if(startBtn) startBtn.textContent = t.start;
+    // عنوان المرحلة والنجوم
+    const s = stars[i] || 0;
+    d.innerHTML = `
+      <div style="text-align:center;margin-top:4px">${translations[currentLang].stage} ${i+1}</div>
+      <div style="font-size:16px;text-align:center">${"⭐".repeat(s)}${"☆".repeat(3-s)}</div>
+    `;
 
-  const settingsBtn = document.querySelector("button[onclick=\"show('settings')\"]");
-  if(settingsBtn) settingsBtn.textContent = t.settingsBtn;
-const soundLabel = document.getElementById("soundLabel");
-if(soundLabel) soundLabel.textContent = t.sound;
+    mapGrid.appendChild(d);
 
-const vibeLabel = document.getElementById("vibeLabel");
-if(vibeLabel) vibeLabel.textContent = t.vibe;
-  const howToBtn = document.querySelector(".secondary-btn");
-  if(howToBtn) howToBtn.textContent = t.howToBtn;
-
-  /* ===== اختيار اللغة ===== */
-  const langLabel = document.querySelector("#settings select")?.previousElementSibling;
-  if(langLabel) langLabel.textContent = t.langLabel;
-
-  /* ===== ⭐ عنوان خريطة المراحل ===== */
-  const mapTitle = document.querySelector("#map h1");
-  if(mapTitle) mapTitle.textContent = t.stagesTitle;
-
-  /* ===== تحديث أزرار المراحل ===== */
-  if(typeof mapGrid !== "undefined" && mapGrid){
-    const keys = mapGrid.querySelectorAll(".key, .stage-key");
-    keys.forEach((key,i)=>{
-      const stageDiv = key.querySelector("div:first-child");
-      if(stageDiv) stageDiv.textContent = `${t.stage} ${i+1}`;
-    });
-  }
-
-  /* ===== ⬅️ جميع أزرار الرجوع ===== */
-  document.querySelectorAll('[data-action="back"]').forEach(btn=>{
-    btn.textContent = t.back;
+    // إنشاء شبكة الأعمدة داخل البطاقة
+    createStageGridForCard(i);
   });
 
-  /* ===== overlays ===== */
-  const winTitle = document.querySelector("#overlay h2");
-  if(winTitle) winTitle.textContent = t.win;
-
-  const stageOverlayTitle = document.querySelector("#stageOverlay h2");
-  if(stageOverlayTitle) stageOverlayTitle.textContent = t.stageEnd || t.win;
-
-  const finalTitle = document.querySelector("#finalOverlay h2");
-  if(finalTitle) finalTitle.textContent = t.final;
-
-  const finalBtn = document.querySelector("#finalOverlay button");
-  if(finalBtn && t.finalMenu) finalBtn.textContent = t.finalMenu;
-
-  /* ===== نص السؤال (إن وجد) ===== */
-  if(typeof questionText !== "undefined" && questionText){
-    questionText.textContent = t.question || "";
-  }
-  /* ===== ⚡ ضبط اتجاه الصفحة بحسب اللغة ===== */
-  if(currentLang === "ar"){
-    document.body.dir = "rtl";
-  } else {
-    document.body.dir = "ltr";
-  }
+  show("map");
 }
-const translations = {
-  ar: {
-    title: "ⵣلعبة الكلمات و الألغاز الأمازيغيةⵣ",
-    start: "▶️ بدء",
-    settings: "⚙️ الإعدادات",
-    settingsBtn: "🔧 الإعدادات",
-    howToBtn: "ℹ كيفية اللعب",
-    langLabel: "🌍 اللغة",
 
-    stage: "مرحلة",
-    stagesTitle: "⭐ المراحل",
-    level: "المرحلة",
-    question: "سؤال",
-
-    back: "⬅️ رجوع",
-    hint: "💡 تلميح",
-
-    win: "🔥 أحسنت 🔥",
-    final: "🏆 مبروك! 🏆",
-
-    sound: "🔊 الصوت",
-    vibe: "📳 الاهتزاز",
-  },
-
-  en: {
-    title: "ⵣ Amazigh Word Game ⵣ",
-    start: "▶️ Start",
-    settings: "⚙️ Settings",
-    settingsBtn: "🔧 Settings",
-    howToBtn: "ℹ How to Play",
-    langLabel: "🌍 Language",
-
-    stage: "Stage",
-    stagesTitle: "⭐ Stages",
-    level: "Stage",
-    question: "Question",
-
-    back: "⬅️ Back",
-    hint: "💡 Hint",
-
-    win: "🔥 Well done 🔥",
-    final: "🏆 Congratulations! 🏆",
-
-    sound: "🔊 Sound",
-    vibe: "📳 Vibration",
-  },
-
-  am: {
-    title: "ⵣ ⵜⴰⵎⴰⵣⵉⵖⵜ ⵣ",
-    start: "▶️ ⴱⴷⴰ",
-    settings: "⚙️ ⵜⵉⵙⵎⵉⵍⵉⵏ",
-    settingsBtn: "🔧 ⵜⵉⵙⵎⵉⵍⵉⵏ",
-    howToBtn: "ℹ ⵜⴰⵙⴽⴰⵡⵜ",
-    langLabel: "🌍 ⵜⵉⵙⴽⵍⵓⵏ",
-
-    stage: "ⵖⴰⵔⴰ",
-    stagesTitle: "⭐ ⵉⵖⴰⵔⴰⵏ",
-    level: "ⵖⴰⵔⴰ",
-    question: "ⵜⵉⵙⴽⴰ",
-
-    back: "⬅️ ⵔⵔⴰⵊⵓ",
-    hint: "💡 ⵜⴰⵙⴽⴰ",
-
-    win: "🔥 ⴰⵢⵢⵓⵣ 🔥",
-    final: "🏆 ⴰⵢⵢⵓⵣ! 🏆",
-
-    sound: "🔊 ⴰⵙⵙⵓⵏ",
-    vibe: "📳 ⴰⵏⵣⵣⵓⵣ",
-  }
-};
-
-const overlay = document.getElementById("overlay");
-const stageOverlay = document.getElementById("stageOverlay");
-const finalOverlay = document.getElementById("finalOverlay");
-const starsView = document.getElementById("starsView");
-const nextStageBtn = document.getElementById("nextStageBtn");
-const hintBtn   = document.getElementById("hintBtn");
-const hintCount = document.getElementById("hintCount");
-/* ===== هنا نزيد المتغيرات العالمية ===== */
-let stage = 0, q = 0, input = [], drag = false;
-let hintsLeft = 3, hintsUsed = 0;  // ✅ هنا فقط
-/* ===== SETTINGS ===== */
-let soundOn = localStorage.getItem("soundOn") !== "0";
-let vibeOn  = localStorage.getItem("vibeOn")  !== "0";
-
-/* 🔊 صوت التصفيق */
-const applauseSound = new Audio("applause.mp3");
-
-const soundToggle = document.getElementById("soundToggle");
-const vibeToggle  = document.getElementById("vibeToggle");
-
-function syncToggles(){
- soundToggle.classList.toggle("on",soundOn);
- vibeToggle.classList.toggle("on",vibeOn);
+/* ===== START STAGE ===== */
+function startStage(stageIndex, questionIndex=0){
+  stage = stageIndex;
+  q = questionIndex;
+  hintsLeft = 3;
+  startQuestion();
+  show("game");
 }
-soundToggle.onclick=()=>{
- soundOn=!soundOn;
- localStorage.setItem("soundOn",soundOn?1:0);
- syncToggles();
-};
-vibeToggle.onclick=()=>{
- vibeOn=!vibeOn;
- localStorage.setItem("vibeOn",vibeOn?1:0);
- syncToggles();
-};
-syncToggles();
 
-/* ===== SOUND (synthetic clap) ===== */
-let ctx;
-function clap(){
- if(!soundOn) return;
- if(!ctx) ctx=new (window.AudioContext||window.webkitAudioContext)();
- for(let i=0;i<6;i++){
-  const o=ctx.createOscillator(),g=ctx.createGain();
-  o.type="square"; o.frequency.value=200+Math.random()*400;
-  g.gain.setValueAtTime(.5,ctx.currentTime);
-  g.gain.exponentialRampToValueAtTime(.01,ctx.currentTime+.15);
-  o.connect(g).connect(ctx.destination);
-  o.start(); o.stop(ctx.currentTime+.15);
- }
- if(vibeOn && navigator.vibrate) navigator.vibrate([80,40,80]);
+function updateStageGrid(stageIndex, questionIndex, answerArr) {
+  const stageCard = mapGrid.children[stageIndex];
+  if (!stageCard) return;
+
+  const grid = stageCard.querySelector('.stage-grid');
+  if (!grid) return;
+
+  const cells = Array.from(
+    grid.querySelectorAll(`.cell[data-q='${questionIndex}']`)
+  );
+
+  cells.forEach((cell, i) => {
+    cell.textContent = answerArr[i] || "";
+  });
 }
-/* ===== DATA (10 مراحل × 3 أسئلة) ===== */
+/* ===== DATA: المراحل والأسئلة ===== */
 const stages = [
+  // المرحلة 1
+  {
+    name:"المرحلة 1",
+    grid:{cols:6, rows:6},
+    layout:[
+      {q:0, col:0, row:0, dir:"vertical", length:5},  // كلمة 1
+      {q:1, col:2, row:0, dir:"horizontal", length:4}, // كلمة 2
+      {q:2, col:1, row:2, dir:"vertical", length:4},  // كلمة 3
+      {q:3, col:3, row:1, dir:"horizontal", length:3}, // كلمة 4
+      {q:4, col:0, row:5, dir:"horizontal", length:5}  // كلمة 5
+    ],
+    qs:[
+      {a:"ⵜⴰⵎⵓⵔⵜ", shape:"grid", img:null, text:{ar:"تعني الأرض",en:"Means land",am:"ⵜⴰⵎⵓⵔⵜ"}},
+      {a:"ⴰⵛⴰⵍ", shape:"grid", img:null, text:{ar:"كل ما هو تراب",en:"Everything soil",am:"ⴰⵛⴰⵍ"}},
+      {a:"ⴰⴷⵔⴰⵔ", shape:"grid", img:null, text:{ar:"جبل",en:"Mountain",am:"ⴰⴷⵔⴰⵔ"}},
+      {a:"ⴰⵣⵣ", shape:"grid", img:null, text:{ar:"زهرة",en:"Flower",am:"ⴰⵣⵣ"}},
+      {a:"ⴰⵎⵍⵍⴰⵙ", shape:"grid", img:null, text:{ar:"نهر صغير",en:"Small river",am:"ⴰⵎⵍⵍⴰⵙ"}}
+    ]
+  },
 
-  {qs:[
-    {a:"ⵜⴰⵎⵓⵔⵜ", shape:"grid", img:null, text:{
-      ar:"تعني الأرض أو الوطن",
-      en:"Means land or homeland",
-      am:"ⵜⴰⵎⵓⵔⵜ"
-    }},
-    {a:"ⴰⵛⴰⵍ", shape:"grid", img:null, text:{
-      ar:"كل ما هو تراب وطبيعة",
-      en:"Everything that is soil and nature",
-      am:"ⴰⵛⴰⵍ"
-    }},
-    {a:"ⵜⴰⴼⵓⵛⵜ", shape:"circle", img:"thafucth.jpg"}
-  ]},
-
-  {qs:[
-    {a:"ⴰⴷⵔⴰⵔ", shape:"circle", img:"mountain.jpg"},
-    {a:"ⴰⵙⵉⴼ", shape:"grid", img:"river.jpg"},
-    {a:"ⴱⴻⵏⵏⴰⵄⵎⴰⵏ", shape:"grid", img:"flower.jpg"}
-  ]},
-
-  {qs:[
-    {a:"ⴷⵊⴰⵡⵣ", shape:"circle", img:"flowers.jpg"},
-    {a:"ⴰⵎⴰⵏ", shape:"hexagon", img:null, text:{
-      ar:"ماء",
-      en:"Water",
-      am:"ⴰⵎⴰⵏ"
-    }},
-    {a:"ⵉⵎⴰⵏⴷⵉ", shape:"grid", img:null, text:{
-      ar:"أساسي في التغذية",
-      en:"Essential for nutrition",
-      am:"ⵉⵎⴰⵏⴷⵉ"
-    }}
-  ]},
-
-  {qs:[
-    {a:"ⵔⴰⴱⵙⴰⵔ", shape:"circle", img:null, text:{
-      ar:"طعام",
-      en:"Food",
-      am:"ⵔⴰⴱⵙⴰⵔ"
-    }},
-    {a:"ⵜⴰⵣⵉⵔⵉ", shape:"hexagon", img:"thaziri.jpg"},
-    {a:"ⴰⵢⵢⵓⵔ", shape:"grid", img:"ayur.jpg"}
-  ]},
-
-  {qs:[
-    {a:"ⵉⵜⵔⴰⵏ", shape:"circle", img:"stars.jpg"},
-    {a:"ⵜⴰⵎⴰⵣⵖⴰ", shape:"hexagon", img:"tamazgha.jpg"},
-    {a:"ⴰⵔⴰⴱⵓⵣ", shape:"grid", img:"araboz.jpg"}
-  ]},
-
-  {qs:[
-    {a:"ⵜⵓⵜⴻⵍⵍⴰⵢⵜ", shape:"grid", img:null, text:{
-      ar:"كل ما هو مرتبط بالكلام",
-      en:"Everything related to speech",
-      am:"ⵜⵓⵜⴻⵍⵍⴰⵢⵜ"
-    }},
-    {a:"ⵜⴰⵎⵎⵓⵔⵜ", shape:"hexagon", img:"riddle2.jpg"},
-    {a:"ⴰⵎⴰⵣⵉⵖ", shape:"circle", img:"riddle3.jpg"}
-  ]},
-
-  {qs:[
-    {a:"ⵜⴰⵔⵉⴼⴰⵛⵜ", shape:"grid", img:null, text:{
-      ar:"من فروع اللغة الأمازيغية",
-      en:"A branch of Amazigh language",
-      am:"ⵜⴰⵔⵉⴼⴰⵛⵜ"
-    }},
-    {a:"ⴰⵎⴰⵣⵉⵖ", shape:"hexagon", img:null, text:{
-      ar:"اسم الشعب الحر",
-      en:"Name of the free people",
-      am:"ⴰⵎⴰⵣⵉⵖ"
-    }},
-    {a:"ⴰⵣⵓⵍ", shape:"circle", img:null, text:{
-      ar:"التحية بالأمازيغية",
-      en:"Greeting in Amazigh",
-      am:"ⴰⵣⵓⵍ"
-    }}
-  ]},
-
-  {qs:[
-    {a:"ⴰⵢⵓⵔ", shape:"hexagon", img:"moon.jpg"},
-    {a:"iṭran", shape:"circle", img:"stars.jpg"},
-    {a:"ⵜⵉⴼⵉⵏⴰⵖ", shape:"grid", img:null, text:{
-      ar:"الكتابة الأمازيغية",
-      en:"Amazigh writing",
-      am:"ⵜⵉⴼⵉⵏⴰⵖ"
-    }}
-  ]},
-
-  {qs:[
-    {a:"ⵎⴰⵙⵉⵏⵉⵙⴰ", shape:"grid", img:null, text:{
-      ar:"ملك أمازيغي وحّد نوميديا وقاوم الرومان",
-      en:"Amazigh king who united Numidia and resisted Romans",
-      am:"ⵎⴰⵙⵉⵏⵉⵙⴰ"
-    }},
-    {a:"ⵢⵓⴳⵓⵔⵜⴰ", shape:"hexagon", img:"jugurtha.jpg"},
-    {a:"ⵜⴰⵎⴰⵣⵉⵖⵜ", shape:"circle", img:null, text:{
-      ar:"اسم اللغة الأمازيغية",
-      en:"Name of Amazigh language",
-      am:"ⵜⴰⵎⴰⵣⵉⵖⵜ"
-    }}
-  ]},
-
-  {qs:[
-    {a:"ⵜⵉⵀⵢⴰ", shape:"circle", img:"dihya.jpg"},
-    {a:"ⵏⵓⵎⵉⴷⵢⴰ", shape:"grid", img:null, text:{
-      ar:"مملكة أمازيغية قديمة في شمال إفريقيا",
-      en:"Ancient Amazigh kingdom in North Africa",
-      am:"ⵏⵓⵎⵉⴷⵢⴰ"
-    }},
-    {a:"ⴰⵣⴰ", shape:"hexagon", img:null, text:{
-      ar:"رمز الحرية عند الأمازيغ",
-      en:"Symbol of freedom among Amazigh",
-      am:"ⴰⵣⴰ"
-    }}
-  ]},
- {qs:[
-    {a:"ⵜⴰⵎⵎⵓⵔⵜ", shape:"grid", img:null, text:{
-      ar:"تعني الأرض أو الوطن",
-      en:"Means land or homeland",
-      am:"ⵜⴰⵎⵎⵓⵔⵜ"
-    }},
-    {a:"ⴰⴽⴰⵍ", shape:"grid", img:null, text:{
-      ar:"كل ما هو تراب وطبيعة",
-      en:"Everything that is soil and nature",
-      am:"ⴰⴽⴰⵍ"
-    }},
-    {a:"ⵜⴰⴼⵓⵢⵜ", shape:"circle", img:"thafucth.jpg"}
-  ]},
- {qs:[
-    {a:"ⵜⴰⵎⵎⵓⵔⵜ", shape:"grid", img:null, text:{
-      ar:"تعني الأرض أو الوطن",
-      en:"Means land or homeland",
-      am:"ⵜⴰⵎⵎⵓⵔⵜ"
-    }},
-    {a:"ⴰⴽⴰⵍ", shape:"grid", img:null, text:{
-      ar:"كل ما هو تراب وطبيعة",
-      en:"Everything that is soil and nature",
-      am:"ⴰⴽⴰⵍ"
-    }},
-    {a:"ⵜⴰⴼⵓⴽⵜ", shape:"circle", img:"thafucth.jpg"}
-  ]},
-{qs:[
-    {a:"ⵜⵉⵀⵢⴰ", shape:"circle", img:"dihya.jpg"},
-    {a:"ⵏⵓⵎⵉⴷⵢⴰ", shape:"grid", img:null, text:{
-      ar:"مملكة أمازيغية قديمة في شمال إفريقيا",
-      en:"Ancient Amazigh kingdom in North Africa",
-      am:"ⵏⵓⵎⵉⴷⵢⴰ"
-    }},
-    {a:"ⴰⵣⴰ", shape:"hexagon", img:null, text:{
-      ar:"رمز الحرية عند الأمازيغ",
-      en:"Symbol of freedom among Amazigh",
-      am:"ⴰⵣⴰ"
-    }}
-  ]},
- {qs:[
-    {a:"ⵜⴰⵎⵎⵓⵔⵜ", shape:"grid", img:null, text:{
-      ar:"تعني الأرض أو الوطن",
-      en:"Means land or homeland",
-      am:"ⵜⴰⵎⵎⵓⵔⵜ"
-    }},
-    {a:"ⴰⴽⴰⵍ", shape:"grid", img:null, text:{
-      ar:"كل ما هو تراب وطبيعة",
-      en:"Everything that is soil and nature",
-      am:"ⴰⴽⴰⵍ"
-    }},
-    {a:"ⵜⴰⴼⵓⵢⵜ", shape:"circle", img:"thafucth.jpg"}
-  ]},
- {qs:[
-    {a:"ⵜⴰⵎⵎⵓⵔⵜ", shape:"grid", img:null, text:{
-      ar:"تعني الأرض أو الوطن",
-      en:"Means land or homeland",
-      am:"ⵜⴰⵎⵎⵓⵔⵜ"
-    }},
-    {a:"ⴰⴽⴰⵍ", shape:"grid", img:null, text:{
-      ar:"كل ما هو تراب وطبيعة",
-      en:"Everything that is soil and nature",
-      am:"ⴰⵛⴰⵍ"
-    }},
-    {a:"ⵜⴰⴼⵓⴽⵜ", shape:"circle", img:"thafucth.jpg"}
-  ]},
-
-{qs:[
-  {a:"ⴰⵢⵜ", shape:"circle", img:"mountain.jpg"},
-  {a:"ⴰⴳⴰⴷⵉⵔ", shape:"grid", img:"river.jpg"},
-  {a:"ⴰⵎⴰⵣⵉⵖ", shape:"grid", img:"flower.jpg"}
-]},
-
-{qs:[
-  {a:"ⵜⴰⴼⵓⴽⵜ", shape:"circle", img:"mountain.jpg"},
-  {a:"ⴰⴷⵍⵉⵙ", shape:"grid", img:"river.jpg"},
-  {a:"ⴰⵏⵙⵉ", shape:"grid", img:"flower.jpg"}
-]},
+  // المرحلة 2
+  {
+    name:"المرحلة 2",
+    grid:{cols:6, rows:6},
+    layout:[
+      {q:0, col:0, row:1, dir:"horizontal", length:5}, // كلمة 1
+      {q:1, col:2, row:0, dir:"vertical", length:4},   // كلمة 2
+      {q:2, col:3, row:2, dir:"horizontal", length:3}, // كلمة 3
+      {q:3, col:1, row:3, dir:"vertical", length:5},   // كلمة 4
+      {q:4, col:4, row:1, dir:"horizontal", length:4}  // كلمة 5
+    ],
+    qs:[
+      {a:"ⴰⵙⵉⴼ", shape:"grid", img:null, text:{ar:"نهر",en:"River",am:"ⴰⵙⵉⴼ"}},
+      {a:"ⴱⴻⵏⵏⴰⵄⵎⴰⵏ", shape:"grid", img:null, text:{ar:"زهرة",en:"Flower",am:"ⴱⴻⵏⵏⴰⵄⵎⴰⵏ"}},
+      {a:"ⴰⵛⴰⵎ", shape:"grid", img:null, text:{ar:"تلة صغيرة",en:"Small hill",am:"ⴰⵛⴰⵎ"}},
+      {a:"ⴰⵎⴰⵣⵉⵖ", shape:"grid", img:null, text:{ar:"أمازيغ",en:"Amazigh",am:"ⴰⵎⴰⵣⵉⵖ"}},
+      {a:"ⵜⴰⵔⴳⴰⵏ", shape:"grid", img:null, text:{ar:"وادي",en:"Valley",am:"ⵜⴰⵔⴳⴰⵏ"}}
+    ]
+  }
 ];
-let unlocked=+localStorage.getItem("amazighUnlocked")||0;
 
-const symbols=["🤗","🤩","👍","👏","👏","ayuuz","ⴰⵢⵢⵓⵣ","🌸","🌺","❤️","💖","💐","ⵣ","ⵉ","ⵜ","ⴰ","🌸","🌺","🌹","🍃","🍃","🌷","🌼","🌻","⚘","🎈","🎈","💵","💶","💸","✔","✅"];
+/* ===== START QUESTION ===== */
+function startQuestion(){
+  const L = stages[stage].qs[q];
+  levelTitle.textContent = stages[stage].name;
+
+  // صورة السؤال
+  if(L.img){ questionImg.src = L.img; questionImg.style.display="block"; }
+  else questionImg.style.display="none";
+
+  // نص السؤال
+  if(L.text && L.text[currentLang]){ questionText.textContent = L.text[currentLang]; questionText.style.display="block"; }
+  else questionText.style.display="none";
+
+  // صناديق الإجابة
+  boxes.innerHTML = ""; input = [];
+  for(let ch of L.a){ const b = document.createElement("div"); b.className = "answer-box"; boxes.appendChild(b); }
+
+  // إنشاء لوحة المفاتيح/العجلة
+  renderBoard(L);
+  hintCount.textContent = hintsLeft;
+}
+
+/* ===== BOARD: KEYBOARD & WHEEL ===== */
+function makeKey(ch){
+  const k = document.createElement("div");
+  k.className="key"; k.textContent=ch; k.dataset.ch=ch;
+  return k;
+}
+
+function pick(el,L){
+  if(el.classList.contains("used") || el.classList.contains("locked")) return;
+  el.classList.add("used");
+  input.push(el);
+  if(vibeOn && navigator.vibrate) navigator.vibrate(20);
+  refresh();
+  if(input.length===L.a.length) check(L);
+}
+
+function removeLast(){
+  if(!input.length) return;
+  const last = input.pop(); if(last) last.classList.remove("used"); refresh();
+}
+
+function renderBoard(L){
+  keyboard.innerHTML=""; wheel.innerHTML="";
+  keyboard.style.display="none"; wheel.style.display="none";
+
+  const letters=[...L.a].sort(()=>Math.random()-.5);
+
+  if(L.shape==="circle"){
+    wheel.style.display="block";
+    const r=110,c=130;
+    letters.forEach((ch,j)=>{
+      const a=2*Math.PI*j/letters.length;
+      const k=makeKey(ch);
+      k.style.left = c+r*Math.cos(a)-26+"px";
+      k.style.top  = c+r*Math.sin(a)-26+"px";
+      wheel.appendChild(k);
+    });
+  } else {
+    keyboard.style.display="grid";
+    keyboard.className=L.shape==="hexagon"?"hexagon":"keyboard";
+    letters.forEach(ch=>{
+      const k=makeKey(ch);
+      k.addEventListener("click",()=>pick(k,L));
+      if(L.shape==="hexagon") k.classList.add("hex-cell");
+      keyboard.appendChild(k);
+    });
+    const del=document.createElement("div"); del.className="delete"; del.textContent="⌫"; del.onclick=removeLast;
+    keyboard.appendChild(del);
+  }
+}
+
+/* ===== DRAG FOR CIRCLE ===== */
+wheel.addEventListener("pointerdown", e=>{
+  const L=stages[stage].qs[q]; if(L.shape!=="circle") return; input=[]; drag=true; dragPick(e,L);
+});
+wheel.addEventListener("pointermove", e=>{ if(!drag) return; const L=stages[stage].qs[q]; dragPick(e,L); });
+document.addEventListener("pointerup", ()=>{
+  if(!drag) return; drag=false;
+  const L=stages[stage].qs[q];
+  if(input.length!==L.a.length) setTimeout(()=>startQuestion(),100);
+  else check(L);
+});
+function dragPick(e,L){
+  const el=document.elementFromPoint(e.clientX,e.clientY);
+  if(el && el.classList.contains("key")) pick(el,L);
+}
+
+/* ===== REFRESH ANSWER BOXES ===== */
+function refresh(){
+  document.querySelectorAll(".answer-box").forEach((b,i)=>{
+    b.textContent = input[i]?.dataset?.ch || "";
+    b.className="answer-box";
+  });
+}
+
+/* ===== CHECK ANSWER ===== */
+function check(L){
+  const answer=input.map(k=>k.dataset.ch).join("");
+  if(answer!==L.a){ document.querySelectorAll(".answer-box").forEach(b=>b.classList.add("bad")); setTimeout(()=>refresh(),500); return; }
+
+  document.querySelectorAll(".answer-box").forEach(b=>b.classList.add("ok"));
+  clap();
+  hintsUsed = input.length; 
+  stars[stage] = Math.max(stars[stage]||0,3-hintsUsed);
+  localStorage.setItem("amazighStars",JSON.stringify(stars));
+document.querySelectorAll(".answer-box").forEach(b=>b.classList.add("ok"));
+clap();
+
+updateStageGrid(stage, q, answer.split(""));   // أضف هذا السطر هنا
+
+hintsUsed = input.length; 
+stars[stage] = Math.max(stars[stage]||0,3-hintsUsed);
+localStorage.setItem("amazighStars",JSON.stringify(stars));
+
+q++;
+  q++;
+  if(q<stages[stage].qs.length){ setTimeout(startQuestion,800); }
+  else {
+    if(stage===unlocked){ unlocked++; localStorage.setItem("amazighUnlocked",unlocked); }
+    if(stage+1<stages.length){
+      stageOverlay.classList.add("active");
+      nextStageBtn.onclick=()=>{ stageOverlay.classList.remove("active"); startStage(stage+1); };
+    } else { celebrate(true); finalOverlay.classList.add("active"); }
+  }
+}
+
+/* ===== CELEBRATION ===== */
+const symbols=["🤗","🤩","👍","👏","👏","ayuuz","ⴰⵢⵢⵓⵣ","🌸","🌺","❤️","💖","💐","ⵣ","ⵉ","ⵜ","ⴰ","🌸","🌺","🌹","🍃","🌷","🌼","🌻","⚘","🎈","💵","💶","💸","✔","✅"];
+
 function celebrate(final=false){
   clap();
-
   for(let i=0;i<25;i++){
     const c=document.createElement("div");
     c.className="confetti";
@@ -1062,249 +1085,25 @@ function celebrate(final=false){
     setTimeout(()=>c.remove(),4000);
   }
 }
-function show(id){
-  document.querySelectorAll(".section").forEach(s=>{
-    s.classList.remove("active");
-    s.style.display = "none";
-  });
 
-  document.body.offsetHeight;
 
-  // ⬅️ هذا السطر أضفه فقط
-  document.getElementById("mapBackground").style.display =
-    (id === "map") ? "block" : "none";
+/* ===== STAGE GRID ===== */
 
-  const el = document.getElementById(id);
-  el.style.display = "block";
-  requestAnimationFrame(()=> el.classList.add("active"));
-}
-function openMap(){
-  mapGrid.innerHTML = "";
+function createStageGrid(rows = 2, cols = 2) {
+  const grid = document.getElementById('stageGrid');
+  if (!grid) return;
 
-  stages.forEach((_,i)=>{
-    const d = document.createElement("div");
-    d.className = "stage-key" + (i > unlocked ? " locked" : "");
-    const s = stars[i] || 0;
-    d.innerHTML = `
-     <div>${translations[currentLang].stage} ${i+1}</div>
-      <div style="font-size:16px">
-        ${"⭐".repeat(s)}${"☆".repeat(3-s)}
-      </div>
-    `;
-    if(i <= unlocked) d.onclick = ()=>startStage(i);
+  grid.innerHTML = '';
 
-    mapGrid.appendChild(d);
-  });
-
-  // ضع صورة الخلفية للمراحل هنا
-  document.getElementById("mapStageBackground").style.backgroundImage = "url('map-bg.png')";
-  document.getElementById("mapStageBackground").style.display = "block";
-
-  show("map");
-}
-
-function startStage(i){
- stage = i;
- q = 0;
- document.getElementById("stageBackground").style.backgroundImage =
-   stages[i].qs[0].img ? `url(${stages[i].qs[0].img})` : "none";
- hintsLeft = 3;
- hintsUsed = 0;
- startQuestion();
-}
-hintBtn.onclick = ()=>{
-  if(hintsLeft <= 0) return alert("ليس لديك تلميحات متبقية!");
-
-  const L = stages[stage].qs[q];
-
-  const used = input.map(k=>k.dataset.ch);
-  const next = [...L.a].find(ch=>!used.includes(ch));
-  if(!next) return;
-
-  const box = boxes.children[input.length];
-  box.textContent = next;
-
-  const keyEl = [...keyboard.children].find(
-    k=>k.dataset?.ch===next && !k.classList.contains("used")
-  );
-  if(keyEl) keyEl.classList.add("used");
-
-  input.push(keyEl || {dataset:{ch:next}});
-
-  hintsLeft--;
-  hintsUsed++;
-  hintCount.textContent = hintsLeft;
-
-  refresh();
-  if(input.length===L.a.length) check(L);
-};
-// ===== CORE GAME FUNCTIONS (الناقصة) =====
-
-function startQuestion(){
-  input = [];
-  drag = false;
-
-  const L = stages[stage].qs[q];
-hintCount.textContent = hintsLeft;
-  const t = translations[currentLang];
-levelTitle.textContent =
-  `${t.level} ${stage+1} — ${t.question} ${q+1}/${stages[stage].qs.length}`;
-
-  if(L.img){
-    questionImg.style.display = "block";
-    questionImg.src = L.img;
-  } else {
-    questionImg.style.display = "none";
-  }
-
-  renderBoxes(L);
-questionText.style.display = L.text ? "block" : "none";  // إظهار/إخفاء
-questionText.textContent = L.text && typeof L.text === "object"
-    ? (L.text[currentLang] || L.text.ar)
-    : L.text || "";  // نص متعدد اللغات أو نص عربي افتراضي
-  renderBoard(L);
-
-  show("game");
-}
-function check(L){
-  const answer = input.map(k=>k.dataset.ch).join("");
-  if(answer !== L.a){
-    document.querySelectorAll(".answer-box")
-      .forEach(b=>b.classList.add("bad"));
-    return;
-  }
-
-  document.querySelectorAll(".answer-box")
-    .forEach(b=>b.classList.add("ok"));
-  celebrate();
-
-  q++;
-
-  if(q < stages[stage].qs.length){
-    setTimeout(startQuestion, 800);
-  } else {
-    // نهاية المرحلة
-    stars[stage] = Math.max(stars[stage] || 0, 3 - hintsUsed);
-    localStorage.setItem("amazighStars", JSON.stringify(stars));
-
-    if(stage === unlocked){
-      unlocked++;
-      localStorage.setItem("amazighUnlocked", unlocked);
-    }
-
-    if(stage + 1 < stages.length){
-      stageOverlay.classList.add("active");
-      nextStageBtn.onclick = ()=>{
-        stageOverlay.classList.remove("active");
-        startStage(stage+1);
-      };
-    } else {
-      celebrate(true);
-      finalOverlay.classList.add("active");
-    }
-  }
-}
-function renderBoxes(L){
-  boxes.innerHTML = "";
-  for(let i=0;i<L.a.length;i++){
-    boxes.innerHTML += `<div class="answer-box"></div>`;
+  for (let i = 0; i < rows * cols; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    grid.appendChild(cell);
   }
 }
 
-function makeKey(ch){
-  const k = document.createElement("div");
-  k.className = "key";
-  k.textContent = ch;
-  k.dataset.ch = ch;
-  return k;
-}
-
-function pick(el,L){
-  if(el.classList.contains("used") || el.classList.contains("locked")) return;
-
-  el.classList.add("used");
-  input.push(el);
-
-  refresh();
-
-  if(input.length === L.a.length) check(L);
-}
-
-function removeLast(){
-  if(!input.length) return;
-  const last = input.pop();
-  if(last) last.classList.remove("used");
-  refresh();
-}
-
-function renderBoard(L){
-  keyboard.innerHTML = "";
-  wheel.innerHTML = "";
-  keyboard.style.display = "none";
-  wheel.style.display = "none";
-
-  const letters = [...L.a].sort(()=>Math.random()-.5);
-
-  if(L.shape==="circle"){
-    wheel.style.display="block";
-    const r=110, c=130;
-    letters.forEach((ch,j)=>{
-      const a = 2*Math.PI*j/letters.length;
-      const k = makeKey(ch);
-      k.style.left = c+r*Math.cos(a)-26+"px";
-      k.style.top  = c+r*Math.sin(a)-26+"px";
-      wheel.appendChild(k);
-    });
-  } else {
-    keyboard.style.display="grid";
-    keyboard.className = L.shape==="hexagon"?"hexagon":"keyboard";
-    letters.forEach(ch=>{
-      const k = makeKey(ch);
-      k.addEventListener("click", ()=>pick(k,L));
-      if(L.shape==="hexagon") k.classList.add("hex-cell");
-      keyboard.appendChild(k);
-    });
-
-    const del = document.createElement("div");
-    del.className = "delete";
-    del.textContent = "⌫";
-    del.onclick = removeLast;
-    keyboard.appendChild(del);
-  }
-}
-
-// ===== DRAG FOR CIRCLE =====
-wheel.addEventListener("pointerdown", e=>{
-  const L = stages[stage].qs[q];
-  if(L.shape!=="circle") return;
-  input=[];
-  drag=true;
-  dragPick(e,L);
-});
-wheel.addEventListener("pointermove", e=>{
-  if(!drag) return;
-  const L = stages[stage].qs[q];
-  dragPick(e,L);
-});
-document.addEventListener("pointerup", ()=>{
-  if(!drag) return;
-  drag=false;
-  const L = stages[stage].qs[q];
-  if(input.length!==L.a.length) setTimeout(()=>startQuestion(),100);
-  else check(L);
-});
-function dragPick(e,L){
-  const el = document.elementFromPoint(e.clientX,e.clientY);
-  if(el && el.classList.contains("key")) pick(el,L);
-}
-// ===== REFRESH ANSWER BOXES =====
-function refresh(){
-  document.querySelectorAll(".answer-box").forEach((b, i) => {
-    b.textContent = input[i]?.dataset.ch || "";
-    b.className = "answer-box";
-  });
-}
-applyLang();
+/* تشغيل الشبكة عند دخول المرحلة */
+createStageGrid(2,2);
 </script>
 </body>
 </html>
