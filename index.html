@@ -908,43 +908,52 @@ function updateStageGrid(stageIndex, questionIndex, answerArr) {
 }
 /* ===== DATA: المراحل والأسئلة ===== */
 const stages = [
-  // المرحلة 1
+  // المرحلة ⵣ
   {
-    name:"المرحلة 1",
-    grid:{cols:6, rows:6},
-    layout:[
-      {q:0, col:0, row:0, dir:"vertical", length:5},  // كلمة 1
-      {q:1, col:2, row:0, dir:"horizontal", length:4}, // كلمة 2
-      {q:2, col:1, row:2, dir:"vertical", length:4},  // كلمة 3
-      {q:3, col:3, row:1, dir:"horizontal", length:3}, // كلمة 4
-      {q:4, col:0, row:5, dir:"horizontal", length:5}  // كلمة 5
+    name: "مرحلة ⵣ",
+    grid: { cols: 7, rows: 7 },
+    layout: [
+      { q: 0, col: 0, row: 0, dir: "vertical", length: 3 },
+      { q: 1, col: 3, row: 0, dir: "vertical", length: 3 },
+      { q: 2, col: 0, row: 5, dir: "vertical", length: 3 },
+      { q: 3, col: 6, row: 0, dir: "vertical", length: 2 },
+ { q: 4, col: 6, row: 6, dir: "vertical", length: 2 },
+      { q: 4, col: 3, row: 1, dir: "vertical", length: 7 },
+      { q: 5, col: 0, row: 2, dir: "horizontal", length: 7 },
+      { q: 6, col: 0, row: 5, dir: "horizontal", length: 7 }
     ],
-    qs:[
-      {a:"ⵜⴰⵎⵓⵔⵜ", shape:"grid", img:null, text:{ar:"تعني الأرض",en:"Means land",am:"ⵜⴰⵎⵓⵔⵜ"}},
-      {a:"ⴰⵛⴰⵍ", shape:"grid", img:null, text:{ar:"كل ما هو تراب",en:"Everything soil",am:"ⴰⵛⴰⵍ"}},
-      {a:"ⴰⴷⵔⴰⵔ", shape:"grid", img:null, text:{ar:"جبل",en:"Mountain",am:"ⴰⴷⵔⴰⵔ"}},
-      {a:"ⴰⵣⵣ", shape:"grid", img:null, text:{ar:"زهرة",en:"Flower",am:"ⴰⵣⵣ"}},
-      {a:"ⴰⵎⵍⵍⴰⵙ", shape:"grid", img:null, text:{ar:"نهر صغير",en:"Small river",am:"ⴰⵎⵍⵍⴰⵙ"}}
+    qs: [
+      { a: "ⴰⴽ", text: { ar: "عمودية1", en: "V1", am: "ⴰⴽ" } },
+      { a: "ⴷⴻⴷ", text: { ar: "عمودية2", en: "V2", am: "ⴷⴻⴷ" } },
+      { a: "ⴳⴷ", text: { ar: "عمودية3", en: "V3", am: "ⴳⴷ" } },
+      { a: "ⴴⴵ", text: { ar: "عمودية4", en: "V4", am: "ⴴⴵ" } },
+      { a: "ⴶⴷⴸⴹⴺ", text: { ar: "وسطى", en: "Middle", am: "ⴶⴷⴸⴹⴺ" } },
+      { a: "ⴻⴼⴽⴾⴿⵀ", text: { ar: "أفقية1", en: "H1", am: "ⴻⴼⴽⴾⴿⵀ" } },
+      { a: "ⵂⵃⵅⵆⵇⵈ", text: { ar: "أفقية2", en: "H2", am: "ⵂⵃⵅⵆⵇⵈ" } }
     ]
   },
 
-  // المرحلة 2
+  // المرحلة ⴰ
   {
-    name:"المرحلة 2",
-    grid:{cols:6, rows:6},
-    layout:[
-      {q:0, col:0, row:1, dir:"horizontal", length:5}, // كلمة 1
-      {q:1, col:2, row:0, dir:"vertical", length:4},   // كلمة 2
-      {q:2, col:3, row:2, dir:"horizontal", length:3}, // كلمة 3
-      {q:3, col:1, row:3, dir:"vertical", length:5},   // كلمة 4
-      {q:4, col:4, row:1, dir:"horizontal", length:4}  // كلمة 5
+    name: "مرحلة ⴰ",
+    grid: { cols: 7, rows: 7 },
+    layout: [
+      { q: 0, col: 1, row: 0, dir: "vertical", length: 3 },
+      { q: 1, col: 3, row: 0, dir: "vertical", length: 4 },
+      { q: 2, col: 5, row: 0, dir: "vertical", length: 3 },
+      { q: 3, col: 0, row: 2, dir: "horizontal", length: 5 },
+      { q: 4, col: 1, row: 4, dir: "horizontal", length: 4 },
+      { q: 5, col: 2, row: 5, dir: "horizontal", length: 3 },
+      { q: 6, col: 0, row: 6, dir: "horizontal", length: 7 }
     ],
-    qs:[
-      {a:"ⴰⵙⵉⴼ", shape:"grid", img:null, text:{ar:"نهر",en:"River",am:"ⴰⵙⵉⴼ"}},
-      {a:"ⴱⴻⵏⵏⴰⵄⵎⴰⵏ", shape:"grid", img:null, text:{ar:"زهرة",en:"Flower",am:"ⴱⴻⵏⵏⴰⵄⵎⴰⵏ"}},
-      {a:"ⴰⵛⴰⵎ", shape:"grid", img:null, text:{ar:"تلة صغيرة",en:"Small hill",am:"ⴰⵛⴰⵎ"}},
-      {a:"ⴰⵎⴰⵣⵉⵖ", shape:"grid", img:null, text:{ar:"أمازيغ",en:"Amazigh",am:"ⴰⵎⴰⵣⵉⵖ"}},
-      {a:"ⵜⴰⵔⴳⴰⵏ", shape:"grid", img:null, text:{ar:"وادي",en:"Valley",am:"ⵜⴰⵔⴳⴰⵏ"}}
+    qs: [
+      { a: "ⴰⴱⴷ", text: { ar: "عمودية1", en: "V1", am: "ⴰⴱⴷ" } },
+      { a: "ⴻⴼⴽⴾ", text: { ar: "عمودية2", en: "V2", am: "ⴻⴼⴽⴾ" } },
+      { a: "ⴿⵀⵁ", text: { ar: "عمودية3", en: "V3", am: "ⴿⵀⵁ" } },
+      { a: "ⵂⵃⵄⵅⵆ", text: { ar: "أفقية1", en: "H1", am: "ⵂⵃⵄⵅⵆ" } },
+      { a: "ⵇⵈⵉⵊ", text: { ar: "أفقية2", en: "H2", am: "ⵇⵈⵉⵊ" } },
+      { a: "ⵋⵌⵍ", text: { ar: "أفقية3", en: "H3", am: "ⵋⵌⵍ" } },
+      { a: "ⵎⵏⵒⵓⵔⵕⵖ", text: { ar: "أفقية4", en: "H4", am: "ⵎⵏⵒⵓⵔⵕⵖ" } }
     ]
   }
 ];
