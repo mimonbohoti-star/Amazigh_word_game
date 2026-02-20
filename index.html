@@ -207,9 +207,9 @@ body::before {
 
 .stage-grid {
   display: grid;
-  gap: 2px;
+  gap: 1px;
 
-  width: 90%;          /* تقريبًا تغطي البطاقة */
+  width: 95%;          /* تقريبًا تغطي البطاقة */
   max-width: 260px;    /* الحد الأقصى للشبكة */
   margin: 6px auto;    /* توسيط الشبكة داخل البطاقة */
 
@@ -221,7 +221,7 @@ body::before {
 }
 
 .stage-grid .cell {
-  background: #334155;
+  background: #FFA500;
   border-radius: 4px;
 
   display: flex;
@@ -520,60 +520,51 @@ body::before {
 }
 
 /* ===== MAP GRID SCROLL & SNAP ===== */
+
+/* ===== MAP GRID ===== */
 #mapGrid {
   display: flex;
+  flex-direction: row;
   gap: 12px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   padding: 10px;
-
-  flex-direction: row;
   min-width: 0; /* مهم لتجنب مشكلة Flexbox على بعض المتصفحات */
 }
 
 .stage-key {
-  flex: 0 0 200px; /* أو calc((100% - 24px*2)/3) كما عندك */
+  flex: 0 0 200px; /* يمكن تعديل الحجم حسب التصميم */
   min-width: 150px; /* يضمن قابلية الضغط على الهاتف */
 }
+
+/* ===== BACKGROUND ===== */
 #stageBackground {
   position: fixed;
-  top: 0; left: 0;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   background-size: cover;
   background-position: center;
- z-index: -1; /* تحت البطاقة وكل العناصر */
-  pointer-events: none; /* لا تتداخل مع أي عناصر */
-  opacity: 0.4; /* يمكن تعديل الشفافية حسب الرغبة */
-}
-.stage-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 2 مربعات لكل صف */
-  grid-template-rows: repeat(2, 1fr);    /* 2 صفوف */
-  gap: 4px;                              /* المسافة بين المربعات */
-  width: 100%;
-  height: 60%;                            /* ارتفاع الشبكة داخل العمود */
-  margin-bottom: 6px;
+  z-index: -1; /* تحت كل العناصر */
+  pointer-events: none; /* لا تتداخل مع العناصر */
+  opacity: 0.4; /* يمكن تعديل الشفافية */
 }
 
-.stage-grid .cell {
-  background: #334155;
-  border-radius: 4px;
-  border: 1px solid #1e293b;
-}
-/* ===== STAGE GRID IMPROVEMENT ===== */
+/* ===== STAGE GRID ===== */
 .stage-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); /* عمود ديناميكي حسب حجم الشاشة */
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); /* أعمدة ديناميكية */
   grid-auto-rows: 80px; /* ارتفاع كل خلية */
-  gap: 6px; /* المسافة بين الخلايا */
+  gap: 6px; /* المسافة بين المربعات */
   width: 100%;
-  max-width: 400px; /* الحد الأقصى للعرض داخل البطاقة */
-  margin: 0 auto 12px auto; /* توسيط الشبكة داخل البطاقة */
+  max-width: 400px;
+  margin: 10px auto 12px auto; /* مسافة من الأعلى والأسفل */
 }
 
+/* ===== STAGE CELL ===== */
 .stage-grid .cell {
-  background: #1e293b; /* لون الخلية */
+  background: #1e293b;
   border-radius: 6px;
   border: 1px solid #334155;
   display: flex;
@@ -582,19 +573,9 @@ body::before {
   font-weight: bold;
   font-size: 22px;
   color: #fff;
-}
-.stage-grid{
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-top: 10px;
+user-select: none;
 }
 
-.cell{
-  background: #eee;
-  border: 2px solid #999;
-  height: 60px;
-}
 </style>
 </head>
 
@@ -725,63 +706,10 @@ const keyboard = document.getElementById("keyboard");
 const wheel = document.getElementById("wheel");
 const mapGrid = document.getElementById("mapGrid");
 
-function createStageGridForCard(stageIndex) {
-  const stageCard = mapGrid.children[stageIndex];
-  if (!stageCard) return;
-
-  let oldGrid = stageCard.querySelector('.stage-grid');
-  if (oldGrid) oldGrid.remove();
-
-  const stageData = stages[stageIndex];
-  const layout = stageData.layout || [];
-
-  const grid = document.createElement('div');
-  grid.className = 'stage-grid';
-  stageCard.appendChild(grid);
-
-  /* حساب الحجم الحقيقي للشبكة */
-  const cols = Math.max(...layout.map(l => l.col + (l.dir === "horizontal" ? l.length : 1)));
-  const rows = Math.max(...layout.map(l => l.row + (l.dir === "vertical" ? l.length : 1)));
-
-  grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-  grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
-
-  /* إنشاء الخلايا في أماكنها الصحيحة */
-  layout.forEach((l) => {
-    for (let i = 0; i < l.length; i++) {
-
-      const cell = document.createElement('div');
-      cell.className = 'cell column-cell';
-      cell.dataset.q = l.q;
-      cell.dataset.pos = i;
-
-      if (l.dir === "vertical") {
-        cell.style.gridColumn = l.col + 1;
-        cell.style.gridRow = l.row + i + 1;
-      } else {
-        cell.style.gridColumn = l.col + i + 1;
-        cell.style.gridRow = l.row + 1;
-      }
-
-      grid.appendChild(cell);
-    }
-  });
-
-  /* تفعيل النقر على العمود */
-  layout.forEach(l => {
-    const cells = grid.querySelectorAll(`.cell[data-q='${l.q}']`);
-    cells.forEach(cell => {
-      cell.addEventListener("click", () => startStage(stageIndex, l.q));
-    });
-  });
-}
-
-const levelTitle = document.getElementById("levelTitle");
-const questionImg = document.getElementById("questionImg");
-const questionText = document.getElementById("questionText");
-
+let isDragging = false;
+let input = []; // صناديق الإجابة
 let currentLang = localStorage.getItem("lang") || "ar";
-let stage = 0, q = 0, input = [], drag = false;
+let stage = 0, q = 0, drag = false;
 let hintsLeft = 3, hintsUsed = 0;
 let unlocked = +localStorage.getItem("amazighUnlocked") || 0;
 
@@ -790,6 +718,152 @@ let soundOn = localStorage.getItem("soundOn") !== "0";
 let vibeOn = localStorage.getItem("vibeOn") !== "0";
 const soundToggle = document.getElementById("soundToggle");
 const vibeToggle = document.getElementById("vibeToggle");
+
+/* ===== عناصر المرحلة ===== */
+const levelTitle = document.getElementById("levelTitle");
+const questionImg = document.getElementById("questionImg");
+const questionText = document.getElementById("questionText");
+
+/* ===== دالة حفظ الإجابات ===== */
+function saveAnswer(stageIndex, qIndex, lettersArray) {
+  const saved = JSON.parse(localStorage.getItem("amazighAnswers") || "{}");
+  if (!saved[stageIndex]) saved[stageIndex] = {};
+  saved[stageIndex][qIndex] = lettersArray;
+  localStorage.setItem("amazighAnswers", JSON.stringify(saved));
+}
+/* ===== إنشاء شبكة المرحلة مع السحب وحفظ الإجابات ===== */
+function createStageGridForCard(stageIndex) {
+  const stageCard = mapGrid.children[stageIndex];
+  if (!stageCard) return;
+
+  // إزالة الشبكة القديمة
+  const oldGrid = stageCard.querySelector('.stage-grid');
+  if (oldGrid) oldGrid.remove();
+
+  const stageData = stages[stageIndex];
+  const layout = stageData.layout || [];
+
+  // صناديق الإجابة
+  input = Array.from(boxes.querySelectorAll('.box'));
+
+  // إنشاء الشبكة
+  const grid = document.createElement('div');
+  grid.className = 'stage-grid';
+  stageCard.appendChild(grid);
+
+  const cols = Math.max(...layout.map(l => l.col + (l.dir === "horizontal" ? l.length : 1)));
+  const rows = Math.max(...layout.map(l => l.row + (l.dir === "vertical" ? l.length : 1)));
+
+  grid.style.display = "grid";
+  grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+  grid.style.gap = "2px";
+
+  const cellsMap = {};
+  const savedAll = JSON.parse(localStorage.getItem("amazighAnswers") || "{}");
+
+  // إنشاء الخلايا وربطها بالـ layout واسترجاع الحروف المحفوظة
+  layout.forEach(l => {
+    for (let i = 0; i < l.length; i++) {
+      const r = l.dir === "horizontal" ? l.row : l.row + i;
+      const c = l.dir === "horizontal" ? l.col + i : l.col;
+      const key = r + "-" + c;
+
+      let cell;
+      if (cellsMap[key]) {
+        cell = cellsMap[key];
+        if (!cell.dataset.q.split(",").includes(String(l.q))) {
+          cell.dataset.q += "," + l.q;
+        }
+      } else {
+        cell = document.createElement('div');
+        cell.className = 'cell column-cell';
+        cell.dataset.q = String(l.q);
+        cell.dataset.row = r;
+        cell.dataset.col = c;
+        cell.dataset.pos = i;
+        grid.appendChild(cell);
+        cellsMap[key] = cell;
+
+        cell.style.gridColumn = l.dir === "horizontal" ? c + 1 : l.col + 1;
+        cell.style.gridRow = l.dir === "horizontal" ? l.row + 1 : r + 1;
+        cell.style.border = "1px solid #aaa";
+        cell.style.display = "flex";
+        cell.style.alignItems = "center";
+        cell.style.justifyContent = "center";
+        cell.style.userSelect = "none";
+        cell.style.fontWeight = "bold";
+        cell.style.fontSize = "20px";
+      }
+
+      // استرجاع الحروف المحفوظة
+      const savedLetter = savedAll?.[stageIndex]?.[l.q]?.[i];
+      if (savedLetter) {
+        cell.textContent = savedLetter;
+        cell.dataset.letter = savedLetter;
+        if (input[i]) input[i].textContent = savedLetter;
+      }
+    }
+  });
+
+  // ===== السحب على الأعمدة وحفظ الإجابات =====
+  layout.forEach(l => {
+    const cells = Array.from(grid.querySelectorAll(".cell"))
+      .filter(cell => cell.dataset.q.split(",").includes(String(l.q)));
+
+    let dragging = false;
+
+    const startDrag = () => { dragging = true; };
+    const endDrag = () => { dragging = false; };
+
+    const updateColumn = () => {
+      const answerArr = stageData.answers?.[l.q] || [];
+      const lettersToSave = [];
+
+      cells.forEach((cell, idx) => {
+        const letter = answerArr[idx];
+        if (!letter) return;
+
+        cell.textContent = letter;
+        cell.dataset.letter = letter;
+
+        // إظهار الحرف في صندوق الإجابة الصحيح
+        const pos = parseInt(cell.dataset.pos, 10);
+        if (input[pos]) input[pos].textContent = letter;
+
+        lettersToSave.push(letter);
+      });
+
+      saveAnswer(stageIndex, l.q, lettersToSave);
+      // تفعيل المرحلة الحالية على هذا السؤال
+      startStage(stageIndex, l.q);
+    };
+
+    // ربط أحداث السحب واللمس
+    cells.forEach(cell => {
+      cell.onmousedown = startDrag;
+      cell.onmouseover = () => { if (dragging) updateColumn(); };
+      cell.ontouchstart = startDrag;
+      cell.ontouchmove = e => {
+        const touch = e.touches[0];
+        const elem = document.elementFromPoint(touch.clientX, touch.clientY);
+        if (dragging && elem && cells.includes(elem)) updateColumn();
+      };
+    });
+
+    document.addEventListener("mouseup", endDrag);
+    document.addEventListener("touchend", endDrag);
+  });
+
+  // إعادة ملء صناديق الإجابة بعد التحميل
+  layout.forEach(l => {
+    const letters = savedAll?.[stageIndex]?.[l.q] || [];
+    letters.forEach((letter, i) => {
+      const pos = i;
+      if (input[pos]) input[pos].textContent = letter;
+    });
+  });
+}
 
 function syncToggles(){
   soundToggle.classList.toggle("on", soundOn);
@@ -814,7 +888,6 @@ function clap(){
   }
   if(vibeOn && navigator.vibrate) navigator.vibrate([80,40,80]);
 }
-
 /* ===== SHOW/HIDE SECTIONS ===== */
 function show(id){
   document.querySelectorAll(".section").forEach(s => { s.classList.remove("active"); s.style.display="none"; });
@@ -883,10 +956,13 @@ function openMap() {
 }
 
 /* ===== START STAGE ===== */
-function startStage(stageIndex, questionIndex=0){
+function startStage(stageIndex, questionIndex = 0){
   stage = stageIndex;
   q = questionIndex;
   hintsLeft = 3;
+
+  // لا تعيد بناء الشبكة هنا
+  // فقط ابدأ السؤال الحالي
   startQuestion();
   show("game");
 }
@@ -898,62 +974,139 @@ function updateStageGrid(stageIndex, questionIndex, answerArr) {
   const grid = stageCard.querySelector('.stage-grid');
   if (!grid) return;
 
-  const cells = Array.from(
-    grid.querySelectorAll(`.cell[data-q='${questionIndex}']`)
-  );
+  const stageData = stages[stageIndex];
+  if (!stageData) return;
 
-  cells.forEach((cell, i) => {
-    cell.textContent = answerArr[i] || "";
-  });
+  const layoutItem = stageData.layout.find(l => l.q === questionIndex);
+  if (!layoutItem) return;
+
+  for (let i = 0; i < layoutItem.length; i++) {
+
+    const r = layoutItem.dir === "horizontal"
+      ? layoutItem.row
+      : layoutItem.row + i;
+
+    const c = layoutItem.dir === "horizontal"
+      ? layoutItem.col + i
+      : layoutItem.col;
+
+    const cell = grid.querySelector(`.cell[data-row='${r}'][data-col='${c}']`);
+    if (!cell) continue;
+
+    const letter = answerArr[i] || "";
+
+    // تحديث الشبكة فقط
+    cell.textContent = letter;
+    cell.dataset.letter = letter;
+
+    // تحديث صناديق الإجابة
+    if (input[i]) input[i].textContent = letter;
+  }
 }
 /* ===== DATA: المراحل والأسئلة ===== */
+
 const stages = [
-  // المرحلة ⵣ
+  // المرحلة 1 (محفوظة كما هي)
   {
-    name: "مرحلة ⵣ",
+    name: "مرحلة ⵣ - 1",
     grid: { cols: 7, rows: 7 },
     layout: [
       { q: 0, col: 0, row: 0, dir: "vertical", length: 3 },
       { q: 1, col: 3, row: 0, dir: "vertical", length: 3 },
       { q: 2, col: 0, row: 5, dir: "vertical", length: 3 },
-      { q: 3, col: 6, row: 0, dir: "vertical", length: 2 },
- { q: 4, col: 6, row: 6, dir: "vertical", length: 2 },
-      { q: 4, col: 3, row: 1, dir: "vertical", length: 7 },
-      { q: 5, col: 0, row: 2, dir: "horizontal", length: 7 },
-      { q: 6, col: 0, row: 5, dir: "horizontal", length: 7 }
+      { q: 3, col: 6, row: 0, dir: "vertical", length: 3 },
+      { q: 4, col: 6, row: 5, dir: "vertical", length: 3 },
+      { q: 5, col: 3, row: 0, dir: "vertical", length: 7 },
+      { q: 6, col: 0, row: 2, dir: "horizontal", length: 7 },
+      { q: 7, col: 0, row: 5, dir: "horizontal", length: 7 }
     ],
     qs: [
-      { a: "ⴰⴽ", text: { ar: "عمودية1", en: "V1", am: "ⴰⴽ" } },
-      { a: "ⴷⴻⴷ", text: { ar: "عمودية2", en: "V2", am: "ⴷⴻⴷ" } },
-      { a: "ⴳⴷ", text: { ar: "عمودية3", en: "V3", am: "ⴳⴷ" } },
-      { a: "ⴴⴵ", text: { ar: "عمودية4", en: "V4", am: "ⴴⴵ" } },
-      { a: "ⴶⴷⴸⴹⴺ", text: { ar: "وسطى", en: "Middle", am: "ⴶⴷⴸⴹⴺ" } },
-      { a: "ⴻⴼⴽⴾⴿⵀ", text: { ar: "أفقية1", en: "H1", am: "ⴻⴼⴽⴾⴿⵀ" } },
-      { a: "ⵂⵃⵅⵆⵇⵈ", text: { ar: "أفقية2", en: "H2", am: "ⵂⵃⵅⵆⵇⵈ" } }
+      { a: "ⴰⵎⵉ", text: { ar: "كلمة عمودية 1", en: "Vertical 1", am: "ⴰⵎⵉ" } },
+      { a: "ⴷⵓⴳ", text: { ar: "كلمة عمودية 2", en: "Vertical 2", am: "ⴷⵓⴳ" } },
+      { a: "ⴳⵉⴳ", text: { ar: "كلمة عمودية 3", en: "Vertical 3", am: "ⴳⵉⴳ" } },
+      { a: "ⵉⵎⵙ", text: { ar: "كلمة عمودية 4", en: "Vertical 4", am: "ⵉⵎⵙ" } },
+      { a: "ⴷⴰⵣ", text: { ar: "كلمة عمودية 5", en: "Vertical 5", am: "ⴷⴰⵣ" } },
+      { a: "ⴰⴱⴳⴷⴻⴽⴳ", text: { ar: "العمود الأوسط", en: "Middle column", am: "ⴰⴱⴳⴷⴻⴽⴳ" } },
+      { a: "ⵉⵎⴰⴳⴷ⵷ⵙ", text: { ar: "أفقية 1", en: "Horizontal 1", am: "ⵉⵎⴰⴳⴷ⵷ⵙ" } },
+      { a: "ⴳⴰⵏⴽⵉⵔⴷ", text: { ar: "أفقية 2", en: "Horizontal 2", am: "ⴳⴰⵏⴽⵉⵔⴷ" } }
     ]
   },
 
-  // المرحلة ⴰ
+  // المرحلة 2
   {
-    name: "مرحلة ⴰ",
+    name: "مرحلة ⵣ - 2",
     grid: { cols: 7, rows: 7 },
     layout: [
-      { q: 0, col: 1, row: 0, dir: "vertical", length: 3 },
-      { q: 1, col: 3, row: 0, dir: "vertical", length: 4 },
-      { q: 2, col: 5, row: 0, dir: "vertical", length: 3 },
-      { q: 3, col: 0, row: 2, dir: "horizontal", length: 5 },
-      { q: 4, col: 1, row: 4, dir: "horizontal", length: 4 },
-      { q: 5, col: 2, row: 5, dir: "horizontal", length: 3 },
-      { q: 6, col: 0, row: 6, dir: "horizontal", length: 7 }
+      { q: 0, col: 0, row: 0, dir: "vertical", length: 3 },
+      { q: 1, col: 3, row: 0, dir: "vertical", length: 3 },
+      { q: 2, col: 0, row: 5, dir: "vertical", length: 3 },
+      { q: 3, col: 6, row: 0, dir: "vertical", length: 3 },
+      { q: 4, col: 6, row: 5, dir: "vertical", length: 3 },
+      { q: 5, col: 3, row: 0, dir: "vertical", length: 7 },
+      { q: 6, col: 0, row: 2, dir: "horizontal", length: 7 },
+      { q: 7, col: 0, row: 5, dir: "horizontal", length: 7 }
     ],
     qs: [
-      { a: "ⴰⴱⴷ", text: { ar: "عمودية1", en: "V1", am: "ⴰⴱⴷ" } },
-      { a: "ⴻⴼⴽⴾ", text: { ar: "عمودية2", en: "V2", am: "ⴻⴼⴽⴾ" } },
-      { a: "ⴿⵀⵁ", text: { ar: "عمودية3", en: "V3", am: "ⴿⵀⵁ" } },
-      { a: "ⵂⵃⵄⵅⵆ", text: { ar: "أفقية1", en: "H1", am: "ⵂⵃⵄⵅⵆ" } },
-      { a: "ⵇⵈⵉⵊ", text: { ar: "أفقية2", en: "H2", am: "ⵇⵈⵉⵊ" } },
-      { a: "ⵋⵌⵍ", text: { ar: "أفقية3", en: "H3", am: "ⵋⵌⵍ" } },
-      { a: "ⵎⵏⵒⵓⵔⵕⵖ", text: { ar: "أفقية4", en: "H4", am: "ⵎⵏⵒⵓⵔⵕⵖ" } }
+      { a: "ⴰⵎⴱ", text: { ar: "Vertical 1", en: "Vertical 1", am: "ⴰⵎⴱ" } },
+      { a: "ⴷⴰⴽ", text: { ar: "Vertical 2", en: "Vertical 2", am: "ⴷⴰⴽ" } },
+      { a: "ⴳⵉⴳ", text: { ar: "Vertical 3", en: "Vertical 3", am: "ⴳⵉⴳ" } },
+      { a: "ⵉⵎⵙ", text: { ar: "Vertical 4", en: "Vertical 4", am: "ⵉⵎⵙ" } },
+      { a: "ⴷⴰⵣ", text: { ar: "Vertical 5", en: "Vertical 5", am: "ⴷⴰⵣ" } },
+      { a: "ⴰⴱⴷⴷⴻⴼⴳ", text: { ar: "Middle column", en: "Middle column", am: "ⴰⴱⴷⴷⴻⴼⴳ" } },
+      { a: "ⴱⵎⴰⴷⴳ⵷ⵙ", text: { ar: "Horizontal 1", en: "Horizontal 1", am: "ⴱⵎⴰⴷⴳ⵷ⵙ" } },
+      { a: "ⴳⴰⵏⴼⵉⵔⴷ", text: { ar: "Horizontal 2", en: "Horizontal 2", am: "ⴳⴰⵏⴼⵉⵔⴷ" } }
+    ]
+  },
+
+  // المرحلة 3
+  {
+    name: "مرحلة ⵣ - 3",
+    grid: { cols: 7, rows: 7 },
+    layout: [
+      { q: 0, col: 0, row: 0, dir: "vertical", length: 3 },
+      { q: 1, col: 3, row: 0, dir: "vertical", length: 3 },
+      { q: 2, col: 0, row: 5, dir: "vertical", length: 3 },
+      { q: 3, col: 6, row: 0, dir: "vertical", length: 3 },
+      { q: 4, col: 6, row: 5, dir: "vertical", length: 3 },
+      { q: 5, col: 3, row: 0, dir: "vertical", length: 7 },
+      { q: 6, col: 0, row: 2, dir: "horizontal", length: 7 },
+      { q: 7, col: 0, row: 5, dir: "horizontal", length: 7 }
+    ],
+    qs: [
+      { a: "ⴰⵎⴷ", text: { ar: "Vertical 1", en: "Vertical 1", am: "ⴰⵎⴷ" } },
+      { a: "ⴷⴰⵃ", text: { ar: "Vertical 2", en: "Vertical 2", am: "ⴷⴰⵃ" } },
+      { a: "ⴳⵉⴳ", text: { ar: "Vertical 3", en: "Vertical 3", am: "ⴳⵉⴳ" } },
+      { a: "ⵉⵎⵙ", text: { ar: "Vertical 4", en: "Vertical 4", am: "ⵉⵎⵙ" } },
+      { a: "ⴷⴰⵣ", text: { ar: "Vertical 5", en: "Vertical 5", am: "ⴷⴰⵣ" } },
+      { a: "ⴰⴱⴳⴷⴻⴿⴳ", text: { ar: "Middle column", en: "Middle column", am: "ⴰⴱⴳⴷⴻⴿⴳ" } },
+      { a: "ⴱⵎⴰⴶⴳ⵷ⵙ", text: { ar: "Horizontal 1", en: "Horizontal 1", am: "ⴱⵎⴰⴶⴳ⵷ⵙ" } },
+      { a: "ⴳⴰⵏⴼⵉⵔⴷ", text: { ar: "Horizontal 2", en: "Horizontal 2", am: "ⴳⴰⵏⴼⵉⵔⴷ" } }
+    ]
+  },
+
+  // المرحلة 4
+  {
+    name: "مرحلة ⵣ - 4",
+    grid: { cols: 7, rows: 7 },
+    layout: [
+      { q: 0, col: 0, row: 0, dir: "vertical", length: 3 },
+      { q: 1, col: 3, row: 0, dir: "vertical", length: 3 },
+      { q: 2, col: 0, row: 5, dir: "vertical", length: 3 },
+      { q: 3, col: 6, row: 0, dir: "vertical", length: 3 },
+      { q: 4, col: 6, row: 5, dir: "vertical", length: 3 },
+      { q: 5, col: 3, row: 0, dir: "vertical", length: 7 },
+      { q: 6, col: 0, row: 2, dir: "horizontal", length: 7 },
+      { q: 7, col: 0, row: 5, dir: "horizontal", length: 7 }
+    ],
+    qs: [
+      { a: "ⴰⵎⵇ", text: { ar: "Vertical 1", en: "Vertical 1", am: "ⴰⵎⵇ" } },
+      { a: "ⴷⴰⵉ", text: { ar: "Vertical 2", en: "Vertical 2", am: "ⴷⴰⵉ" } },
+      { a: "ⴳⵉⴳ", text: { ar: "Vertical 3", en: "Vertical 3", am: "ⴳⵉⴳ" } },
+      { a: "ⵉⵎⵙ", text: { ar: "Vertical 4", en: "Vertical 4", am: "ⵉⵎⵙ" } },
+      { a: "ⴷⴰⵣ", text: { ar: "Vertical 5", en: "Vertical 5", am: "ⴷⴰⵣ" } },
+      { a: "ⴰⴱⴳⴷⴻⵀⴳ", text: { ar: "Middle column", en: "Middle column", am: "ⴰⴱⴳⴷⴻⵀⴳ" } },
+      { a: "ⴱⵎⴰⴷⴳ⵸ⵙ", text: { ar: "Horizontal 1", en: "Horizontal 1", am: "ⴱⵎⴰⴷⴳ⵸ⵙ" } },
+      { a: "ⴳⴰⵏⴼⵉⵔⴷ", text: { ar: "Horizontal 2", en: "Horizontal 2", am: "ⴳⴰⵏⴼⵉⵔⴷ" } }
     ]
   }
 ];
@@ -1049,40 +1202,91 @@ function dragPick(e,L){
 
 /* ===== REFRESH ANSWER BOXES ===== */
 function refresh(){
-  document.querySelectorAll(".answer-box").forEach((b,i)=>{
-    b.textContent = input[i]?.dataset?.ch || "";
-    b.className="answer-box";
+  const stageCard = mapGrid.children[stage];
+  if (!stageCard) return;
+
+  const grid = stageCard.querySelector('.stage-grid');
+
+  document.querySelectorAll(".answer-box").forEach((box,i)=>{
+
+    // قراءة حرف من الشبكة إذا موجود
+    let letterFromGrid = "";
+    if (grid) {
+      const cell = grid.querySelector(`.cell[data-q='${q}'][data-pos='${i}']`);
+      if (cell && cell.dataset.letter) {
+        letterFromGrid = cell.dataset.letter;
+      }
+    }
+
+    // إذا لم يوجد حرف نأخذ من الإدخال الحالي
+    box.textContent = letterFromGrid || input[i]?.dataset?.ch || "";
+    box.className = "answer-box";
   });
 }
-
 /* ===== CHECK ANSWER ===== */
 function check(L){
-  const answer=input.map(k=>k.dataset.ch).join("");
-  if(answer!==L.a){ document.querySelectorAll(".answer-box").forEach(b=>b.classList.add("bad")); setTimeout(()=>refresh(),500); return; }
+  const answer = input.map(k => k.dataset.ch).join("");
 
-  document.querySelectorAll(".answer-box").forEach(b=>b.classList.add("ok"));
+  // إذا كانت الإجابة خاطئة
+  if(answer !== L.a){
+    document.querySelectorAll(".answer-box").forEach(b => b.classList.add("bad"));
+    setTimeout(() => refresh(), 500);
+    return;
+  }
+
+  // الإجابة صحيحة
   clap();
-  hintsUsed = input.length; 
-  stars[stage] = Math.max(stars[stage]||0,3-hintsUsed);
-  localStorage.setItem("amazighStars",JSON.stringify(stars));
-document.querySelectorAll(".answer-box").forEach(b=>b.classList.add("ok"));
-clap();
+  hintsUsed = input.length;
+  stars[stage] = Math.max(stars[stage] || 0, 3 - hintsUsed);
+  localStorage.setItem("amazighStars", JSON.stringify(stars));
 
-updateStageGrid(stage, q, answer.split(""));   // أضف هذا السطر هنا
+  // تحديث الشبكة وصناديق الإجابة
+  const stageCard = mapGrid.children[stage];
+  if(stageCard){
+    const grid = stageCard.querySelector('.stage-grid');
+    const layoutItem = stages[stage].layout.find(l => l.q === q);
 
-hintsUsed = input.length; 
-stars[stage] = Math.max(stars[stage]||0,3-hintsUsed);
-localStorage.setItem("amazighStars",JSON.stringify(stars));
+    if(grid && layoutItem){
+      for(let i = 0; i < layoutItem.length; i++){
+        const r = layoutItem.dir === "horizontal" ? layoutItem.row : layoutItem.row + i;
+        const c = layoutItem.dir === "horizontal" ? layoutItem.col + i : layoutItem.col;
 
-q++;
+        const cell = grid.querySelector(`.cell[data-row='${r}'][data-col='${c}']`);
+        if(cell){
+          cell.textContent = answer[i];
+          cell.dataset.letter = answer[i];
+          cell.dataset.pos = i; // مهم: موقع الحرف ضمن الكلمة
+        }
+      }
+    }
+
+    // تحديث صناديق الإجابة
+    document.querySelectorAll(".answer-box").forEach((box, i) => {
+      box.textContent = answer[i];
+      box.classList.add("ok");
+    });
+  }
+
+  // السؤال التالي
   q++;
-  if(q<stages[stage].qs.length){ setTimeout(startQuestion,800); }
-  else {
-    if(stage===unlocked){ unlocked++; localStorage.setItem("amazighUnlocked",unlocked); }
-    if(stage+1<stages.length){
+  if(q < stages[stage].qs.length){
+    setTimeout(startQuestion, 800);
+  } else {
+    if(stage === unlocked){
+      unlocked++;
+      localStorage.setItem("amazighUnlocked", unlocked);
+    }
+
+    if(stage + 1 < stages.length){
       stageOverlay.classList.add("active");
-      nextStageBtn.onclick=()=>{ stageOverlay.classList.remove("active"); startStage(stage+1); };
-    } else { celebrate(true); finalOverlay.classList.add("active"); }
+      nextStageBtn.onclick = () => {
+        stageOverlay.classList.remove("active");
+        startStage(stage + 1);
+      };
+    } else {
+      celebrate(true);
+      finalOverlay.classList.add("active");
+    }
   }
 }
 
