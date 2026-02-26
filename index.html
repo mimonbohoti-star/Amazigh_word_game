@@ -277,6 +277,17 @@ body::before {
   color: #f0eae2; /* خط أبيض */
   border: 1px solid #334155; /* نفس الحدود */
 }
+
+.reset-btn{
+  margin-top:15px;
+  background:#c0392b;
+  color:white;
+  border:none;
+  padding:8px 14px;
+  border-radius:8px;
+  cursor:pointer;
+}
+
 .btn-back{
  background:linear-gradient(135deg,#0f172a,#334155);
  color:#f0eae2;
@@ -609,6 +620,9 @@ user-select: none;
     <option value="am">ⵜⴰⵎⴰⵣⵉⵖⵜ</option>
   </select>
 </div>
+<button onclick="clearGameData()" class="reset-btn">
+  🗑 مسح التقدم
+</button>
  <button class="btn btn-back" onclick="show('menu')">←</button>  
 </div>  
 <div class="map-container">
@@ -629,8 +643,8 @@ user-select: none;
  <div class="answer-boxes" id="boxes"></div>
 
  <!-- زر التلميح والعداد -->
- <button class="btn btn-back" id="hintBtn">💡</button>
- <div id="hintCount">3</div>
+ <button class="btn btn-hint" id="hintBtn" onclick="useHint()">💡 تلميح</button>
+<div id="hintCount">3</div>
 
  <!-- عجلة الأحرف -->
  <div id="wheel" class="wheel"></div>
@@ -701,13 +715,54 @@ function closeHowTo(){ document.getElementById("howToBox").style.display="none";
 
 /* ===== المتغيرات العامة ===== */
 let stars = JSON.parse(localStorage.getItem("amazighStars") || "[]");
+
+function useHint() {
+  const savedAll = JSON.parse(localStorage.getItem("amazighAnswers") || "{}");
+  const savedStage = savedAll[stage] || {};
+  const savedQuestion = savedStage[q] || {};
+  
+  // تلميحات مستخدمة حتى الآن
+  const usedHints = savedQuestion.hintsUsed || 0;
+  
+  if(usedHints >= 3) return; // لا تلميحات متبقية
+  
+  const L = stages[stage].qs[q];
+  
+  // إيجاد أول خانة فارغة
+  for(let i = 0; i < answerBoxes.length; i++){
+    const box = answerBoxes[i];
+    if(!box.textContent){
+      const letter = L.a[i];
+      box.textContent = letter;
+
+      // تحديث التخزين
+      savedQuestion.answers = savedQuestion.answers || [];
+      savedQuestion.answers[i] = letter;
+      savedQuestion.hintsUsed = usedHints + 1;
+
+      savedStage[q] = savedQuestion;
+      savedAll[stage] = savedStage;
+      localStorage.setItem("amazighAnswers", JSON.stringify(savedAll));
+
+      // تحديث واجهة العد
+      hintCount.textContent = 3 - savedQuestion.hintsUsed;
+
+      break; // تلميح واحد فقط في كل مرة
+    }
+  }
+}
+/* ربط الزر */
+document.getElementById("hintBtn").addEventListener("click", useHint);
+
 const boxes = document.getElementById("boxes");
 const keyboard = document.getElementById("keyboard");
 const wheel = document.getElementById("wheel");
 const mapGrid = document.getElementById("mapGrid");
 
 let isDragging = false;
-let input = []; // صناديق الإجابة
+let selectedKeys = [];
+let answerBoxes = [];
+
 let currentLang = localStorage.getItem("lang") || "ar";
 let stage = 0, q = 0, drag = false;
 let hintsLeft = 3, hintsUsed = 0;
@@ -725,52 +780,54 @@ const questionImg = document.getElementById("questionImg");
 const questionText = document.getElementById("questionText");
 
 /* ===== دالة حفظ الإجابات ===== */
-function saveAnswer(stageIndex, qIndex, lettersArray) {
+
+function saveAnswer(stageIndex, qIndex, answerArray) {
+
   const saved = JSON.parse(localStorage.getItem("amazighAnswers") || "{}");
-  if (!saved[stageIndex]) saved[stageIndex] = {};
-  saved[stageIndex][qIndex] = lettersArray;
+
+  if (!saved[stageIndex]) {
+    saved[stageIndex] = {};
+  }
+
+  saved[stageIndex][qIndex] = answerArray;
+
   localStorage.setItem("amazighAnswers", JSON.stringify(saved));
 }
-/* ===== إنشاء شبكة المرحلة مع السحب وحفظ الإجابات ===== */
+
 
 function createStageGridForCard(stageIndex) {
+
   const stageCard = mapGrid.children[stageIndex];
   if (!stageCard) return;
 
-  // إزالة الشبكة القديمة إذا كانت موجودة
-  let oldGrid = stageCard.querySelector(".stage-grid");
+  const oldGrid = stageCard.querySelector('.stage-grid');
   if (oldGrid) oldGrid.remove();
 
   const stageData = stages[stageIndex];
-  const layout = stageData.layout || [];
-  const answers = stageData.answers || [];
+  if (!stageData) return;
 
-  const grid = document.createElement("div");
-  grid.className = "stage-grid";
+  const layout = stageData.layout || [];
+
+  const grid = document.createElement('div');
+  grid.className = 'stage-grid';
   stageCard.appendChild(grid);
 
-  // حساب عدد الأعمدة والصفوف
-  const cols = Math.max(...layout.map(l => l.col + (l.dir === "horizontal" ? l.length : 1)));
-  const rows = Math.max(...layout.map(l => l.row + (l.dir === "horizontal" ? 1 : l.length)));
+  const cols = Math.max(...layout.map(l =>
+    l.col + (l.dir === "horizontal" ? l.length : 1)
+  ));
+
+  const rows = Math.max(...layout.map(l =>
+    l.row + (l.dir === "vertical" ? l.length : 1)
+  ));
 
   grid.style.display = "grid";
   grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
   grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
   grid.style.gap = "2px";
 
-  // حفظ كل الخلايا في خريطة للوصول السريع
   const cellsMap = {};
 
-  // استرجاع البيانات المحفوظة من localStorage
-  const savedAll = JSON.parse(localStorage.getItem("amazighAnswers") || "{}");
-  if (!savedAll[stageIndex]) savedAll[stageIndex] = {};
-// إنشاء الخلايا وربطها بكل الكلمات
   layout.forEach(l => {
-
-    // تأكد أن لكل سؤال مصفوفة محفوظة
-    if (!savedAll[stageIndex][l.q]) {
-      savedAll[stageIndex][l.q] = Array(l.length).fill("");
-    }
 
     for (let i = 0; i < l.length; i++) {
 
@@ -780,22 +837,16 @@ function createStageGridForCard(stageIndex) {
 
       let cell;
 
-      // إذا الخلية موجودة مسبقًا (خلية مشتركة)
       if (cellsMap[key]) {
         cell = cellsMap[key];
-
-        const existingQs = cell.dataset.q.split(",");
-        if (!existingQs.includes(String(l.q))) {
-          cell.dataset.q += "," + l.q;
-        }
-
+        cell.dataset.q += "," + l.q;
       } else {
-        // إنشاء خلية جديدة
-        cell = document.createElement("div");
-        cell.className = "cell column-cell";
-        cell.dataset.q = String(l.q);
+
+        cell = document.createElement('div');
+        cell.className = 'cell';
         cell.dataset.row = r;
         cell.dataset.col = c;
+        cell.dataset.q = l.q;
 
         cell.style.gridColumn = c + 1;
         cell.style.gridRow = r + 1;
@@ -803,136 +854,34 @@ function createStageGridForCard(stageIndex) {
         cell.style.display = "flex";
         cell.style.alignItems = "center";
         cell.style.justifyContent = "center";
-        cell.style.userSelect = "none";
         cell.style.fontWeight = "bold";
         cell.style.fontSize = "20px";
+        cell.style.cursor = "pointer";
+
+        // 🔥 الضغط على الخلية يفتح السؤال
+        cell.addEventListener("click", () => {
+          const questions = cell.dataset.q.split(",");
+          const questionIndex = parseInt(questions[0]); // أول سؤال مرتبط
+          startStage(stageIndex, questionIndex);
+        });
 
         grid.appendChild(cell);
         cellsMap[key] = cell;
       }
-
-      // ===== استرجاع الحروف المحفوظة لهذه الخلية =====
-      const qIds = cell.dataset.q.split(",");
-
-      let letterToShow = "";
-
-      qIds.forEach(qId => {
-        const savedLetter = savedAll[stageIndex][qId]?.[i];
-        if (savedLetter && !letterToShow) {
-          letterToShow = savedLetter;
-        }
-      });
-
-      if (letterToShow) {
-        cell.textContent = letterToShow;
-        cell.dataset.letter = letterToShow;
-      }
-
     }
   });
 
-  // حفظ أي تصحيح هيكلي
-  localStorage.setItem("amazighAnswers", JSON.stringify(savedAll));
+  // ===== استرجاع الإجابات المحفوظة =====
 
-// ===== نظام السحب والتحديث =====
-  layout.forEach(l => {
+  const savedAll = JSON.parse(localStorage.getItem("amazighAnswers") || "{}");
 
-    const cells = Array.from(grid.querySelectorAll(".cell"))
-      .filter(cell => cell.dataset.q.split(",").includes(String(l.q)));
-
-    let dragging = false;
-
-    const startDrag = () => { dragging = true; };
-    const stopDrag = () => { dragging = false; };
-
-    const fillWord = () => {
-
-      const answerArr = answers[l.q] || [];
-
-      cells.forEach((cell, idx) => {
-
-        const correctLetter = answerArr[idx];
-        if (!correctLetter) return;
-
-        // عرض الحرف
-        cell.textContent = correctLetter;
-        cell.dataset.letter = correctLetter;
-
-        // تحديث جميع الأسئلة المشتركة بهذه الخلية
-        const qIds = cell.dataset.q.split(",");
-
-        qIds.forEach(qId => {
-
-          const layoutItem = layout.find(item => String(item.q) === String(qId));
-          if (!layoutItem) return;
-
-          // حساب الفهرس الصحيح داخل الكلمة الأخرى
-          let otherIndex = 0;
-
-          if (layoutItem.dir === "horizontal") {
-            otherIndex = parseInt(cell.dataset.col) - layoutItem.col;
-          } else {
-            otherIndex = parseInt(cell.dataset.row) - layoutItem.row;
-          }
-
-          if (!savedAll[stageIndex][qId]) {
-            savedAll[stageIndex][qId] = Array(layoutItem.length).fill("");
-          }
-
-          savedAll[stageIndex][qId][otherIndex] = correctLetter;
-
-        });
-
-      });
-
-      // حفظ شامل
-      localStorage.setItem("amazighAnswers", JSON.stringify(savedAll));
-
-      // تحديث صناديق الإجابة
-      startStage(stageIndex, l.q);
-
-      // ===== التحقق من اكتمال المرحلة بالكامل =====
-      const stageComplete = layout.every(item => {
-        const word = savedAll[stageIndex][item.q];
-        return word && word.length === item.length && word.every(ch => ch && ch !== "");
-      });
-
-      if (stageComplete) {
-        enableNextStage(stageIndex);
-      }
-
-    };
-
-    // أحداث الماوس
-    cells.forEach(cell => {
-      cell.addEventListener("mousedown", startDrag);
-      cell.addEventListener("mouseover", () => {
-        if (dragging) fillWord();
-      });
+  if (savedAll[stageIndex]) {
+    Object.keys(savedAll[stageIndex]).forEach(qIndex => {
+      updateStageGrid(stageIndex, parseInt(qIndex), savedAll[stageIndex][qIndex]);
     });
-
-    document.addEventListener("mouseup", stopDrag);
-
-    // أحداث اللمس
-    cells.forEach(cell => {
-      cell.addEventListener("touchstart", startDrag);
-      cell.addEventListener("touchmove", e => {
-        if (!dragging) return;
-
-        const touch = e.touches[0];
-        const element = document.elementFromPoint(touch.clientX, touch.clientY);
-
-        if (element && cells.includes(element)) {
-          fillWord();
-        }
-      });
-    });
-
-    document.addEventListener("touchend", stopDrag);
-
-  });
-
+  }
 }
+
 
 function syncToggles(){
   soundToggle.classList.toggle("on", soundOn);
@@ -1004,26 +953,29 @@ applyLang();
 function openMap() {
   mapGrid.innerHTML = "";
 
+  const savedAll = JSON.parse(localStorage.getItem("amazighAnswers") || "{}");
+
   stages.forEach((stageData, i) => {
     const d = document.createElement("div");
     d.className = "stage-key" + (i > unlocked ? " locked" : "");
 
-    // النجوم من localStorage
     const s = stars[i] || 0;
-
     d.innerHTML = `
-      <div style="text-align:center;margin-top:4px">
-        ${translations[currentLang].stage} ${i + 1}
-      </div>
-      <div style="font-size:16px;text-align:center">
-        ${"⭐".repeat(s)}${"☆".repeat(3 - s)}
-      </div>
+      <div style="text-align:center;margin-top:4px">${translations[currentLang].stage} ${i+1}</div>
+      <div style="font-size:16px;text-align:center">${"⭐".repeat(s)}${"☆".repeat(3-s)}</div>
     `;
 
     mapGrid.appendChild(d);
 
-    // إنشاء الشبكة داخل البطاقة مع الحروف المحفوظة
+    // إنشاء شبكة الأعمدة داخل البطاقة
     createStageGridForCard(i);
+
+    // ===== استرجاع الحروف المحفوظة لكل سؤال =====
+    if (savedAll[i]) {
+      Object.keys(savedAll[i]).forEach(qIndex => {
+        updateStageGrid(i, qIndex, savedAll[i][qIndex]);
+      });
+    }
   });
 
   show("map");
@@ -1042,16 +994,15 @@ function startStage(stageIndex, questionIndex = 0){
 }
 
 function updateStageGrid(stageIndex, questionIndex, answerArr) {
+  if (!Array.isArray(answerArr)) return;
+
   const stageCard = mapGrid.children[stageIndex];
   if (!stageCard) return;
 
   const grid = stageCard.querySelector('.stage-grid');
   if (!grid) return;
 
-  const stageData = stages[stageIndex];
-  if (!stageData) return;
-
-  const layoutItem = stageData.layout.find(l => l.q === questionIndex);
+  const layoutItem = stages[stageIndex].layout.find(l => l.q === questionIndex);
   if (!layoutItem) return;
 
   for (let i = 0; i < layoutItem.length; i++) {
@@ -1069,90 +1020,175 @@ function updateStageGrid(stageIndex, questionIndex, answerArr) {
 
     const letter = answerArr[i] || "";
 
-    // تحديث الشبكة فقط
     cell.textContent = letter;
     cell.dataset.letter = letter;
-
-    // تحديث صناديق الإجابة
-    if (input[i]) input[i].textContent = letter;
   }
 }
+
 /* ===== DATA: المراحل والأسئلة ===== */
+const stages = [];
 
-const stages = [
-  // المرحلة 1 (محفوظة كما هي)
-  {
-    name: "مرحلة ⵣ - 1",
-    grid: { cols: 7, rows: 7 },
-    layout: [
-      { q: 0, col: 0, row: 0, dir: "vertical", length: 3 },
-      { q: 1, col: 3, row: 0, dir: "vertical", length: 3 },
-      { q: 2, col: 0, row: 5, dir: "vertical", length: 3 },
-      { q: 3, col: 6, row: 0, dir: "vertical", length: 3 },
-      { q: 4, col: 6, row: 5, dir: "vertical", length: 3 },
-      { q: 5, col: 3, row: 0, dir: "vertical", length: 7 },
-      { q: 6, col: 0, row: 2, dir: "horizontal", length: 7 },
-      { q: 7, col: 0, row: 5, dir: "horizontal", length: 7 }
-    ],
-    qs: [
-      { a: "ⴰⵎⵉ", text: { ar: "كلمة عمودية 1", en: "Vertical 1", am: "ⴰⵎⵉ" } },
-      { a: "ⴷⵓⴳ", text: { ar: "كلمة عمودية 2", en: "Vertical 2", am: "ⴷⵓⴳ" } },
-      { a: "ⴳⵉⴳ", text: { ar: "كلمة عمودية 3", en: "Vertical 3", am: "ⴳⵉⴳ" } },
-      { a: "ⵉⵎⵙ", text: { ar: "كلمة عمودية 4", en: "Vertical 4", am: "ⵉⵎⵙ" } },
-      { a: "ⴷⴰⵣ", text: { ar: "كلمة عمودية 5", en: "Vertical 5", am: "ⴷⴰⵣ" } },
-      { a: "ⴰⴱⴳⴷⴻⴽⴳ", text: { ar: "العمود الأوسط", en: "Middle column", am: "ⴰⴱⴳⴷⴻⴽⴳ" } },
-      { a: "ⵉⵎⴰⴳⴷⵉⵙ", text: { ar: "أفقية 1", en: "Horizontal 1", am: "ⵉⵎⴰⴳⴷⵉⵙ" } },
-      { a: "ⴳⴰⵏⴽⵉⵔⴷ", text: { ar: "أفقية 2", en: "Horizontal 2", am: "ⴳⴰⵏⴽⵉⵔⴷ" } }
-    ]
-  },
+// ===== مرحلة ⵣ - 1 =====
+stages[0] = {
+  name: "مرحلة ⵣ - 1",
+  grid: { cols: 7, rows: 7 },
+  layout: [
+    { q: 0, col: 0, row: 0, dir: "vertical", length: 3 },
+    { q: 1, col: 3, row: 0, dir: "vertical", length: 7 },
+    { q: 2, col: 0, row: 5, dir: "vertical", length: 3 },
+    { q: 3, col: 6, row: 0, dir: "vertical", length: 3 },
+    { q: 4, col: 6, row: 5, dir: "vertical", length: 3 },
+    { q: 5, col: 0, row: 2, dir: "horizontal", length: 7 },
+    { q: 6, col: 0, row: 5, dir: "horizontal", length: 7 }
+  ],
+  qs: [
+    { a: "ⵄⵎⵉ", text: { ar: "كلمة عمودية 4", en: "Vertical 1", am: "ⵄⵎⵉ" } },
+    { a: "ⵊⵓⴳⴰⴱⴳⴷ", text: { ar: "العمود الأوسط", en: "Middle column", am: "ⵊⵓⴳⴰⴱⴳⴷ" } },
+    { a: "ⴳⵉⵛ", text: { ar: "كلمة عمودية 3", en: "Vertical 3", am: "ⴳⵉⵛ" } },
+    { a: "ⴰⵎⵙ", text: { ar: "كلمة عمودية 1", en: "Vertical 4", am: "ⴰⵎⵙ" } },
+    { a: "ⴷⴰⵊ", text: { ar: "كلمة عمودية 2", en: "Vertical 5", am: "ⴷⴰⵊ" } },
+    { a: "ⵉⵢⴰⴳⴷ⵷ⵙ", text: { ar: "أفقية 3", en: "Horizontal 1", am: "ⵉⵢⴰⴳⴷ⵷ⵙ" } },
+    { a: "ⴳⴰⵔⴳⵉⵔⴷ", text: { ar: "أفقية 2", en: "Horizontal 2", am: "ⴳⴰⵔⴳⵉⵔⴷ" } }
+  ],
+  answers: [
+    ["ⵄ","ⵎ","ⵉ"],
+    ["ⵊ","ⵓ","ⴳ","ⴰ","ⴱ","ⴳ","ⴷ"],
+    ["ⴳ","ⵉ","ⵛ"],
+    ["ⴰ","ⵎ","ⵙ"],
+    ["ⴷ","ⴰ","ⵊ"],
+    ["ⵉ","ⵢ","ⴰ","ⴳ","ⴷ","⵷","ⵙ"],
+    ["ⴳ","ⴰ","ⵔ","ⴳ","ⵉ","ⵔ","ⴷ"]
+  ]
+};
 
-  // المرحلة 2
-  {
-    name: "مرحلة ⵣ - 2",
-    grid: { cols: 7, rows: 7 },
-    layout: [
-      { q: 0, col: 0, row: 0, dir: "vertical", length: 3 },
-      { q: 1, col: 3, row: 0, dir: "vertical", length: 3 },
-      { q: 2, col: 0, row: 5, dir: "vertical", length: 3 },
-      { q: 3, col: 6, row: 0, dir: "vertical", length: 3 },
-      { q: 4, col: 6, row: 5, dir: "vertical", length: 3 },
-      { q: 5, col: 3, row: 0, dir: "vertical", length: 7 },
-      { q: 6, col: 0, row: 2, dir: "horizontal", length: 7 },
-      { q: 7, col: 0, row: 5, dir: "horizontal", length: 7 }
-    ],
-    qs: [
-      { a: "ⴰⵎⵉ", text: { ar: "كلمة عمودية 1", en: "Vertical 1", am: "ⴰⵎⵉ" } },
-      { a: "ⴷⵓⴳ", text: { ar: "كلمة عمودية 2", en: "Vertical 2", am: "ⴷⵓⴳ" } },
-      { a: "ⴳⵉⴳ", text: { ar: "كلمة عمودية 3", en: "Vertical 3", am: "ⴳⵉⴳ" } },
-      { a: "ⵉⵎⵙ", text: { ar: "كلمة عمودية 4", en: "Vertical 4", am: "ⵉⵎⵙ" } },
-      { a: "ⴷⴰⵣ", text: { ar: "كلمة عمودية 5", en: "Vertical 5", am: "ⴷⴰⵣ" } },
-      { a: "ⵓⴱⴳⴷⴻⴽⴳ", text: { ar: "العمود الأوسط", en: "Middle column", am: "ⵓⴱⴳⴷⴻⴽⴳ" } },
-      { a: "ⵉⵎⴰⴳⴷⵉⵙ", text: { ar: "أفقية 1", en: "Horizontal 1", am: "ⵉⵎⴰⴳⴷⵉⵙ" } },
-      { a: "ⴳⴰⵎⴽⵉⵔⴷ", text: { ar: "أفقية 2", en: "Horizontal 2", am: "ⴳⴰⵎⴽⵉⵔⴷ" } }
-    ]
-  }
-];
+// ===== مرحلة ⵣ - 2 =====
+stages[1] = {
+  name: "مرحلة ⵣ - 2",
+  grid: { cols: 7, rows: 7 },
+  layout: [
+    { q: 0, col: 0, row: 0, dir: "vertical", length: 3 },
+    { q: 1, col: 3, row: 0, dir: "vertical", length: 7 },
+    { q: 2, col: 0, row: 5, dir: "vertical", length: 3 },
+    { q: 3, col: 6, row: 0, dir: "vertical", length: 3 },
+    { q: 4, col: 6, row: 5, dir: "vertical", length: 3 },
+    { q: 5, col: 0, row: 2, dir: "horizontal", length: 7 },
+    { q: 6, col: 0, row: 5, dir: "horizontal", length: 7 }
+  ],
+  qs: [
+    { a: "ⴰⵎⵉ", text: { ar: "كلمة عمودية 4", en: "Vertical 1", am: "ⴰⵎⵉ" } },
+    { a: "ⴷⵓⴳⴰⴱⴳⴷ", text: { ar: "العمود الأوسط", en: "Middle column", am: "ⴷⵓⴳⴰⴱⴳⴷ" } },
+    { a: "ⴳⵉⴳ", text: { ar: "كلمة عمودية 3", en: "Vertical 3", am: "ⴳⵉⴳ" } },
+    { a: "ⵉⵎⵙ", text: { ar: "كلمة عمودية 1", en: "Vertical 4", am: "ⵉⵎⵙ" } },
+    { a: "ⴷⴰⵣ", text: { ar: "كلمة عمودية 2", en: "Vertical 5", am: "ⴷⴰⵣ" } },
+    { a: "ⵉⵎⴰⴳⴷ⵷ⵙ", text: { ar: "أفقية 3", en: "Horizontal 1", am: "ⵉⵎⴰⴳⴷ⵷ⵙ" } },
+    { a: "ⴳⴰⵏⴳⵉⵔⴷ", text: { ar: "أفقية 2", en: "Horizontal 2", am: "ⴳⴰⵏⴳⵉⵔⴷ" } }
+  ],
+  answers: [
+    ["ⴰ","ⵎ","ⵉ"],
+    ["ⴷ","ⵓ","ⴳ","ⴰ","ⴱ","ⴳ","ⴷ"],
+    ["ⴳ","ⵉ","ⴳ"],
+    ["ⵉ","ⵎ","ⵙ"],
+    ["ⴷ","ⴰ","ⵣ"],
+    ["ⵉ","ⵎ","ⴰ","ⴳ","ⴷ","⵷","ⵙ"],
+    ["ⴳ","ⴰ","ⵏ","ⴳ","ⵉ","ⵔ","ⴷ"]
+  ]
+};
+
+// ===== مرحلة ⵣ - 3 =====
+stages[2] = {
+  name: "مرحلة ⵣ - 3",
+  grid: { cols: 7, rows: 7 },
+  layout: [
+    { q: 0, col: 0, row: 0, dir: "vertical", length: 3 },
+    { q: 1, col: 3, row: 0, dir: "vertical", length: 7 },
+    { q: 2, col: 0, row: 5, dir: "vertical", length: 3 },
+    { q: 3, col: 6, row: 0, dir: "vertical", length: 3 },
+    { q: 4, col: 6, row: 5, dir: "vertical", length: 3 },
+    { q: 5, col: 0, row: 2, dir: "horizontal", length: 7 },
+    { q: 6, col: 0, row: 5, dir: "horizontal", length: 7 }
+  ],
+  qs: [
+    { a: "ⵓⵎⵉ", text: { ar: "كلمة عمودية 4", en: "Vertical 1", am: "ⵓⵎⵉ" } },
+    { a: "ⵢⵓⴳⴰⴱⴳⴷ", text: { ar: "العمود الأوسط", en: "Middle column", am: "ⵢⵓⴳⴰⴱⴳⴷ" } },
+    { a: "ⴳⵉⴷ", text: { ar: "كلمة عمودية 3", en: "Vertical 3", am: "ⴳⵉⴷ" } },
+    { a: "ⴷⵎⵙ", text: { ar: "كلمة عمودية 1", en: "Vertical 4", am: "ⴷⵎⵙ" } },
+    { a: "ⴷⴰⵔ", text: { ar: "كلمة عمودية 2", en: "Vertical 5", am: "ⴷⴰⵔ" } },
+    { a: "ⵉⵎⴰⴳⴷⵓⵙ", text: { ar: "أفقية 3", en: "Horizontal 1", am: "ⵉⵎⴰⴳⴷⵓⵙ" } },
+    { a: "ⴳⴰⵎⴳⵉⵔⴷ", text: { ar: "أفقية 2", en: "Horizontal 2", am: "ⴳⴰⵎⴳⵉⵔⴷ" } }
+  ],
+  answers: [
+    ["ⵓ","ⵎ","ⵉ"],
+    ["ⵢ","ⵓ","ⴳ","ⴰ","ⴱ","ⴳ","ⴷ"],
+    ["ⴳ","ⵉ","ⴷ"],
+    ["ⴷ","ⵎ","ⵙ"],
+    ["ⴷ","ⴰ","ⵔ"],
+    ["ⵉ","ⵎ","ⴰ","ⴳ","ⴷ","ⵓ","ⵙ"],
+    ["ⴳ","ⴰ","ⵎ","ⴳ","ⵉ","ⵔ","ⴷ"]
+  ]
+};
 
 /* ===== START QUESTION ===== */
-function startQuestion(){
+function startQuestion() {
   const L = stages[stage].qs[q];
   levelTitle.textContent = stages[stage].name;
 
   // صورة السؤال
-  if(L.img){ questionImg.src = L.img; questionImg.style.display="block"; }
-  else questionImg.style.display="none";
+  if(L.img){ 
+    questionImg.src = L.img; 
+    questionImg.style.display="block"; 
+  } else {
+    questionImg.style.display="none"; 
+  }
 
   // نص السؤال
-  if(L.text && L.text[currentLang]){ questionText.textContent = L.text[currentLang]; questionText.style.display="block"; }
-  else questionText.style.display="none";
+  if(L.text && L.text[currentLang]){ 
+    questionText.textContent = L.text[currentLang]; 
+    questionText.style.display="block"; 
+  } else {
+    questionText.style.display="none"; 
+  }
 
   // صناديق الإجابة
-  boxes.innerHTML = ""; input = [];
-  for(let ch of L.a){ const b = document.createElement("div"); b.className = "answer-box"; boxes.appendChild(b); }
+  boxes.innerHTML = "";
+  selectedKeys = [];
+  answerBoxes = [];
 
-  // إنشاء لوحة المفاتيح/العجلة
+  const savedAll = JSON.parse(localStorage.getItem("amazighAnswers") || "{}")[stage] || {};
+  const stageLayout = stages[stage].layout;
+  const thisLayout = stageLayout.find(l => l.q === q);
+
+  for (let i = 0; i < L.a.length; i++) {
+    const b = document.createElement("div");
+    b.className = "answer-box";
+    b.dataset.pos = i;
+
+    // تعبئة الحرف إذا كان موجودًا في أي سؤال آخر يشارك نفس الخلية
+    let letter = "";
+    stageLayout.forEach(layoutItem => {
+      const savedAnswer = savedAll[layoutItem.q];
+      if(!savedAnswer) return;
+      for (let j = 0; j < layoutItem.length; j++) {
+        const r = layoutItem.dir === "horizontal" ? layoutItem.row : layoutItem.row + j;
+        const c = layoutItem.dir === "horizontal" ? layoutItem.col + j : layoutItem.col;
+        const thisR = thisLayout.dir === "horizontal" ? thisLayout.row : thisLayout.row + i;
+        const thisC = thisLayout.dir === "horizontal" ? thisLayout.col + i : thisLayout.col;
+        if(r === thisR && c === thisC) {
+          letter = savedAnswer[j] || letter;
+        }
+      }
+    });
+
+    b.textContent = letter;
+    boxes.appendChild(b);
+    answerBoxes.push(b);
+  }
+
+  // لوحة المفاتيح / العجلة
   renderBoard(L);
-  hintCount.textContent = hintsLeft;
+
+  // تحديث عداد التلميحات للسؤال الحالي
+  const savedHints = savedAll[q] || [];
+  hintCount.textContent = Math.max(0, 3 - savedHints.length);
 }
 
 /* ===== BOARD: KEYBOARD & WHEEL ===== */
@@ -1165,15 +1201,24 @@ function makeKey(ch){
 function pick(el,L){
   if(el.classList.contains("used") || el.classList.contains("locked")) return;
   el.classList.add("used");
-  input.push(el);
+  selectedKeys.push(el);
+
   if(vibeOn && navigator.vibrate) navigator.vibrate(20);
   refresh();
-  if(input.length===L.a.length) check(L);
+  if(selectedKeys.length===L.a.length)
+ check(L);
 }
 
 function removeLast(){
-  if(!input.length) return;
-  const last = input.pop(); if(last) last.classList.remove("used"); refresh();
+
+  if(!selectedKeys.length) return;
+
+  const lastKey = selectedKeys.pop();
+  if(lastKey){
+    lastKey.classList.remove("used");
+  }
+
+  refresh();
 }
 
 function renderBoard(L){
@@ -1224,83 +1269,87 @@ function dragPick(e,L){
 
 /* ===== REFRESH ANSWER BOXES ===== */
 function refresh(){
-  const stageCard = mapGrid.children[stage];
-  if (!stageCard) return;
-
-  const grid = stageCard.querySelector('.stage-grid');
-
-  document.querySelectorAll(".answer-box").forEach((box,i)=>{
-
-    // قراءة حرف من الشبكة إذا موجود
-    let letterFromGrid = "";
-    if (grid) {
-      const cell = grid.querySelector(`.cell[data-q='${q}'][data-pos='${i}']`);
-      if (cell && cell.dataset.letter) {
-        letterFromGrid = cell.dataset.letter;
-      }
-    }
-
-    // إذا لم يوجد حرف نأخذ من الإدخال الحالي
-    box.textContent = letterFromGrid || input[i]?.dataset?.ch || "";
+  answerBoxes.forEach((box,i)=>{
+    box.textContent = selectedKeys[i]?.dataset?.ch || "";
     box.className = "answer-box";
   });
 }
-/* ===== CHECK ANSWER ===== */
-function check(L){
-  const answer = input.map(k => k.dataset.ch).join("");
 
-  // إذا كانت الإجابة خاطئة
+/* ===== CHECK ANSWER ===== */
+function check(L) {
+  const answer = selectedKeys.map(k => k.dataset.ch).join("");
+
+  // ❌ إجابة خاطئة
   if(answer !== L.a){
     document.querySelectorAll(".answer-box").forEach(b => b.classList.add("bad"));
     setTimeout(() => refresh(), 500);
     return;
   }
 
-  // الإجابة صحيحة
+  // ✅ إجابة صحيحة
   clap();
-  hintsUsed = input.length;
-  stars[stage] = Math.max(stars[stage] || 0, 3 - hintsUsed);
-  localStorage.setItem("amazighStars", JSON.stringify(stars));
 
-  // تحديث الشبكة وصناديق الإجابة
+  // 🔥 حفظ الإجابة
+  saveAnswer(stage, q, [...answer]);
+
+  // تحديث شبكة الخريطة
   const stageCard = mapGrid.children[stage];
   if(stageCard){
-    const grid = stageCard.querySelector('.stage-grid');
+    const grid = stageCard.querySelector(".stage-grid");
     const layoutItem = stages[stage].layout.find(l => l.q === q);
-
     if(grid && layoutItem){
       for(let i = 0; i < layoutItem.length; i++){
         const r = layoutItem.dir === "horizontal" ? layoutItem.row : layoutItem.row + i;
         const c = layoutItem.dir === "horizontal" ? layoutItem.col + i : layoutItem.col;
-
-        const cell = grid.querySelector(`.cell[data-row='${r}'][data-col='${c}']`);
+        const cell = grid.querySelector(`.cell[data-row="${r}"][data-col="${c}"]`);
         if(cell){
-          cell.textContent = answer[i];
-          cell.dataset.letter = answer[i];
-          cell.dataset.pos = i; // مهم: موقع الحرف ضمن الكلمة
+          cell.textContent = answer[i] || "";
+          cell.dataset.letter = answer[i] || "";
         }
       }
     }
-
-    // تحديث صناديق الإجابة
-    document.querySelectorAll(".answer-box").forEach((box, i) => {
-      box.textContent = answer[i];
-      box.classList.add("ok");
-    });
   }
 
-  // السؤال التالي
+  // تنظيف التحديد
+  selectedKeys = [];
+
+  // الانتقال للسؤال التالي
   q++;
+
+  const saved = JSON.parse(localStorage.getItem("amazighAnswers") || "{}");
+  const savedStage = saved[stage] || {};
+
+  // تحقق من أن كل الأسئلة في المرحلة أجاب عنها
+  const allAnswered = stages[stage].qs.every((_, idx) => savedStage[idx]?.length === stages[stage].qs[idx].a.length);
+
+  // ===== حساب النجوم بعد انتهاء جميع الأسئلة =====
+  if(allAnswered){
+    let totalHintsUsed = 0;
+    stages[stage].qs.forEach((_, idx) => {
+      totalHintsUsed += savedStage[idx]?.length || 0;
+    });
+
+    let stageStars = 3 - Math.floor(totalHintsUsed / 3);
+    stageStars = Math.max(0, Math.min(3, stageStars));
+    stars[stage] = stageStars;
+    localStorage.setItem("amazighStars", JSON.stringify(stars));
+
+    starsView.textContent = "⭐".repeat(stageStars) + "☆".repeat(3 - stageStars);
+  }
+
+  // ===== متابعة الأسئلة أو الانتقال للمرحلة التالية =====
   if(q < stages[stage].qs.length){
-    setTimeout(startQuestion, 800);
+    setTimeout(() => startQuestion(), 600);
   } else {
-    if(stage === unlocked){
+    // فقط إذا انتهت جميع الأسئلة، نفتح المرحلة التالية
+    if(allAnswered && stage === unlocked){
       unlocked++;
       localStorage.setItem("amazighUnlocked", unlocked);
     }
 
+    // عرض واجهة نهاية المرحلة
+    stageOverlay.classList.add("active");
     if(stage + 1 < stages.length){
-      stageOverlay.classList.add("active");
       nextStageBtn.onclick = () => {
         stageOverlay.classList.remove("active");
         startStage(stage + 1);
@@ -1345,11 +1394,45 @@ function createStageGrid(rows = 2, cols = 2) {
 }
 
 /* تشغيل الشبكة عند دخول المرحلة */
-createStageGrid(2,2);
+
+
 document.addEventListener("DOMContentLoaded", () => {
   applyLang();
 });
+// حفظ التقدم
+function saveProgress() {
+    const data = {
+        level: currentLevel,
+        foundWords: foundWords
+    };
+    localStorage.setItem("amazighGameProgress", JSON.stringify(data));
+}
 
+// استرجاع التقدم عند فتح اللعبة
+function loadProgress() {
+    const data = JSON.parse(localStorage.getItem("amazighGameProgress"));
+    if (data) {
+        currentLevel = parseInt(data.level) || 0;
+        foundWords = Array.isArray(data.foundWords) ? data.foundWords : [];
+        foundWords.forEach(word => fillWordInBoxes(word));
+    }
+}
+
+function clearGameData(){
+  if(!confirm("هل أنت متأكد من مسح كل التقدم؟")){
+    return;
+  }
+
+  localStorage.removeItem("amazighAnswers");
+  localStorage.removeItem("amazighStars");
+  localStorage.removeItem("amazighStage");
+  localStorage.removeItem("amazighHints");
+  localStorage.removeItem("soundOn");
+  localStorage.removeItem("vibeOn");
+
+  alert("تم مسح جميع بيانات اللعبة ✅");
+  location.reload();
+}
 </script>
 </body>
 </html>
