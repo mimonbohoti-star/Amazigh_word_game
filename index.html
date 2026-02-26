@@ -1164,14 +1164,18 @@ function startQuestion() {
 
     // تعبئة الحرف إذا كان موجودًا في أي سؤال آخر يشارك نفس الخلية
     let letter = "";
+
     stageLayout.forEach(layoutItem => {
       const savedAnswer = savedAll[layoutItem.q];
       if(!savedAnswer) return;
+
       for (let j = 0; j < layoutItem.length; j++) {
         const r = layoutItem.dir === "horizontal" ? layoutItem.row : layoutItem.row + j;
         const c = layoutItem.dir === "horizontal" ? layoutItem.col + j : layoutItem.col;
+
         const thisR = thisLayout.dir === "horizontal" ? thisLayout.row : thisLayout.row + i;
         const thisC = thisLayout.dir === "horizontal" ? thisLayout.col + i : thisLayout.col;
+
         if(r === thisR && c === thisC) {
           letter = savedAnswer[j] || letter;
         }
@@ -1183,14 +1187,10 @@ function startQuestion() {
     answerBoxes.push(b);
   }
 
-  // لوحة المفاتيح / العجلة
+  // إنشاء لوحة المفاتيح/العجلة
   renderBoard(L);
-
-  // تحديث عداد التلميحات للسؤال الحالي
-  const savedHints = savedAll[q] || [];
-  hintCount.textContent = Math.max(0, 3 - savedHints.length);
+  hintCount.textContent = hintsLeft;
 }
-
 /* ===== BOARD: KEYBOARD & WHEEL ===== */
 function makeKey(ch){
   const k = document.createElement("div");
@@ -1281,7 +1281,9 @@ function check(L) {
 
   // ❌ إجابة خاطئة
   if(answer !== L.a){
-    document.querySelectorAll(".answer-box").forEach(b => b.classList.add("bad"));
+    document.querySelectorAll(".answer-box").forEach(b => {
+      b.classList.add("bad");
+    });
     setTimeout(() => refresh(), 500);
     return;
   }
@@ -1292,15 +1294,17 @@ function check(L) {
   // 🔥 حفظ الإجابة
   saveAnswer(stage, q, [...answer]);
 
-  // تحديث شبكة الخريطة
+  // تحديث الشبكة إذا كانت موجودة
   const stageCard = mapGrid.children[stage];
   if(stageCard){
     const grid = stageCard.querySelector(".stage-grid");
     const layoutItem = stages[stage].layout.find(l => l.q === q);
+
     if(grid && layoutItem){
       for(let i = 0; i < layoutItem.length; i++){
         const r = layoutItem.dir === "horizontal" ? layoutItem.row : layoutItem.row + i;
         const c = layoutItem.dir === "horizontal" ? layoutItem.col + i : layoutItem.col;
+
         const cell = grid.querySelector(`.cell[data-row="${r}"][data-col="${c}"]`);
         if(cell){
           cell.textContent = answer[i] || "";
@@ -1322,18 +1326,21 @@ function check(L) {
   // تحقق من أن كل الأسئلة في المرحلة أجاب عنها
   const allAnswered = stages[stage].qs.every((_, idx) => savedStage[idx]?.length === stages[stage].qs[idx].a.length);
 
-  // ===== حساب النجوم بعد انتهاء جميع الأسئلة =====
+  // ===== تحديث النجوم حسب مجموع التلميحات لجميع الأسئلة =====
+  let stageStars = 3; // البداية بـ 3 نجوم
   if(allAnswered){
     let totalHintsUsed = 0;
     stages[stage].qs.forEach((_, idx) => {
-      totalHintsUsed += savedStage[idx]?.length || 0;
+      totalHintsUsed += savedStage[idx]?.length || 0; // كل التلميحات المستخدمة
     });
 
-    let stageStars = 3 - Math.floor(totalHintsUsed / 3);
+    // كل 3 تلميحات تُخصم نجمة واحدة
+    stageStars = 3 - Math.floor(totalHintsUsed / 3);
     stageStars = Math.max(0, Math.min(3, stageStars));
     stars[stage] = stageStars;
     localStorage.setItem("amazighStars", JSON.stringify(stars));
 
+    // عرض النجوم عند نهاية المرحلة
     starsView.textContent = "⭐".repeat(stageStars) + "☆".repeat(3 - stageStars);
   }
 
@@ -1341,20 +1348,21 @@ function check(L) {
   if(q < stages[stage].qs.length){
     setTimeout(() => startQuestion(), 600);
   } else {
-    // فقط إذا انتهت جميع الأسئلة، نفتح المرحلة التالية
+    // فتح المرحلة التالية فقط إذا أجاب اللاعب على كل الأسئلة
     if(allAnswered && stage === unlocked){
       unlocked++;
       localStorage.setItem("amazighUnlocked", unlocked);
     }
 
-    // عرض واجهة نهاية المرحلة
-    stageOverlay.classList.add("active");
     if(stage + 1 < stages.length){
+      // عرض واجهة نهاية المرحلة مع خيارات الانتقال
+      stageOverlay.classList.add("active");
       nextStageBtn.onclick = () => {
         stageOverlay.classList.remove("active");
         startStage(stage + 1);
       };
     } else {
+      // نهاية اللعبة
       celebrate(true);
       finalOverlay.classList.add("active");
     }
