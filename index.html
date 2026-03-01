@@ -6,7 +6,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link
  href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+
+
 <style>
+
 :root{--accent:#f0eae2} 
 *{box-sizing:border-box}
 #mapStageBackground {
@@ -90,20 +93,36 @@ body {
 }
 
 .overlay-content {
-  background: #000;
-  border-radius: 20px;
-  padding: 20px;
-  width: 90%;
-  max-width: 380px;
-  max-height: 85vh;
+  background: linear-gradient(
+    160deg,
+    #0b1026,
+    #140a2e
+  );
+
+  border-radius: 22px;
+  padding: 18px;
+  width: 85%;
+  max-width: 320px;
+  max-height: 80vh;
   overflow-y: auto;
-  box-shadow: 0 0 0 2px var(--accent);
+
+  border: 2px solid rgba(255, 215, 0, 0.6);
+
+  box-shadow:
+    0 0 20px rgba(255, 215, 0, 0.25),
+    0 0 50px rgba(255, 180, 0, 0.15);
 }
 
 .overlay-content h2 {
   text-align: center;
-  color: var(--accent);
-  margin-bottom: 10px;
+  margin-bottom: 15px;
+
+  background: linear-gradient(to right, #ffd700, #ffae00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  font-weight: bold;
+  font-size: 22px;
 }
 
 .overlay-content p,
@@ -122,7 +141,21 @@ body {
   opacity: .7;
   text-align: center;
 }
+.overlay-stars {
+  font-size: 40px;
+  margin: 20px 0;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
 
+.overlay-star {
+  transition: transform 0.4s ease;
+}
+
+.overlay-star.pop {
+  transform: scale(1.4);
+}
 /* ===== حروف أمازيغية في الخلفية ===== */
 body::before {
   content: '';
@@ -139,13 +172,26 @@ body::before {
   z-index: 0;
   opacity: 0.5;
 }
-
 @keyframes lettersMove {
   0% { transform: translate(0,0); }
   100% { transform: translate(-50%, -50%); }
 }
 
 /* ===== البطاقة العامة ===== */
+
+#coinsContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  font-weight: bold;
+  margin: 8px 0;
+  color: gold;
+}
+
+#coinCount {
+  margin-right: 6px;
+}
 .card {
   position: fixed;
   top: 50%;
@@ -182,61 +228,28 @@ body::before {
   margin-bottom: 12px;   /* مسافة أسفل الصورة قبل المحتوى التالي */
 }
 
-/* ===== بطاقات المراحل ===== */
+/* ===== بطاقات المراحل ===== *//* ===== STAGE KEY (البطاقة) ===== */
 .stage-key {
-  position: relative;        /* ضروري للقفل */
-  flex: 0 0 200px;
-  min-width: 250px;
-  height: 350px;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start; /* الشبكة أعلى البطاقة */
+  position: relative;
+  flex: 0 0 200px;        /* حجم افتراضي لكل بطاقة */
+  min-width: 200px;       /* يمنع البطاقة من التمدد أكثر من اللازم */
+  max-width: 250px;       /* يمنع البطاقة من التمدد أكثر من اللازم */
+  height: auto;
   padding: 6px;
-
   border-radius: 14px;
   background: #1e293b;
   color: #fff;
   font-weight: bold;
   cursor: pointer;
   scroll-snap-align: start;
-}
-
-/* ===== الشبكة داخل البطاقة ===== */
-
-.stage-grid {
-  display: grid;
-  gap: 1px;
-
-  width: 95%;          /* تقريبًا تغطي البطاقة */
-  max-width: 260px;    /* الحد الأقصى للشبكة */
-  margin: 6px auto;    /* توسيط الشبكة داخل البطاقة */
-
-  /* نضمن أن الصفوف تتكيف بشكل متساوي */
-  grid-auto-rows: 1fr;
-
-  /* الحد الأقصى للارتفاع لتجنب الخروج من البطاقة */
-  max-height: 180px;   
-}
-
-.stage-grid .cell {
-  background: #FFA500;
-  border-radius: 4px;
-
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-
-  font-weight: bold;
-  font-size: clamp(10px, 2vw, 16px);
-
-  /* الحفاظ على الخانة مربعة */
-  aspect-ratio: 1 / 1;
-
-  width: 100%;
-  height: 100%;
+  justify-content: flex-start;
+  overflow: hidden;       /* يمنع أي تمدد زائد للشبكة خارج البطاقة */
 }
+
+
 .stage-key.locked {
   opacity: .35;
   pointer-events: none;
@@ -491,6 +504,17 @@ body::before {
  background:#020617;padding:26px;border-radius:22px;
  box-shadow:0 0 60px var(--accent);text-align:center;
 }
+/* تصغير الأزرار داخل بطاقة الاحتفال */
+#stageOverlay .win .btn {
+  padding: 6px 12px;       /* يقلل المساحة الداخلية للزر */
+  font-size: 14px;         /* يصغر حجم الخط داخل الزر */
+  border-radius: 12px;     /* يحافظ على الشكل المستدير */
+}
+
+/* مسافة أقل بين الأزرار والنجوم */
+#stageOverlay .win #starsView {
+  margin-bottom: 10px;     /* يقلل المسافة بين النجوم والأزرار */
+}
 
 /* ===== CONFETTI ===== */
 .confetti{
@@ -543,10 +567,6 @@ body::before {
   min-width: 0; /* مهم لتجنب مشكلة Flexbox على بعض المتصفحات */
 }
 
-.stage-key {
-  flex: 0 0 200px; /* يمكن تعديل الحجم حسب التصميم */
-  min-width: 150px; /* يضمن قابلية الضغط على الهاتف */
-}
 
 /* ===== BACKGROUND ===== */
 #stageBackground {
@@ -563,36 +583,158 @@ body::before {
 }
 
 /* ===== STAGE GRID ===== */
-.stage-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); /* أعمدة ديناميكية */
-  grid-auto-rows: 80px; /* ارتفاع كل خلية */
-  gap: 6px; /* المسافة بين المربعات */
-  width: 100%;
-  max-width: 400px;
-  margin: 10px auto 12px auto; /* مسافة من الأعلى والأسفل */
+.stage-key {
+  flex: 0 0 200px;       /* حجم ثابت للبطاقة */
+  max-width: 220px;      /* يمنع البطاقة من التمدد */
+  height: auto;
+  padding: 4px;          /* تقليل padding قليلًا لتجنب الضغط */
+  overflow: hidden;      /* أي محتوى زائد يتم قطعه */
 }
 
-/* ===== STAGE CELL ===== */
+.stage-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(32px, 1fr)); /* أعمدة صغيرة وثابتة */
+  grid-auto-rows: 32px;   /* ارتفاع ثابت لكل خلية */
+  gap: 4px;               /* تقليل الفجوات لتناسب البطاقة */
+  width: 100%;
+  max-width: 220px;       /* لا تتجاوز حجم البطاقة */
+  margin: 0 auto;
+}
+
 .stage-grid .cell {
-  background: #1e293b;
-  border-radius: 6px;
-  border: 1px solid #334155;
+  font-size: clamp(14px, 1.6vw, 18px); /* حجم خط معقول */
+  aspect-ratio: 1 / 1;
+  overflow: hidden;                    /* يمنع خروج النص خارج الخلية */
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* ===== تأثير بروز وانفجار النجمة ===== */
+.star-animate {
+  width: 24px;
+  height: 24px;
+  background: gold;
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+  box-shadow: 0 0 6px gold, 0 0 12px orange;
+}
+
+.star-animate.pop {
+  animation: popStar 0.5s ease forwards;
+}
+
+.spark {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: gold;
+  border-radius: 50%;
+  transform: translate(0,0);
+  animation: sparkAnim 0.6s forwards;
+}
+
+@keyframes popStar {
+  0%   { transform: scale(0.3); opacity: 0; }
+  50%  { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes sparkAnim {
+  to { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; }
+}
+
+/* الأقراص الذهبية المتحركة */
+.golden-disc {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background: gold;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1000; /* فوق بطاقة الاحتفال */
+  text-align: center;
+  line-height: 24px;
   font-weight: bold;
-  font-size: 22px;
   color: #fff;
-user-select: none;
+  text-shadow: 0 0 4px #ffd700, 0 0 8px orange;
+  transform: scale(0);
+  transition: transform 0.3s ease, left 0.8s ease-in-out, top 0.8s ease-in-out, opacity 0.8s ease-in-out;
+}
+
+/* ظهور الأقراص */
+.golden-disc.fly {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.flying-coin {
+  pointer-events: none;
+  background: gold;
+  border-radius: 50%;
+  width: 12px;
+  height: 12px;
+  position: fixed;
+  z-index: 30;
+  box-shadow: 0 0 4px #ffd700;
+}
+
+/* ===== Stars Display ===== */
+.stars-display {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 6px;
+}
+
+.star-icon {
+  font-size: 20px;
+  transition: transform 0.3s ease, color 0.3s ease;
+  color: gold;
+  display: inline-block;
+}
+
+/* ===== تأثير توهج / بوم عند الفوز ===== */
+.stars-glow .star-icon {
+  animation: star-pop 0.6s forwards, star-bounce 2s infinite ease-in-out;
+}
+
+/* وميض متتابع لكل نجمة */
+.stars-glow .star-icon:nth-child(1) { animation-delay: 0s, 0s; }
+.stars-glow .star-icon:nth-child(2) { animation-delay: 0.1s, 0s; }
+.stars-glow .star-icon:nth-child(3) { animation-delay: 0.2s, 0s; }
+
+@keyframes star-pop {
+  0%   { transform: scale(0.8); color: #ccc; }
+  30%  { transform: scale(1.4); color: gold; }
+  50%  { transform: scale(1.2); color: #ffd700; }
+  70%  { transform: scale(1.3) translateY(-4px); color: #ffec8b; }
+  100% { transform: scale(1) translateY(0); color: gold; }
+}
+
+@keyframes star-bounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-3px) scale(1.05); }
 }
 
 </style>
-</head>
 
+</head>
 <body>
 <div id="mapBackground"></div>
 <div class="card">
+
+  <div id="coinsContainer">
+    <span id="coinCount">0</span> 💰
+  </div>
+
+  <div id="starsContainer">
+  <div class="star-animate"></div>
+  <div class="star-animate"></div>
+  <div class="star-animate"></div>
+</div>
+
 <div id="menu" class="section active">
  <h1>ⵣلعبة الكلمات و الألغاز الأمازيغيةⵣ</h1>
  <button class="btn btn-main" onclick="openMap()">▶️ ⴱⴷⴰ</button>
@@ -643,7 +785,7 @@ user-select: none;
  <div class="answer-boxes" id="boxes"></div>
 
  <!-- زر التلميح والعداد -->
- <button class="btn btn-hint" id="hintBtn" onclick="useHint()">💡 تلميح</button>
+ <button class="btn btn-hint" id="hintBtn">💡 تلميح</button>
 <div id="hintCount">3</div>
 
  <!-- عجلة الأحرف -->
@@ -667,8 +809,10 @@ user-select: none;
 </div>
 </div>
 <div id="stageOverlay" class="overlay">
- <div class="win">
+ 
+<div class="win">
   <h2>✨ نهاية المرحلة ✨</h2>
+<div id="overlayStars" class="overlay-stars"></div>
   <div id="starsView" style="font-size:32px;margin:12px 0"></div>
   <button class="btn btn-main" id="nextStageBtn">▶️ المرحلة التالية</button>
   <button class="btn btn-back" onclick="show('map'); stageOverlay.classList.remove('active')">🗺️ الخريطة</button>
@@ -708,52 +852,14 @@ This Amazigh words and puzzles game aims to test your knowledge and enrich your 
     <button 
 onclick="closeHowTo()">إغلاق</button>
   </div>
+
+
 <script>
+
 /* ===== فتح وغلق How To ===== */
 function openHowTo(){ document.getElementById("howToBox").style.display="flex"; }
 function closeHowTo(){ document.getElementById("howToBox").style.display="none"; }
-
-/* ===== المتغيرات العامة ===== */
-let stars = JSON.parse(localStorage.getItem("amazighStars") || "[]");
-
-function useHint() {
-  const savedAll = JSON.parse(localStorage.getItem("amazighAnswers") || "{}");
-  const savedStage = savedAll[stage] || {};
-  const savedQuestion = savedStage[q] || {};
-  
-  // تلميحات مستخدمة حتى الآن
-  const usedHints = savedQuestion.hintsUsed || 0;
-  
-  if(usedHints >= 3) return; // لا تلميحات متبقية
-  
-  const L = stages[stage].qs[q];
-  
-  // إيجاد أول خانة فارغة
-  for(let i = 0; i < answerBoxes.length; i++){
-    const box = answerBoxes[i];
-    if(!box.textContent){
-      const letter = L.a[i];
-      box.textContent = letter;
-
-      // تحديث التخزين
-      savedQuestion.answers = savedQuestion.answers || [];
-      savedQuestion.answers[i] = letter;
-      savedQuestion.hintsUsed = usedHints + 1;
-
-      savedStage[q] = savedQuestion;
-      savedAll[stage] = savedStage;
-      localStorage.setItem("amazighAnswers", JSON.stringify(savedAll));
-
-      // تحديث واجهة العد
-      hintCount.textContent = 3 - savedQuestion.hintsUsed;
-
-      break; // تلميح واحد فقط في كل مرة
-    }
-  }
-}
-/* ربط الزر */
-document.getElementById("hintBtn").addEventListener("click", useHint);
-
+/* ======================= المتغيرات العامة ======================= */
 const boxes = document.getElementById("boxes");
 const keyboard = document.getElementById("keyboard");
 const wheel = document.getElementById("wheel");
@@ -767,17 +873,117 @@ let currentLang = localStorage.getItem("lang") || "ar";
 let stage = 0, q = 0, drag = false;
 let hintsLeft = 3, hintsUsed = 0;
 let unlocked = +localStorage.getItem("amazighUnlocked") || 0;
+let stars = JSON.parse(localStorage.getItem("amazighStars") || "[]");
 
-/* ===== SETTINGS ===== */
+/* ======================= SETTINGS ======================= */
 let soundOn = localStorage.getItem("soundOn") !== "0";
 let vibeOn = localStorage.getItem("vibeOn") !== "0";
 const soundToggle = document.getElementById("soundToggle");
 const vibeToggle = document.getElementById("vibeToggle");
 
-/* ===== عناصر المرحلة ===== */
+/* ======================= صوت النجوم ======================= */
+const starSound = new Audio("sounds/star-coin.mp3"); // ضع مسار الصوت المناسب
+
+/* ======================= عناصر المرحلة ======================= */
 const levelTitle = document.getElementById("levelTitle");
 const questionImg = document.getElementById("questionImg");
 const questionText = document.getElementById("questionText");
+const hintCount = document.getElementById("hintCount");
+const stageOverlay = document.getElementById("stageOverlay");
+const nextStageBtn = document.getElementById("nextStageBtn");
+const finalOverlay = document.getElementById("finalOverlay");
+
+/* ======================= دالة استخدام التلميح ======================= */
+function useHint() {
+  const savedAll = JSON.parse(localStorage.getItem("amazighAnswers") || "{}");
+  if (!savedAll[stage]) savedAll[stage] = {};
+  const savedStage = savedAll[stage];
+  const currentQData = savedStage[q] || {};
+
+  // عدد التلميحات المستخدمة للسؤال الحالي
+  let hintsUsed = currentQData.hintsUsed || 0;
+
+  // أقصى عدد تلميحات مسموح بها (مثلاً 3)
+  const maxHints = 3;
+  if (hintsUsed >= maxHints) {
+    alert("لقد استخدمت كل التلميحات لهذا السؤال!");
+    return;
+  }
+
+  // تحقق إذا الرصيد كافٍ
+  if (!spendCoins(10)) return; // خصم 10 عملات فقط إذا الرصيد كافٍ
+
+  // تحديث عدد التلميحات المستخدمة
+  hintsUsed++;
+  currentQData.hintsUsed = hintsUsed;
+  savedStage[q] = currentQData;
+  savedAll[stage] = savedStage;
+  localStorage.setItem("amazighAnswers", JSON.stringify(savedAll));
+
+  // تنفيذ التلميح فعلياً (كشف حرف جديد)
+  revealHintForQuestion(q);
+}
+
+function revealHintForQuestion(qIndex) {
+  const L = stages[stage].qs[qIndex]; // بيانات السؤال
+  const savedAll = JSON.parse(localStorage.getItem("amazighAnswers") || "{}");
+  if (!savedAll[stage]) savedAll[stage] = {};
+  const savedStage = savedAll[stage];
+  const currentQData = savedStage[qIndex] || {};
+
+  const answerBoxes = document.querySelectorAll(".answer-box");
+  if (!answerBoxes.length) return;
+
+  // مصفوفة الحروف التي لم تُكشف بعد
+  const revealed = currentQData.revealedIndices || [];
+  const hiddenIndices = [];
+  for (let i = 0; i < L.a.length; i++) {
+    if (!revealed.includes(i)) hiddenIndices.push(i);
+  }
+
+  if (!hiddenIndices.length) return; // كل الحروف مكشوفة بالفعل
+
+  // كشف أول حرف مخفي فقط (لتجنب التكرار)
+  const indexToReveal = hiddenIndices[0];
+
+  answerBoxes[indexToReveal].textContent = L.a[indexToReveal];
+  answerBoxes[indexToReveal].classList.add("hint-revealed");
+
+  // تحديث revealedIndices
+  revealed.push(indexToReveal);
+  currentQData.revealedIndices = revealed;
+  savedStage[qIndex] = currentQData;
+  savedAll[stage] = savedStage;
+  localStorage.setItem("amazighAnswers", JSON.stringify(savedAll));
+
+  // تحديث selectedKeys لتوافق الحروف المكشوفة (نفس طريقة لعبتك)
+  selectedKeys[indexToReveal] = { dataset: { ch: L.a[indexToReveal] } };
+}
+
+/* ======================= تحديث النجوم المباشرة ======================= */
+function updateLiveStars() {
+  const allSaved = JSON.parse(localStorage.getItem("amazighAnswers") || "{}");
+  const savedStage = allSaved[stage] || {};
+  let totalHintsUsed = 0;
+
+  Object.values(savedStage).forEach(obj => {
+    if (obj && typeof obj === "object") {
+      totalHintsUsed += obj.hintsUsed || 0;
+    }
+  });
+
+  let liveStars = 3;
+  if (totalHintsUsed >= 3) liveStars = 2;
+  if (totalHintsUsed >= 5) liveStars = 1;
+  if (totalHintsUsed >= 8) liveStars = 0;
+
+  // تحديث العرض فقط، لا تحفظ هنا
+  updateStarsDisplay(stage, liveStars);
+}
+
+/* ======================= ربط زر التلميح ======================= */
+document.getElementById("hintBtn").addEventListener("click", useHint);
+
 
 /* ===== دالة حفظ الإجابات ===== */
 
@@ -877,7 +1083,13 @@ function createStageGridForCard(stageIndex) {
 
   if (savedAll[stageIndex]) {
     Object.keys(savedAll[stageIndex]).forEach(qIndex => {
-      updateStageGrid(stageIndex, parseInt(qIndex), savedAll[stageIndex][qIndex]);
+      
+updateStageGrid(
+  stageIndex,
+  parseInt(qIndex),
+  savedAll[stageIndex][qIndex].answer
+);
+
     });
   }
 }
@@ -960,17 +1172,21 @@ function openMap() {
     d.className = "stage-key" + (i > unlocked ? " locked" : "");
 
     const s = stars[i] || 0;
+
     d.innerHTML = `
-      <div style="text-align:center;margin-top:4px">${translations[currentLang].stage} ${i+1}</div>
-      <div style="font-size:16px;text-align:center">${"⭐".repeat(s)}${"☆".repeat(3-s)}</div>
+      <div style="text-align:center;margin-top:4px">
+        ${translations[currentLang].stage} ${i+1}
+      </div>
+      <div class="stars-display" style="font-size:16px;text-align:center"></div>
     `;
 
     mapGrid.appendChild(d);
 
-    // إنشاء شبكة الأعمدة داخل البطاقة
+    // عرض النجوم الحقيقية
+    updateStarsDisplay(i, s);
+
     createStageGridForCard(i);
 
-    // ===== استرجاع الحروف المحفوظة لكل سؤال =====
     if (savedAll[i]) {
       Object.keys(savedAll[i]).forEach(qIndex => {
         updateStageGrid(i, qIndex, savedAll[i][qIndex]);
@@ -1127,25 +1343,104 @@ stages[2] = {
   ]
 };
 
+// تهيئة العملات عند فتح اللعبة
+let coins = parseInt(localStorage.getItem("amazighCoins") || "0");
+updateCoinsUI();
+
+// دالة لتحديث الرقم في الصفحة
+function updateCoinsUI() {
+  const coinElem = document.getElementById("coinCount");
+  if (coinElem) {
+    coinElem.textContent = coins;
+  }
+}
+
+// عند الإجابة الصحيحة في دالة check(L)
+function addCoins(amount) {
+  coins += amount;          // مثال: كل جواب صحيح 20
+  localStorage.setItem("amazighCoins", coins);
+  updateCoinsUI();
+}
+
+function collectGoldenCoins(amount = 30) {
+    const coinElem = document.getElementById("coinCount");
+    if (!coinElem) return;
+
+    const rectCoin = coinElem.getBoundingClientRect();
+
+    for (let i = 0; i < 3; i++) {
+        const disc = document.createElement("div");
+        disc.className = "golden-disc";
+        disc.textContent = "🪙"; // أيقونة القرص
+
+        document.body.appendChild(disc);
+
+        // البداية من منتصف الشاشة (أو موقع مميز)
+        disc.style.position = "fixed";
+        disc.style.left = "50%";
+        disc.style.top = "50%";
+        disc.style.transform = "translate(-50%, -50%) scale(1.2)";
+        disc.style.fontSize = "28px";
+        disc.style.zIndex = 9999;
+        disc.style.transition = "all 0.8s ease-in-out";
+
+        // حركة تدريجية نحو الكيس
+        setTimeout(() => {
+            disc.style.left = rectCoin.left + "px";
+            disc.style.top = rectCoin.top + "px";
+            disc.style.transform = "scale(0.4)";
+            disc.style.opacity = 0.7;
+        }, i * 150);
+
+        // عند الوصول → إضافة العملات + صوت تصادم
+        setTimeout(() => {
+            disc.remove();
+            if (i === 2) {
+                addCoins(amount);
+                playCoinSound(); // دالة صوتية
+            }
+        }, 1000 + i * 150);
+    }
+}
+
+// صوت تصادم العملات المعدنية
+function playCoinSound() {
+    const audio = new Audio("sounds/coin.mp3"); // ضع المسار الصحيح للصوت
+    audio.play();
+}
+
+// عند شراء تلميح
+function spendCoins(amount) {
+  if(coins >= amount) {
+    coins -= amount;
+    localStorage.setItem("amazighCoins", coins);
+    updateCoinsUI();
+    return true;
+  } else {
+    alert("ليس لديك عملات كافية!");
+    return false;
+  }
+}
+
 /* ===== START QUESTION ===== */
 function startQuestion() {
   const L = stages[stage].qs[q];
   levelTitle.textContent = stages[stage].name;
 
   // صورة السؤال
-  if(L.img){ 
-    questionImg.src = L.img; 
-    questionImg.style.display="block"; 
+  if(L.img){
+    questionImg.src = L.img;
+    questionImg.style.display = "block";
   } else {
-    questionImg.style.display="none"; 
+    questionImg.style.display = "none";
   }
 
   // نص السؤال
-  if(L.text && L.text[currentLang]){ 
-    questionText.textContent = L.text[currentLang]; 
-    questionText.style.display="block"; 
+  if(L.text && L.text[currentLang]){
+    questionText.textContent = L.text[currentLang];
+    questionText.style.display = "block";
   } else {
-    questionText.style.display="none"; 
+    questionText.style.display = "none";
   }
 
   // صناديق الإجابة
@@ -1162,21 +1457,17 @@ function startQuestion() {
     b.className = "answer-box";
     b.dataset.pos = i;
 
-    // تعبئة الحرف إذا كان موجودًا في أي سؤال آخر يشارك نفس الخلية
+    // تعبئة الحرف إذا موجود في أي سؤال آخر يشارك نفس الخلية
     let letter = "";
-
     stageLayout.forEach(layoutItem => {
       const savedAnswer = savedAll[layoutItem.q];
       if(!savedAnswer) return;
-
-      for (let j = 0; j < layoutItem.length; j++) {
-        const r = layoutItem.dir === "horizontal" ? layoutItem.row : layoutItem.row + j;
-        const c = layoutItem.dir === "horizontal" ? layoutItem.col + j : layoutItem.col;
-
-        const thisR = thisLayout.dir === "horizontal" ? thisLayout.row : thisLayout.row + i;
-        const thisC = thisLayout.dir === "horizontal" ? thisLayout.col + i : thisLayout.col;
-
-        if(r === thisR && c === thisC) {
+      for(let j=0; j<layoutItem.length; j++){
+        const r = layoutItem.dir==="horizontal"? layoutItem.row : layoutItem.row+j;
+        const c = layoutItem.dir==="horizontal"? layoutItem.col + j : layoutItem.col;
+        const thisR = thisLayout.dir==="horizontal"? thisLayout.row : thisLayout.row+i;
+        const thisC = thisLayout.dir==="horizontal"? thisLayout.col + i : thisLayout.col;
+        if(r===thisR && c===thisC){
           letter = savedAnswer[j] || letter;
         }
       }
@@ -1187,10 +1478,18 @@ function startQuestion() {
     answerBoxes.push(b);
   }
 
-  // إنشاء لوحة المفاتيح/العجلة
+  // لوحة المفاتيح / العجلة
   renderBoard(L);
+
+  // تحديث عداد التلميحات للسؤال الحالي
+ 
+const savedQ = savedAll[q] || {};
+hintsUsed = savedQ.hintsUsed || 0;
+hintsLeft = Math.max(0, 3 - hintsUsed);
+
   hintCount.textContent = hintsLeft;
 }
+
 /* ===== BOARD: KEYBOARD & WHEEL ===== */
 function makeKey(ch){
   const k = document.createElement("div");
@@ -1275,15 +1574,61 @@ function refresh(){
   });
 }
 
+// ===== نجوم البطاقة: انفجار بصري وحركي + شرارات =====
+
+
+// ===== أقراص ذهبية تتحرك للكيس مع صوت تصادم =====
+function flyGoldenDiscsToCoin(amount = 30, stageIndex = stage) {
+
+  const coinsKey = `amazighStageCoins_${stageIndex}`;
+
+  // نضيف العملات مرة واحدة فقط
+  const alreadyRewarded = localStorage.getItem(coinsKey);
+
+  const coinElem = document.getElementById("coinCount");
+  if (!coinElem) return;
+
+  const rectCoin = coinElem.getBoundingClientRect();
+  const discCount = 10;
+
+  for (let i = 0; i < discCount; i++) {
+    const disc = document.createElement("div");
+    disc.className = "golden-disc";
+    disc.textContent = "🪙";
+    document.body.appendChild(disc);
+
+    disc.style.position = "fixed";
+    disc.style.left = "50%";
+    disc.style.top = "50%";
+    disc.style.transform = "translate(-50%, -50%) scale(1.2)";
+    disc.style.zIndex = 9999;
+    disc.style.opacity = 1;
+
+    setTimeout(() => {
+      disc.style.left = rectCoin.left + "px";
+      disc.style.top = rectCoin.top + "px";
+      disc.style.transform = "scale(0.3)";
+      disc.style.opacity = 0;
+    }, i * 120);
+
+    setTimeout(() => {
+      disc.remove();
+      if (i === discCount - 1 && !alreadyRewarded) {
+        localStorage.setItem(coinsKey, "1");
+        addCoins(amount);
+        playCoinSound();
+      }
+    }, 1000 + i * 120);
+  }
+}
 /* ===== CHECK ANSWER ===== */
+
 function check(L) {
   const answer = selectedKeys.map(k => k.dataset.ch).join("");
 
   // ❌ إجابة خاطئة
-  if(answer !== L.a){
-    document.querySelectorAll(".answer-box").forEach(b => {
-      b.classList.add("bad");
-    });
+  if (answer !== L.a) {
+    document.querySelectorAll(".answer-box").forEach(b => b.classList.add("bad"));
     setTimeout(() => refresh(), 500);
     return;
   }
@@ -1291,22 +1636,34 @@ function check(L) {
   // ✅ إجابة صحيحة
   clap();
 
-  // 🔥 حفظ الإجابة
-  saveAnswer(stage, q, [...answer]);
+  const currentQ = q;
+  const savedAll = JSON.parse(localStorage.getItem("amazighAnswers") || "{}");
+  if (!savedAll[stage]) savedAll[stage] = {};
+  const savedStage = savedAll[stage];
 
-  // تحديث الشبكة إذا كانت موجودة
+  const alreadySolved = savedStage[currentQ]?.solved;
+
+  // 🔥 ربح 20 عملة للسؤال مرة واحدة فقط
+  if (!alreadySolved) addCoins(20);
+
+  // ===== حفظ الإجابة فقط إذا لم تحل مسبقًا =====
+  savedStage[currentQ] = savedStage[currentQ] || {};
+  savedStage[currentQ].answer = [...answer];
+  savedStage[currentQ].solved = true;
+  savedAll[stage] = savedStage;
+  localStorage.setItem("amazighAnswers", JSON.stringify(savedAll));
+
+  // ===== تحديث الشبكة =====
   const stageCard = mapGrid.children[stage];
-  if(stageCard){
+  if (stageCard) {
     const grid = stageCard.querySelector(".stage-grid");
-    const layoutItem = stages[stage].layout.find(l => l.q === q);
-
-    if(grid && layoutItem){
-      for(let i = 0; i < layoutItem.length; i++){
+    const layoutItem = stages[stage].layout.find(l => l.q === currentQ);
+    if (grid && layoutItem) {
+      for (let i = 0; i < layoutItem.length; i++) {
         const r = layoutItem.dir === "horizontal" ? layoutItem.row : layoutItem.row + i;
         const c = layoutItem.dir === "horizontal" ? layoutItem.col + i : layoutItem.col;
-
         const cell = grid.querySelector(`.cell[data-row="${r}"][data-col="${c}"]`);
-        if(cell){
+        if (cell) {
           cell.textContent = answer[i] || "";
           cell.dataset.letter = answer[i] || "";
         }
@@ -1317,57 +1674,71 @@ function check(L) {
   // تنظيف التحديد
   selectedKeys = [];
 
-  // الانتقال للسؤال التالي
-  q++;
+  // ===== التحقق من اكتمال المرحلة =====
+  const updatedStage = savedAll[stage];
+  const allAnswered = stages[stage].qs.every((_, idx) => updatedStage[idx]?.solved);
 
-  const saved = JSON.parse(localStorage.getItem("amazighAnswers") || "{}");
-  const savedStage = saved[stage] || {};
-
-  // تحقق من أن كل الأسئلة في المرحلة أجاب عنها
-  const allAnswered = stages[stage].qs.every((_, idx) => savedStage[idx]?.length === stages[stage].qs[idx].a.length);
-
-  // ===== تحديث النجوم حسب مجموع التلميحات لجميع الأسئلة =====
-  let stageStars = 3; // البداية بـ 3 نجوم
-  if(allAnswered){
+  if (allAnswered) {
+    // ===== حساب النجوم النهائي حسب التلميحات =====
     let totalHintsUsed = 0;
     stages[stage].qs.forEach((_, idx) => {
-      totalHintsUsed += savedStage[idx]?.length || 0; // كل التلميحات المستخدمة
+      totalHintsUsed += updatedStage[idx]?.hintsUsed || 0;
     });
 
-    // كل 3 تلميحات تُخصم نجمة واحدة
-    stageStars = 3 - Math.floor(totalHintsUsed / 3);
-    stageStars = Math.max(0, Math.min(3, stageStars));
+    let stageStars = 3;
+    if (totalHintsUsed >= 3) stageStars = 2;
+    if (totalHintsUsed >= 5) stageStars = 1;
+    if (totalHintsUsed >= 8) stageStars = 0;
+
+    // حفظ النجوم
     stars[stage] = stageStars;
     localStorage.setItem("amazighStars", JSON.stringify(stars));
 
-    // عرض النجوم عند نهاية المرحلة
-    starsView.textContent = "⭐".repeat(stageStars) + "☆".repeat(3 - stageStars);
-  }
+    // فتح المرحلة التالية مرة واحدة فقط
+    unlocked = Math.max(unlocked, stage + 1);
+    localStorage.setItem("amazighUnlocked", unlocked);
 
-  // ===== متابعة الأسئلة أو الانتقال للمرحلة التالية =====
-  if(q < stages[stage].qs.length){
-    setTimeout(() => startQuestion(), 600);
-  } else {
-    // فتح المرحلة التالية فقط إذا أجاب اللاعب على كل الأسئلة
-    if(allAnswered && stage === unlocked){
-      unlocked++;
-      localStorage.setItem("amazighUnlocked", unlocked);
-    }
+// ===== مكافأة الـ30 عملة مرة واحدة لكل مرحلة =====
+const coinsFromStageKey = `amazigh30Coins_${stage}`;
+if (!localStorage.getItem(coinsFromStageKey)) {
+  setTimeout(() => {
+    addCoins(30);        // تمنح 30 عملة مرة واحدة فقط
+    playCoinSound();
+    localStorage.setItem(coinsFromStageKey, "1"); // حفظ المفتاح بعد المنح
+  }, 600);
+}
 
-    if(stage + 1 < stages.length){
-      // عرض واجهة نهاية المرحلة مع خيارات الانتقال
-      stageOverlay.classList.add("active");
+
+    // ===== عرض overlay + النجوم + تأثير البطاقة =====
+    stageOverlay.classList.add("active");
+    showOverlayStars(stageStars);
+    setTimeout(() => celebrateStage(stageStars, 30), 1200);
+
+    // ===== زر المرحلة التالية أو الاحتفال النهائي =====
+    if (stage + 1 < stages.length) {
       nextStageBtn.onclick = () => {
         stageOverlay.classList.remove("active");
         startStage(stage + 1);
       };
     } else {
-      // نهاية اللعبة
       celebrate(true);
       finalOverlay.classList.add("active");
     }
+  } else {
+    // ===== الانتقال للسؤال التالي =====
+    setTimeout(() => {
+      const nextUnsolved = stages[stage].qs.findIndex((_, idx) => !updatedStage[idx]?.solved);
+      if (nextUnsolved !== -1) {
+        q = nextUnsolved;
+        startQuestion();
+      }
+    }, 600);
   }
+
+  // ===== تحديث النجوم الحية (Live Stars) =====
+  updateLiveStars(); // تزامن مع التلميحات المستخدمة
 }
+
 
 /* ===== CELEBRATION ===== */
 const symbols=["🤗","🤩","👍","👏","👏","ayuuz","ⴰⵢⵢⵓⵣ","🌸","🌺","❤️","💖","💐","ⵣ","ⵉ","ⵜ","ⴰ","🌸","🌺","🌹","🍃","🌷","🌼","🌻","⚘","🎈","💵","💶","💸","✔","✅"];
@@ -1384,6 +1755,7 @@ function celebrate(final=false){
     setTimeout(()=>c.remove(),4000);
   }
 }
+
 
 
 /* ===== STAGE GRID ===== */
@@ -1407,40 +1779,229 @@ function createStageGrid(rows = 2, cols = 2) {
 document.addEventListener("DOMContentLoaded", () => {
   applyLang();
 });
-// حفظ التقدم
-function saveProgress() {
-    const data = {
-        level: currentLevel,
-        foundWords: foundWords
-    };
-    localStorage.setItem("amazighGameProgress", JSON.stringify(data));
-}
 
-// استرجاع التقدم عند فتح اللعبة
-function loadProgress() {
-    const data = JSON.parse(localStorage.getItem("amazighGameProgress"));
-    if (data) {
-        currentLevel = parseInt(data.level) || 0;
-        foundWords = Array.isArray(data.foundWords) ? data.foundWords : [];
-        foundWords.forEach(word => fillWordInBoxes(word));
-    }
-}
 
-function clearGameData(){
-  if(!confirm("هل أنت متأكد من مسح كل التقدم؟")){
-    return;
-  }
 
+function clearGameData() {
+  if (!confirm("هل أنت متأكد من مسح كل التقدم؟")) return;
+
+  // ==== مسح جميع البيانات المخزنة ====
   localStorage.removeItem("amazighAnswers");
   localStorage.removeItem("amazighStars");
-  localStorage.removeItem("amazighStage");
+  localStorage.removeItem("amazighUnlocked");
   localStorage.removeItem("amazighHints");
+  localStorage.removeItem("amazighCoins");
   localStorage.removeItem("soundOn");
   localStorage.removeItem("vibeOn");
 
+  // ==== إعادة تعيين المتغيرات ====
+  stars = [];
+  unlocked = 0;
+  coins = 0;
+  selectedKeys = [];
+  q = 0;
+
+  // ==== تحديث واجهة العملات ====
+  updateCoinsUI();
+
+  // ==== إعادة تعيين واجهة النجوم داخل البطاقات ====
+  document.querySelectorAll(".stage-key").forEach((card, idx) => {
+    card.classList.add("locked"); // قفل كل المراحل
+    const starsInCard = card.querySelectorAll(".star-animate");
+    starsInCard.forEach(star => star.classList.remove("pop"));
+  });
+
+  // ==== إزالة أي إجابات من الشبكة داخل البطاقات ====
+  document.querySelectorAll(".stage-grid .cell").forEach(cell => {
+    cell.textContent = "";
+    cell.dataset.letter = "";
+  });
+
+  // ==== إعادة تعيين واجهة الإجابة ====
+  document.querySelectorAll(".answer-box").forEach(box => {
+    box.textContent = "";
+    box.classList.remove("ok", "bad");
+  });
+
+  // ==== إزالة أي واجهات نهاية مرحلة أو نهائية ====
+  document.querySelectorAll(".overlay").forEach(ov => ov.classList.remove("active"));
+
   alert("تم مسح جميع بيانات اللعبة ✅");
-  location.reload();
 }
+
+function popStars(container) {
+  const stars = container.querySelectorAll('.star-animate');
+
+  stars.forEach(star => {
+    // تفعيل أنيميشن البروز
+    star.classList.add('pop');
+
+    // إنشاء الشرارات حول النجمة
+    for (let i = 0; i < 6; i++) {
+      const spark = document.createElement('div');
+      spark.classList.add('spark');
+
+      // زاوية وحركة عشوائية
+      const angle = Math.random() * 2 * Math.PI;
+      const distance = 30 + Math.random() * 20; // مدى الشرارة
+      spark.style.setProperty('--x', `${Math.cos(angle) * distance}px`);
+      spark.style.setProperty('--y', `${Math.sin(angle) * distance}px`);
+
+      star.appendChild(spark);
+
+      // إزالة الشرارة بعد الأنيميشن
+      spark.addEventListener('animationend', () => spark.remove());
+    }
+  });
+}
+
+function flyStarsToCoinFromCenter(amount) {
+
+  const coinElem = document.getElementById("coinCount");
+  if (!coinElem) return;
+
+  const rectCoin = coinElem.getBoundingClientRect();
+
+  for (let i = 0; i < 3; i++) {
+
+    const disc = document.createElement("div");
+    disc.className = "star-fly";
+    disc.textContent = "🪙";
+
+    document.body.appendChild(disc);
+
+    disc.style.position = "fixed";
+    disc.style.left = "50%";
+    disc.style.top = "50%";
+    disc.style.transform = "translate(-50%, -50%)";
+    disc.style.transition = "all 0.8s ease";
+    disc.style.zIndex = 9999;
+
+    setTimeout(() => {
+      disc.style.left = rectCoin.left + "px";
+      disc.style.top = rectCoin.top + "px";
+      disc.style.opacity = 0;
+      disc.style.transform = "scale(0.3)";
+    }, i * 120);
+
+    setTimeout(() => {
+      disc.remove();
+      if (i === 2) {
+        addCoins(amount);
+      }
+    }, 900 + i * 120);
+  }
+}
+/* ===== CELEBRATE STAGE (نجوم + أقراص ذهبية) ===== */
+
+function celebrateStage(stageStars, coinAmount = 30) {
+  const stageCard = mapGrid.children[stage];
+  if (!stageCard) return;
+
+  const starsContainer = stageCard.querySelector(".stars-display");
+  if (starsContainer) {
+    starsContainer.innerHTML = "";
+    for (let i = 0; i < 3; i++) {
+      const star = document.createElement("span");
+      star.className = "star-icon";
+      star.textContent = i < stageStars ? "⭐" : "☆";
+      starsContainer.appendChild(star);
+
+      if (i < stageStars) {
+        setTimeout(() => {
+          star.classList.add("pop");
+          for (let j = 0; j < 6; j++) {
+            const spark = document.createElement("div");
+            spark.className = "spark";
+            const angle = Math.random() * 2 * Math.PI;
+            const dist = 20 + Math.random() * 15;
+            spark.style.setProperty('--x', `${Math.cos(angle) * dist}px`);
+            spark.style.setProperty('--y', `${Math.sin(angle) * dist}px`);
+            star.appendChild(spark);
+            spark.addEventListener('animationend', () => spark.remove());
+          }
+          setTimeout(() => star.classList.remove("pop"), 800);
+        }, i * 250);
+      }
+    }
+
+    stageCard.classList.add("stars-glow");
+    setTimeout(() => stageCard.classList.remove("stars-glow"), 2000);
+  }
+
+  // أقراص ذهبية تتحرك للكيس
+  const coinElem = document.getElementById("coinCount");
+  if (!coinElem) return;
+
+  const rectCoin = coinElem.getBoundingClientRect();
+  for (let i = 0; i < 5; i++) {
+    const disc = document.createElement("div");
+    disc.className = "golden-disc";
+    disc.textContent = "🪙";
+    document.body.appendChild(disc);
+
+    disc.style.position = "fixed";
+    disc.style.left = "50%";
+    disc.style.top = "50%";
+    disc.style.transform = "translate(-50%, -50%) scale(1.2)";
+    disc.style.zIndex = 9999;
+    disc.style.opacity = 1;
+    disc.style.transition = "all 0.8s ease-in-out";
+
+    setTimeout(() => {
+      disc.style.left = rectCoin.left + "px";
+      disc.style.top = rectCoin.top + "px";
+      disc.style.transform = "scale(0.4)";
+      disc.style.opacity = 0.7;
+    }, i * 150);
+
+    setTimeout(() => {
+      disc.remove();
+      if (i === 4) {
+        addCoins(coinAmount);
+        playCoinSound();
+      }
+    }, 1000 + i * 150);
+  }
+}
+
+
+
+function updateStarsDisplay(stageIndex, starCount) {
+  const stageCard = mapGrid.children[stageIndex];
+  if (!stageCard) return;
+
+  const starsContainer = stageCard.querySelector(".stars-display");
+  if (!starsContainer) return;
+
+  starsContainer.innerHTML = ""; // مسح النجوم القديمة
+
+  for (let i = 0; i < 3; i++) {
+    const star = document.createElement("span");
+    star.className = "star-icon";
+    star.textContent = i < starCount ? "⭐" : "☆";
+    starsContainer.appendChild(star);
+  }
+}
+
+/* ===== إظهار overlay النجوم ===== */
+function showOverlayStars(stageStars) {
+  const container = document.getElementById("overlayStars");
+  if (!container) return;
+  container.innerHTML = "";
+
+  for (let i = 0; i < 3; i++) {
+    const star = document.createElement("span");
+    star.className = "overlay-star";
+    star.textContent = i < stageStars ? "⭐" : "☆";
+    container.appendChild(star);
+
+    if (i < stageStars) {
+      setTimeout(() => star.classList.add("pop"), i * 250);
+    }
+  }
+}
+
 </script>
 </body>
 </html>
