@@ -1189,7 +1189,9 @@ function openMap() {
 
     if (savedAll[i]) {
       Object.keys(savedAll[i]).forEach(qIndex => {
-        updateStageGrid(i, qIndex, savedAll[i][qIndex]);
+        
+updateStageGrid(i, qIndex, savedAll[i][qIndex].answer);
+
       });
     }
   });
@@ -1460,7 +1462,8 @@ function startQuestion() {
     // تعبئة الحرف إذا موجود في أي سؤال آخر يشارك نفس الخلية
     let letter = "";
     stageLayout.forEach(layoutItem => {
-      const savedAnswer = savedAll[layoutItem.q];
+      
+const savedAnswer = savedAll[layoutItem.q]?.answer;
       if(!savedAnswer) return;
       for(let j=0; j<layoutItem.length; j++){
         const r = layoutItem.dir==="horizontal"? layoutItem.row : layoutItem.row+j;
@@ -1474,9 +1477,18 @@ function startQuestion() {
     });
 
     b.textContent = letter;
-    boxes.appendChild(b);
-    answerBoxes.push(b);
-  }
+
+// 🔥 إذا كان هذا الحرف مكشوف بتلميح سابق
+const savedQData = savedAll[q];
+if (savedQData?.revealedIndices?.includes(i)) {
+  b.textContent = L.a[i];
+  selectedKeys[i] = { dataset: { ch: L.a[i] } };
+}
+
+boxes.appendChild(b);
+answerBoxes.push(b);
+
+}
 
   // لوحة المفاتيح / العجلة
   renderBoard(L);
@@ -1624,7 +1636,11 @@ function flyGoldenDiscsToCoin(amount = 30, stageIndex = stage) {
 /* ===== CHECK ANSWER ===== */
 
 function check(L) {
-  const answer = selectedKeys.map(k => k.dataset.ch).join("");
+ 
+const answer = Array.from(document.querySelectorAll(".answer-box"))
+  .map(b => b.textContent)
+  .join("");
+
 
   // ❌ إجابة خاطئة
   if (answer !== L.a) {
