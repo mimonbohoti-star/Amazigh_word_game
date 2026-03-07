@@ -11,6 +11,132 @@
 
 <style>
 
+
+#wheelWrapper {
+  position: absolute; /* فوق اللعبة */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  width: 300px;
+  height: 300px;
+  z-index: 50; /* أعلى من باقي عناصر اللعبة */
+}
+
+#wheelContainer {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 0 20px #000 inset;
+  transition: transform 0.5s ease-out;
+}
+
+.wheel-sector {
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  top: 50%;
+  left: 50%;
+  transform-origin: 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 18px;
+  border-radius: 0 100% 0 0;
+  color: #fff;
+  border: 2px solid #111;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+}
+
+.sector-gray { background: linear-gradient(135deg,#999,#555); }
+.sector-purple { background: linear-gradient(135deg,#c084fc,#7c3aed); }
+.sector-black { background: linear-gradient(135deg,#444,#111); }
+.sector-blue { background: linear-gradient(135deg,#60a5fa,#1e3a8a); }
+
+.wheel-sector span.icon {
+  font-size: 28px;
+  text-shadow: 1px 1px 3px #000;
+}
+
+.wheel-sector span.label {
+  font-size: 14px;
+  margin-top: 3px;
+  text-shadow: 1px 1px 2px #000;
+}
+
+#wheelArrow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 50px;
+  height: 50px;
+  transform: translate(-50%,-50%);
+  pointer-events: none;
+  z-index: 10;
+}
+
+#wheelArrow::after {
+  content: "▲";
+  font-size: 28px;
+  color: #ff3b3b;
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+#wheelSpinBtn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  width: 50px;
+  height: 50px;
+  background: #ff3b3b;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 20;
+  font-size: 14px;
+  font-weight: bold;
+  color: #fff;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+}
+
+
+
+
+
+
+/* النجوم المتفجرة */
+.star {
+  position: absolute;
+  font-size: 20px;
+  pointer-events: none;
+  animation: starAnim 1s forwards;
+}
+@keyframes starAnim {
+  0% { transform: translate(0,0) scale(1); opacity:1; }
+  100% { transform: translate(var(--sx), var(--sy)) scale(0.5); opacity:0; }
+}
+
+/* Sparkles */
+.sparkle {
+  position: absolute;
+  font-size: 14px;
+  pointer-events: none;
+  animation: sparkleAnim 0.8s forwards;
+}
+@keyframes sparkleAnim {
+  0% { transform: translate(0,0) scale(1); opacity:1; }
+  100% { transform: translate(var(--sx), var(--sy)) scale(0); opacity:0; }
+}
+
+
+
 :root{--accent:#f0eae2} 
 *{box-sizing:border-box}
 #mapStageBackground {
@@ -646,41 +772,6 @@ body::before {
   to { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; }
 }
 
-/* الأقراص الذهبية المتحركة */
-.golden-disc {
-  position: absolute;
-  width: 24px;
-  height: 24px;
-  background: gold;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 1000; /* فوق بطاقة الاحتفال */
-  text-align: center;
-  line-height: 24px;
-  font-weight: bold;
-  color: #fff;
-  text-shadow: 0 0 4px #ffd700, 0 0 8px orange;
-  transform: scale(0);
-  transition: transform 0.3s ease, left 0.8s ease-in-out, top 0.8s ease-in-out, opacity 0.8s ease-in-out;
-}
-
-/* ظهور الأقراص */
-.golden-disc.fly {
-  transform: scale(1);
-  opacity: 1;
-}
-
-.flying-coin {
-  pointer-events: none;
-  background: gold;
-  border-radius: 50%;
-  width: 12px;
-  height: 12px;
-  position: fixed;
-  z-index: 30;
-  box-shadow: 0 0 4px #ffd700;
-}
-
 /* ===== Stars Display ===== */
 .stars-display {
   display: flex;
@@ -723,18 +814,21 @@ body::before {
 
 </head>
 <body>
+
+
+
+
+
+
+
+
+
 <div id="mapBackground"></div>
 <div class="card">
 
-  <div id="coinsContainer">
+<div id="coinsContainer">
     <span id="coinCount">0</span> 💰
   </div>
-
-  <div id="starsContainer">
-  <div class="star-animate"></div>
-  <div class="star-animate"></div>
-  <div class="star-animate"></div>
-</div>
 
 <div id="menu" class="section active">
  <h1>ⵣلعبة الكلمات و الألغاز الأمازيغيةⵣ</h1>
@@ -784,6 +878,12 @@ body::before {
 <div id="questionText" class="question-text"></div>
  <!-- صناديق الإجابة -->
  <div class="answer-boxes" id="boxes"></div>
+
+
+<button id="openWheelBtn">🎡 عجلة الجوائز</button>
+
+
+
 
  <!-- زر التلميح والعداد -->
  <button class="btn btn-hint" id="hintBtn">💡 تلميح</button>
@@ -1816,19 +1916,25 @@ document.addEventListener("DOMContentLoaded", () => {
   applyLang();
 });
 
-
-
 function clearGameData() {
   if (!confirm("هل أنت متأكد من مسح كل التقدم؟")) return;
 
-  // ==== مسح جميع البيانات المخزنة ====
-  localStorage.removeItem("amazighAnswers");
-  localStorage.removeItem("amazighStars");
-  localStorage.removeItem("amazighUnlocked");
-  localStorage.removeItem("amazighHints");
-  localStorage.removeItem("amazighCoins");
-  localStorage.removeItem("soundOn");
-  localStorage.removeItem("vibeOn");
+  // ==== مسح جميع البيانات المخزنة في localStorage ====
+  const keysToRemove = [
+    "amazighAnswers",   // إجابات اللعبة
+    "amazighStars",     // النجوم المكتسبة
+    "amazighUnlocked",  // المراحل المفتوحة
+    "amazighHints",     // التلميحات
+    "amazighCoins",     // نظام العملات الأساسي
+    "coins",            // تنظيف أي نظام قديم
+    "shopCoins",        // عملات الشوبين
+    "tempRewardCoins",  // عملات مؤقتة
+    "soundOn",
+    "vibeOn",
+    "lastRewardTime"    // وقت آخر جائزة
+  ];
+
+  keysToRemove.forEach(key => localStorage.removeItem(key));
 
   // ==== إعادة تعيين المتغيرات ====
   stars = [];
@@ -1840,27 +1946,29 @@ function clearGameData() {
   // ==== تحديث واجهة العملات ====
   updateCoinsUI();
 
-  // ==== إعادة تعيين واجهة النجوم داخل البطاقات ====
-  document.querySelectorAll(".stage-key").forEach((card, idx) => {
-    card.classList.add("locked"); // قفل كل المراحل
+  // ==== إعادة تعيين بطاقات المراحل ====
+  document.querySelectorAll(".stage-key").forEach(card => {
+    card.classList.add("locked");
     const starsInCard = card.querySelectorAll(".star-animate");
     starsInCard.forEach(star => star.classList.remove("pop"));
   });
 
-  // ==== إزالة أي إجابات من الشبكة داخل البطاقات ====
+  // ==== مسح خلايا الشبكة ====
   document.querySelectorAll(".stage-grid .cell").forEach(cell => {
     cell.textContent = "";
     cell.dataset.letter = "";
   });
 
-  // ==== إعادة تعيين واجهة الإجابة ====
+  // ==== إعادة تعيين صناديق الإجابة ====
   document.querySelectorAll(".answer-box").forEach(box => {
     box.textContent = "";
     box.classList.remove("ok", "bad");
   });
 
-  // ==== إزالة أي واجهات نهاية مرحلة أو نهائية ====
-  document.querySelectorAll(".overlay").forEach(ov => ov.classList.remove("active"));
+  // ==== إغلاق أي Overlay مفتوح ====
+  document.querySelectorAll(".overlay").forEach(ov => {
+    ov.classList.remove("active");
+  });
 
   alert("تم مسح جميع بيانات اللعبة ✅");
 }
@@ -2037,6 +2145,113 @@ function showOverlayStars(stageStars) {
     }
   }
 }
+
+
+
+
+
+
+/* ===== عجلة الجوائز مدمجة مع اللعبة ===== */
+const wheelOverlay = document.createElement("div");
+wheelOverlay.id = "wheelOverlay";
+wheelOverlay.style.position = "fixed";
+wheelOverlay.style.top = 0;
+wheelOverlay.style.left = 0;
+wheelOverlay.style.width = "100vw";
+wheelOverlay.style.height = "100vh";
+wheelOverlay.style.background = "rgba(0,0,0,0.7)";
+wheelOverlay.style.display = "none";
+wheelOverlay.style.zIndex = 9999;
+wheelOverlay.style.justifyContent = "center";
+wheelOverlay.style.alignItems = "center";
+wheelOverlay.style.flexDirection = "column";
+document.body.appendChild(wheelOverlay);
+
+// داخل overlay نضع العجلة
+wheelOverlay.innerHTML = `
+  <div id="wheelWrapper" style="position:relative;width:400px;height:400px;">
+    <div id="wheelContainer" style="width:100%;height:100%;border-radius:50%;overflow:hidden;position:relative;transition: transform 0.5s ease-out;"></div>
+    <div id="wheelArrow" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:80px;height:80px;z-index:10;"></div>
+    <button id="wheelSpinBtn" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:80px;height:80px;border-radius:50%;background:#ff3b3b;color:#fff;border:none;cursor:pointer;z-index:20;">لف</button>
+  </div>
+  <button id="closeWheel" style="margin-top:20px;padding:10px 20px;font-size:18px;">✖ إغلاق</button>
+  <h3 id="wheelResult" style="margin-top:15px;color:#fff;"></h3>
+`;
+
+// إضافة القطاعات
+const wheelContainer = document.getElementById("wheelContainer");
+const wheelSectors = [
+  {icon:"❌", label:"لا شيء", type:"nothing"},
+  {icon:"💰", label:"50 عملة", type:"coins", value:50},
+  {icon:"❌", label:"جرب حظك", type:"nothing"},
+  {icon:"🎁", label:"هدية رمزية", type:"temp"}
+];
+
+wheelSectors.forEach((s,i)=>{
+  const div=document.createElement("div");
+  div.className="wheel-sector";
+  div.style.transform=`rotate(${i*90}deg)`;
+  div.style.position="absolute";
+  div.style.width="50%"; div.style.height="50%";
+  div.style.top="50%"; div.style.left="50%";
+  div.style.transformOrigin="0 0";
+  div.style.display="flex"; div.style.flexDirection="column"; div.style.alignItems="center"; div.style.justifyContent="center";
+  div.innerHTML=`<span class="icon">${s.icon}</span><span class="label">${s.label}</span>`;
+  wheelContainer.appendChild(div);
+});
+
+// فتح العجلة
+const openWheelBtn = document.getElementById("openWheelBtn");
+openWheelBtn.onclick = ()=> wheelOverlay.style.display="flex";
+
+// إغلاق العجلة
+document.getElementById("closeWheel").onclick = ()=> wheelOverlay.style.display="none";
+
+// دوران العجلة
+let spinning=false;
+document.getElementById("wheelSpinBtn").onclick = ()=>{
+  if(spinning) return;
+  spinning=true;
+  const rotations=20;
+  const stopSector=Math.floor(Math.random()*wheelSectors.length);
+  const stopAngle=stopSector*90 + 45;
+  const finalDeg=360*rotations + stopAngle;
+  const duration=5000;
+  const start=performance.now();
+
+  function animate(now){
+    const elapsed=now-start;
+    const t=Math.min(elapsed/duration,1);
+    const ease=1-Math.pow(1-t,3);
+    const angle=ease*finalDeg + Math.sin(elapsed/100)*5;
+    wheelContainer.style.transform=`rotate(${angle}deg)`;
+    if(t<1) requestAnimationFrame(animate);
+    else setTimeout(()=>{
+      applyWheelPrize(stopSector);
+      spinning=false;
+    },400);
+  }
+  requestAnimationFrame(animate);
+};
+
+function applyWheelPrize(index){
+  const resEl = document.getElementById("wheelResult");
+  const s = wheelSectors[index];
+  if(s.type==="coins"){
+    addCoins(s.value); // استخدام وظيفة لعبتك
+    playCoinSound();
+    resEl.textContent = `💰 حصلت على ${s.value} عملة!`;
+  } else if(s.type==="temp"){
+    collectGoldenCoins(30); // استخدام دالتك الخاصة
+    resEl.textContent = "🎁 حصلت على هدية رمزية!";
+  } else {
+    resEl.textContent = "جرب حظك مرة أخرى!";
+  }
+  updateCoinsUI(); // تحديث واجهة العملات
+}
+
+
+
 
 </script>
 </body>
