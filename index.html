@@ -147,10 +147,6 @@
   height: 60px;
   background: #facc15;
 }
-
-
-
-
 /* زر المتجر */
 #openShop {
   position: fixed;
@@ -199,22 +195,12 @@
   border-radius: 10px;
   cursor: pointer;
 }
-
 #watchAdBtn { background: #f59e0b; color: white; }
 #buyCoinsBtn { background: #22c55e; color: white; }
 #buyLevelBtn { background: #3b82f6; color: white; }
 #buyGameBtn { background: #8b5cf6; color: white; }
 #buyBookBtn { background: #ec4899; color: white; }
 #closeShop { background: #ef4444; color: white; }
-
-
-
-
-
-
-
-
-
 /* النجوم المتفجرة */
 .star {
   position: absolute;
@@ -238,9 +224,6 @@
   0% { transform: translate(0,0) scale(1); opacity:1; }
   100% { transform: translate(var(--sx), var(--sy)) scale(0); opacity:0; }
 }
-
-
-
 :root{--accent:#f0eae2} 
 *{box-sizing:border-box}
 #mapStageBackground {
@@ -550,13 +533,6 @@ body::before {
   font-size: 14px;
   border-radius: 12px;
 }
-
-
-
-
-
-
-
 /* ===== SETTINGS ===== */
 .setting-item{
  display:flex;justify-content:space-between;align-items:center;
@@ -925,15 +901,6 @@ body::before {
 
 </head>
 <body>
-
-
-
-
-
-
-
-
-
 <div id="mapBackground"></div>
 <div class="card">
 
@@ -962,13 +929,6 @@ body::before {
     <button id="closeShop">❌ إغلاق المتجر</button>
   </div>
 </div>
-
-
-
-
-
-
-
  <button class="btn btn-main" onclick="openMap()">▶️ ⴱⴷⴰ</button>
 
  <button class="btn btn-back" onclick="show('settings')">🔧 settings</button>
@@ -1015,15 +975,7 @@ body::before {
 <div id="questionText" class="question-text"></div>
  <!-- صناديق الإجابة -->
  <div class="answer-boxes" id="boxes"></div>
-
-
 <button id="openWheelBtn">🎡 عجلة الجوائز</button>
-
-
-
-
-
-
  <!-- زر التلميح والعداد -->
  <button class="btn btn-hint" id="hintBtn">💡 تلميح</button>
 <div id="hintCount">3</div>
@@ -1352,8 +1304,6 @@ updateStageGrid(
     });
   }
 }
-
-
 function syncToggles(){
   soundToggle.classList.toggle("on", soundOn);
   vibeToggle.classList.toggle("on", vibeOn);
@@ -1697,8 +1647,6 @@ stages[5] = {
   ]
 };
 
-
-
 // ===== مرحلة ⵣ - 6 =====
 stages[6] = {
   name: "مرحلة ⵣ - 5",
@@ -1731,9 +1679,6 @@ stages[6] = {
     ["ⴳ","ⴰ","ⵎ","ⴳ","ⵉ","ⵔ","ⴷ"]
   ]
 };
-
-
-
 // تهيئة العملات عند فتح اللعبة
 let coins = parseInt(localStorage.getItem("amazighCoins") || "0");
 updateCoinsUI();
@@ -2145,8 +2090,6 @@ function check(L){
 
   updateLiveStars();
 }
-
-
 /* ===== CELEBRATION ===== */
 const symbols=["🤗","🤩","👍","👏","👏","ayuuz","ⴰⵢⵢⵓⵣ","🌸","🌺","❤️","💖","💐","ⵣ","ⵉ","ⵜ","ⴰ","🌸","🌺","🌹","🍃","🌷","🌼","🌻","⚘","🎈","💵","💶","💸","✔","✅"];
 
@@ -2162,9 +2105,6 @@ function celebrate(final=false){
     setTimeout(()=>c.remove(),4000);
   }
 }
-
-
-
 /* ===== STAGE GRID ===== */
 
 function createStageGrid(rows = 2, cols = 2) {
@@ -2379,9 +2319,6 @@ function celebrateStage(stageStars, coinAmount = 30) {
     }, 1000 + i * 150);
   }
 }
-
-
-
 function updateStarsDisplay(stageIndex, starCount) {
   const stageCard = mapGrid.children[stageIndex];
   if (!stageCard) return;
@@ -2416,13 +2353,6 @@ function showOverlayStars(stageStars) {
     }
   }
 }
-
-
-
-
-
-
-
 // ===== عجلة الجوائز مدمجة مع اللعبة =====
 const wheelOverlay = document.createElement("div");
 wheelOverlay.id = "wheelOverlay";
@@ -2521,11 +2451,6 @@ function applyWheelPrize(index){
   }
   updateCoinsUI(); // تحديث واجهة العملات
 }
-
-
-
-
-
 const shop = document.getElementById("shopOverlay");
 
 document.getElementById("openShop").onclick = () => {
@@ -2556,12 +2481,6 @@ document.getElementById("buyGameBtn").onclick = () => {
 document.getElementById("buyBookBtn").onclick = () => {
   window.open("https://gumroad.com/yourbook");
 }
-
-
-
-
-
-
 </script>
 </body>
 </html>
