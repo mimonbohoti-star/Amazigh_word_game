@@ -12,141 +12,8 @@
 <style>
 
 
-/* overlay */
-#wheelOverlay {
-  position: fixed;
-  top:0;
-  left:0;
-  width:100vw;
-  height:100vh;
-  background: rgba(0,0,0,0.65);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  z-index: 9999;
-}
 
-/* wrapper العجلة مصغرة 20٪ */
-#wheelWrapper {
-  position: relative;
-  width: 272px; 
-  height: 272px; 
-  border-radius: 50%;
-  background: radial-gradient(circle, #1e1e1e 0%, #111 100%);
-  box-shadow: 0 0 20px rgba(255,255,255,0.1) inset;
-}
 
-/* الأزرار */
-#wheelSpinBtn {
-  width: 48px;
-  height: 48px;
-  font-size: 11px;
-  font-weight: bold;
-  border-radius:50%;
-  background: linear-gradient(135deg,#f43f5e,#d0274d);
-  color:#fff;
-  border:none;
-  cursor:pointer;
-  box-shadow:0 4px 8px rgba(0,0,0,0.5);
-  transition: transform 0.2s, background 0.3s;
-}
-
-#wheelSpinBtn:hover {
-  transform: scale(1.05);
-  background: linear-gradient(135deg,#f87171,#d0274d);
-}
-
-#closeWheel {
-  margin-top:14px;
-  padding:5px 13px;
-  font-size:13px;
-  border-radius:8px;
-  background: linear-gradient(135deg,#f43f5e,#d0274d);
-  color:#fff;
-  border:none;
-  cursor:pointer;
-  box-shadow:0 4px 8px rgba(0,0,0,0.5);
-  transition: transform 0.2s, background 0.3s;
-}
-
-#closeWheel:hover {
-  transform: scale(1.05);
-  background: linear-gradient(135deg,#f87171,#d0274d);
-}
-
-/* القطاعات */
-.wheel-sector {
-  position: absolute;
-  width: 50%;
-  height: 50%;
-  top:50%;
-  left:50%;
-  transform-origin: 0 0;
-  display:flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-weight:bold;
-  font-size:15px;
-  border-radius:0 100% 0 0;
-  color:#fff;
-  border:2px solid #111;
-  box-shadow: inset 0 0 8px rgba(0,0,0,0.5), 1px 1px 4px rgba(0,0,0,0.2);
-  transition: transform 0.3s ease;
-}
-
-.wheel-sector:nth-child(odd) {
-  background: linear-gradient(135deg,#60a5fa,#1e3a8a);
-}
-
-.wheel-sector:nth-child(even) {
-  background: linear-gradient(135deg,#c084fc,#7c3aed);
-}
-
-.wheel-sector span.icon {
-  font-size:21px;
-  text-shadow: 2px 2px 3px rgba(0,0,0,0.7);
-}
-
-.wheel-sector span.label {
-  font-size:10px;
-  margin-top:3px;
-  text-shadow:1px 1px 2px rgba(0,0,0,0.6);
-}
-
-/* العقرب كسهم طويل وحاد */
-#wheelArrow {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  pointer-events: none;
-  z-index: 20;
-}
-
-#wheelArrow::before {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: -60px; /* طول السهم */
-  transform: translateX(-50%);
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-bottom: 22px solid #facc15; /* رأس السهم */
-}
-
-#wheelArrow::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: -40px; /* طول العمود تحت الرأس */
-  transform: translateX(-50%);
-  width: 4px;
-  height: 60px;
-  background: #facc15;
-}
 /* زر المتجر */
 #openShop {
   position: fixed;
@@ -195,12 +62,22 @@
   border-radius: 10px;
   cursor: pointer;
 }
+
 #watchAdBtn { background: #f59e0b; color: white; }
 #buyCoinsBtn { background: #22c55e; color: white; }
 #buyLevelBtn { background: #3b82f6; color: white; }
 #buyGameBtn { background: #8b5cf6; color: white; }
 #buyBookBtn { background: #ec4899; color: white; }
 #closeShop { background: #ef4444; color: white; }
+
+
+
+
+
+
+
+
+
 /* النجوم المتفجرة */
 .star {
   position: absolute;
@@ -224,6 +101,9 @@
   0% { transform: translate(0,0) scale(1); opacity:1; }
   100% { transform: translate(var(--sx), var(--sy)) scale(0); opacity:0; }
 }
+
+
+
 :root{--accent:#f0eae2} 
 *{box-sizing:border-box}
 #mapStageBackground {
@@ -533,6 +413,13 @@ body::before {
   font-size: 14px;
   border-radius: 12px;
 }
+
+
+
+
+
+
+
 /* ===== SETTINGS ===== */
 .setting-item{
  display:flex;justify-content:space-between;align-items:center;
@@ -901,6 +788,15 @@ body::before {
 
 </head>
 <body>
+
+
+
+
+
+
+
+
+
 <div id="mapBackground"></div>
 <div class="card">
 
@@ -929,6 +825,13 @@ body::before {
     <button id="closeShop">❌ إغلاق المتجر</button>
   </div>
 </div>
+
+
+
+
+
+
+
  <button class="btn btn-main" onclick="openMap()">▶️ ⴱⴷⴰ</button>
 
  <button class="btn btn-back" onclick="show('settings')">🔧 settings</button>
@@ -975,7 +878,15 @@ body::before {
 <div id="questionText" class="question-text"></div>
  <!-- صناديق الإجابة -->
  <div class="answer-boxes" id="boxes"></div>
+
+
 <button id="openWheelBtn">🎡 عجلة الجوائز</button>
+
+
+
+
+
+
  <!-- زر التلميح والعداد -->
  <button class="btn btn-hint" id="hintBtn">💡 تلميح</button>
 <div id="hintCount">3</div>
@@ -1304,6 +1215,8 @@ updateStageGrid(
     });
   }
 }
+
+
 function syncToggles(){
   soundToggle.classList.toggle("on", soundOn);
   vibeToggle.classList.toggle("on", vibeOn);
@@ -1647,6 +1560,8 @@ stages[5] = {
   ]
 };
 
+
+
 // ===== مرحلة ⵣ - 6 =====
 stages[6] = {
   name: "مرحلة ⵣ - 5",
@@ -1679,6 +1594,9 @@ stages[6] = {
     ["ⴳ","ⴰ","ⵎ","ⴳ","ⵉ","ⵔ","ⴷ"]
   ]
 };
+
+
+
 // تهيئة العملات عند فتح اللعبة
 let coins = parseInt(localStorage.getItem("amazighCoins") || "0");
 updateCoinsUI();
@@ -2090,6 +2008,8 @@ function check(L){
 
   updateLiveStars();
 }
+
+
 /* ===== CELEBRATION ===== */
 const symbols=["🤗","🤩","👍","👏","👏","ayuuz","ⴰⵢⵢⵓⵣ","🌸","🌺","❤️","💖","💐","ⵣ","ⵉ","ⵜ","ⴰ","🌸","🌺","🌹","🍃","🌷","🌼","🌻","⚘","🎈","💵","💶","💸","✔","✅"];
 
@@ -2105,6 +2025,9 @@ function celebrate(final=false){
     setTimeout(()=>c.remove(),4000);
   }
 }
+
+
+
 /* ===== STAGE GRID ===== */
 
 function createStageGrid(rows = 2, cols = 2) {
@@ -2353,104 +2276,216 @@ function showOverlayStars(stageStars) {
     }
   }
 }
-// ===== عجلة الجوائز مدمجة مع اللعبة =====
+// ===== صوت التك بدون ملف خارجي =====
+let lastTick = -1;
+function playTick() {
+  const osc = new AudioContext();
+  const o = osc.createOscillator();
+  const g = osc.createGain();
+  o.type = "square";
+  o.frequency.setValueAtTime(800, osc.currentTime);
+  g.gain.setValueAtTime(0.05, osc.currentTime);
+  o.connect(g);
+  g.connect(osc.destination);
+  o.start();
+  o.stop(osc.currentTime + 0.03);
+}
+
+// ===== إنشاء overlay العجلة =====
 const wheelOverlay = document.createElement("div");
-wheelOverlay.id = "wheelOverlay";
-wheelOverlay.style.position = "fixed";
-wheelOverlay.style.top = 0;
-wheelOverlay.style.left = 0;
-wheelOverlay.style.width = "100vw";
-wheelOverlay.style.height = "100vh";
-wheelOverlay.style.background = "rgba(0,0,0,0.7)";
-wheelOverlay.style.display = "none";
-wheelOverlay.style.zIndex = 9999;
-wheelOverlay.style.justifyContent = "center";
-wheelOverlay.style.alignItems = "center";
-wheelOverlay.style.flexDirection = "column";
+Object.assign(wheelOverlay.style, {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: "100vw",
+  height: "100vh",
+  background: "rgba(0,0,0,0.7)",
+  display: "none",
+  zIndex: 9999,
+  justifyContent: "center",
+  alignItems: "center",
+  flexDirection: "column",
+});
 document.body.appendChild(wheelOverlay);
 
-// داخل overlay نضع العجلة
+// ===== محتوى العجلة مع السهم للأسفل =====
 wheelOverlay.innerHTML = `
-  <div id="wheelWrapper" style="position:relative;width:272px;height:272px;">
-    <div id="wheelContainer" style="width:100%;height:100%;border-radius:50%;overflow:hidden;position:relative;transition: transform 0.5s ease-out;"></div>
-    <div id="wheelArrow" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:50px;height:50px;z-index:10;"></div>
-    <button id="wheelSpinBtn" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:48px;height:48px;border-radius:50%;background:#ff3b3b;color:#fff;border:none;cursor:pointer;z-index:20;">لف</button>
-  </div>
-  <button id="closeWheel" style="margin-top:15px;padding:5px 13px;font-size:13px;">✖ إغلاق</button>
-  <h3 id="wheelResult" style="margin-top:15px;color:#fff;"></h3>
+<div id="wheelWrapper" style="
+  position:relative;
+  width:300px;
+  height:300px;
+  border-radius:50%;
+  background: radial-gradient(circle,#1e1e1e 0%,#111 100%);
+  box-shadow:0 0 20px rgba(255,255,255,0.1) inset;
+">
+  <div id="wheelContainer" style="width:100%;height:100%;border-radius:50%;overflow:hidden;position:relative;"></div>
+
+  <button id="wheelSpinBtn" style="
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    width:50px;
+    height:50px;
+    border-radius:50%;
+    background:#ff3b3b;
+    color:#fff;
+    border:none;
+    cursor:pointer;
+    z-index:10;">لف</button>
+
+<!-- السهم في نفس مكانه بالأعلى، لكن الرأس يشير للأسفل -->
+<div id="wheelArrow" style="
+  position:absolute;
+  top:-10px;           /* نفس مكان السهم الأصلي */
+  left:50%;
+  transform:translateX(-50%);
+  width:0;
+  height:0;
+  border-left:12px solid transparent;
+  border-right:12px solid transparent;
+  border-top:22px solid #fff; /* بدل border-bottom، الرأس يشير للأسفل */
+  z-index:100;
+"></div>
+
+<button id="closeWheel" style="
+  margin-top:15px;
+  padding:5px 13px;
+  font-size:13px;
+  border-radius:8px;
+  background:#ff3b3b;
+  color:#fff;
+  border:none;
+  cursor:pointer;
+  z-index:10;
+">✖ إغلاق</button>
+<h3 id="wheelResult" style="margin-top:15px;color:#fff;"></h3>
 `;
 
-// إضافة القطاعات
+// ===== القطاعات =====
 const wheelContainer = document.getElementById("wheelContainer");
 const wheelSectors = [
-  {icon:"❌", label:"لا شيء", type:"nothing"},
-  {icon:"💰", label:"50 عملة", type:"coins", value:50},
-  {icon:"❌", label:"جرب حظك", type:"nothing"},
-  {icon:"🎁", label:"هدية رمزية", type:"temp"}
+  {icon:"💰",label:"50 عملة",type:"coins",value:50},
+  {icon:"❌",label:"لا شيء",type:"nothing"},
+  {icon:"🎁",label:"هدية رمزية",type:"temp"},
+  {icon:"💰",label:"20 عملة",type:"coins",value:20},
+  {icon:"🔄",label:"إعادة",type:"extra"},
+  {icon:"❌",label:"جرب حظك",type:"nothing"}
 ];
+const sectorAngle = 360 / wheelSectors.length;
+wheelContainer.style.background = `
+conic-gradient(
+from -90deg,
+#ffeb3b 0deg 60deg,
+#f44336 60deg 120deg,
+#4caf50 120deg 180deg,
+#2196f3 180deg 240deg,
+#9c27b0 240deg 300deg,
+#ff9800 300deg 360deg
+)
+`;
 
+
+// ===== وضع الأيقونات =====
 wheelSectors.forEach((s,i)=>{
-  const div=document.createElement("div");
-  div.className="wheel-sector";
-  div.style.transform=`rotate(${i*90}deg)`;
-  div.style.position="absolute";
-  div.style.width="50%"; div.style.height="50%";
-  div.style.top="50%"; div.style.left="50%";
-  div.style.transformOrigin="0 0";
-  div.style.display="flex"; div.style.flexDirection="column"; div.style.alignItems="center"; div.style.justifyContent="center";
-  div.innerHTML=`<span class="icon">${s.icon}</span><span class="label">${s.label}</span>`;
+  const div = document.createElement("div");
+  Object.assign(div.style, {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: `rotate(${i*sectorAngle + sectorAngle/2}deg) translate(120px) rotate(-${i*sectorAngle + sectorAngle/2}deg)`,
+    transformOrigin: "center",
+    textAlign: "center",
+    color: "#fff"
+  });
+  div.innerHTML = `<span style="font-size:18px">${s.icon}</span><br><span style="font-size:12px">${s.label}</span>`;
   wheelContainer.appendChild(div);
 });
 
-// فتح العجلة
-const openWheelBtn = document.getElementById("openWheelBtn");
-openWheelBtn.onclick = ()=> wheelOverlay.style.display="flex";
+// ===== فتح وغلق العجلة =====
+document.getElementById("openWheelBtn").onclick = ()=> wheelOverlay.style.display = "flex";
+document.getElementById("closeWheel").onclick = ()=> wheelOverlay.style.display = "none";
 
-// إغلاق العجلة
-document.getElementById("closeWheel").onclick = ()=> wheelOverlay.style.display="none";
-
-// دوران العجلة
-let spinning=false;
-document.getElementById("wheelSpinBtn").onclick = ()=>{
-  if(spinning) return;
-  spinning=true;
-  const rotations=20;
-  const stopSector=Math.floor(Math.random()*wheelSectors.length);
-  const stopAngle=stopSector*90 + 45;
-  const finalDeg=360*rotations + stopAngle;
-  const duration=5000;
-  const start=performance.now();
-
-  function animate(now){
-    const elapsed=now-start;
-    const t=Math.min(elapsed/duration,1);
-    const ease=1-Math.pow(1-t,3);
-    const angle=ease*finalDeg + Math.sin(elapsed/100)*5;
-    wheelContainer.style.transform=`rotate(${angle}deg)`;
-    if(t<1) requestAnimationFrame(animate);
-    else setTimeout(()=>{
-      applyWheelPrize(stopSector);
-      spinning=false;
-    },400);
-  }
-  requestAnimationFrame(animate);
-};
-
+// ===== دوال الجوائز =====
 function applyWheelPrize(index){
-  const resEl = document.getElementById("wheelResult");
   const s = wheelSectors[index];
+  const result = document.getElementById("wheelResult");
+
   if(s.type==="coins"){
-    addCoins(s.value); // استخدام وظيفة لعبتك
+    addCoins(s.value);
+    updateCoinsUI();
     playCoinSound();
-    resEl.textContent = `💰 حصلت على ${s.value} عملة!`;
+    result.textContent = "ربحت "+s.value+" عملة 💰";
+  } else if(s.type==="extra"){
+    result.textContent = "لف مرة أخرى 🔄";
+    spinning = false;
+    return;
   } else if(s.type==="temp"){
-    collectGoldenCoins(30); // استخدام دالتك الخاصة
-    resEl.textContent = "🎁 حصلت على هدية رمزية!";
+    collectGoldenCoins(5);
+    triggerFireworks();
+    result.textContent = "هدية 🎁";
   } else {
-    resEl.textContent = "جرب حظك مرة أخرى!";
+    result.textContent = "لم تربح شيئًا ❌";
   }
-  updateCoinsUI(); // تحديث واجهة العملات
 }
+let spinning = false;
+
+document.getElementById("wheelSpinBtn").addEventListener("click", () => {
+  if (spinning) return;
+  spinning = true;
+
+  const rotations = 10;
+  const stopSector = Math.floor(Math.random() * wheelSectors.length);
+
+  // زاوية التوقف على منتصف القطاع لضمان الوقوف بالضبط
+const stopAngle = stopSector * sectorAngle + sectorAngle/2 + 90;
+const finalDeg = rotations * 360 + stopAngle;
+
+
+  const duration = 5000;
+  const start = performance.now();
+
+  function animate(now) {
+    const elapsed = now - start;
+    const t = Math.min(elapsed / duration, 1);
+    const ease = 1 - Math.pow(1 - t, 3);
+    const angle = ease * finalDeg;
+
+    wheelContainer.style.transform = `rotate(${angle}deg)`;
+
+    // صوت التك عند المرور على القطاعات
+    const normalized = ((angle % 360) + 360) % 360;
+    const sectorIndexForTick = Math.floor(normalized / sectorAngle) % wheelSectors.length;
+    if (sectorIndexForTick !== lastTick) {
+      lastTick = sectorIndexForTick;
+      playTick();
+    }
+
+    if (t < 1) {
+      requestAnimationFrame(animate);
+    } else {
+      
+// === عند التوقف ===
+wheelContainer.style.transition = "transform 0.25s";
+wheelContainer.style.transform = `rotate(${finalDeg}deg)`;
+
+setTimeout(() => {
+
+  // استخدم القطاع الذي تم اختياره مسبقًا
+  applyWheelPrize(stopSector);
+
+  spinning = false;
+  lastTick = -1;
+
+}, 250);
+
+}
+
+}
+
+requestAnimationFrame(animate);
+});
+
 const shop = document.getElementById("shopOverlay");
 
 document.getElementById("openShop").onclick = () => {
