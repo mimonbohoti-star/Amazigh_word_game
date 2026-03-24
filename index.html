@@ -6,6 +6,7 @@
 <title> AWAR-Gⵣ</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link
+
  href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
 
 
@@ -271,192 +272,244 @@ body::before {
   100% { transform: translate(-50%, -50%); }
 }
 
-/* ===== البطاقة العامة ===== */
 
-#coinsContainer {
+/* ===== البطاقة العامة ===== */  
+  
+#coinsContainer {  
+  display: flex;  
+  justify-content: center;  
+  align-items: center;  
+  font-size: 20px;  
+  font-weight: bold;  
+  margin: 8px 0;  
+  color: gold;  
+}  
+  
+#coinCount {  
+  margin-right: 6px;  
+}  
+
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden; /* بدون scroll عام */
+}
+
+#app {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.cards-container {
+  width: 100%;
+  height: 100%;
+
   display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 20px;
-  font-weight: bold;
-  margin: 8px 0;
-  color: gold;
+  gap: 12px;
+  padding: 16px;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  align-items: stretch; /* ✅ مهم */
 }
 
-#coinCount {
-  margin-right: 6px;
-}
 .card {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  flex: 0 0 83%;
+  max-width: 420px;
 
-  width: 90%;
-  max-width: 560px;
+  height: 100%; /* ✅ مهم */
 
-  height: auto;          /* بدل height: 80vh; */
-  min-height: 50vh;      /* أقل ارتفاع ممكن */
-  max-height: 90vh;      /* لا يتجاوز 90% من الشاشة */
-
-  padding: 22px;
-  border-radius: 26px;
-  background: linear-gradient(to bottom, #0000ff, #008000, #ffff00);
+  background: #0f172a;
+  border-radius: 20px;
+  padding: 12px;
 
   display: flex;
   flex-direction: column;
 
-  overflow-y: auto;      /* يسمح بالتمرير داخل البطاقة فقط */
-  overflow-x: hidden;
-
-  z-index: 10;
+  overflow: hidden;
 }
 
-/* ===== صورة السؤال داخل البطاقة ===== */
+/* ===== صورة السؤال داخل البطاقة ===== */  
 #questionImg {
-  width: 100%;          /* تغطي كامل عرض البطاقة */
+  width: 100%;
   height: auto;
-  max-height: 260px;    /* لا تتجاوز 40% من ارتفاع البطاقة */
-  object-fit: contain;   /* تحافظ على نسبة العرض إلى الارتفاع */
-  border-radius: 16px;   /* حواف ناعمة */
-  margin-bottom: 12px;   /* مسافة أسفل الصورة قبل المحتوى التالي */
-}
 
-/* ===== بطاقات المراحل ===== *//* ===== STAGE KEY (البطاقة) ===== */
+  max-height: 35%; /* ❗ بدل 260px */
+
+  object-fit: contain;
+  border-radius: 16px;
+  margin-bottom: 8px;
+
+  flex-shrink: 0; /* ✅ مهم */
+}
+  
+/* ===== بطاقات المراحل ===== */  
 .stage-key {
-  position: relative;
-  flex: 0 0 200px;        /* حجم افتراضي لكل بطاقة */
-  min-width: 200px;       /* يمنع البطاقة من التمدد أكثر من اللازم */
-  max-width: 250px;       /* يمنع البطاقة من التمدد أكثر من اللازم */
-  height: auto;
-  padding: 6px;
+  flex: 0 0 240px;
+  max-width: 240px;
+
+  height: 340px; /* ✅ زيدنا الطول */
+
+  padding: 8px;
   border-radius: 14px;
+
   background: #1e293b;
   color: #fff;
-  font-weight: bold;
-  cursor: pointer;
-  scroll-snap-align: start;
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  overflow: hidden;       /* يمنع أي تمدد زائد للشبكة خارج البطاقة */
+  justify-content: center; /* ✅ يخلي grid وسط */
+
+  overflow: hidden; /* ❗ مهم بزاف */
+  position: relative; /* باش lock يبقى صحيح */
 }
 
-
-.stage-key.locked {
-  opacity: .35;
-  pointer-events: none;
+/* ===== SECTIONS ===== */  
+.section {
+  position: absolute; /* ✅ مهم */
+  inset: 0;
+  display: none;
 }
 
-.stage-key.locked::after {
-  content: "🔒";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 26px;
+.section.active {
+  display: flex; /* ❗ بدل block */
+  flex-direction: column;
 }
 
-/* ===== SECTIONS ===== */
-.section{
- display:none;
- opacity:0;
- transform:translateY(16px) scale(.97);
- pointer-events:none;
- transition: opacity .35s ease, transform .35s cubic-bezier(.4,0,.2,1);
-}
-.section.active{
- display:block;
- opacity:1;
- transform:translateY(0) scale(1);
- pointer-events:auto;
-}
+/* ===== BUTTONS ===== */  
+.btn{  
+ width:100%;
+ min-height:44px;
+ margin:5px 0;
+ border:none;
+ border-radius:16px;  
+ font-size:15px;
+ font-weight:700;
+ cursor:pointer;  
+ transition:all .3s ease;  
+}  
 
-/* ===== BUTTONS ===== */
-.btn{
- width:100%;min-height:52px;margin:8px 0;border:none;border-radius:16px;
- font-size:18px;font-weight:700;cursor:pointer;
- transition:all .3s ease;
-}
-.btn-main {
-  background: linear-gradient(135deg, #0f172a, #334155); /* نفس تدرج زر الإعدادات */
-  color: #f0eae2; /* خط أبيض */
-  border: 1px solid #334155; /* نفس الحدود */
-}
-
-.reset-btn{
-  margin-top:15px;
-  background:#c0392b;
-  color:white;
-  border:none;
-  padding:8px 14px;
-  border-radius:8px;
-  cursor:pointer;
-}
-
-.btn-back{
- background:linear-gradient(135deg,#0f172a,#334155);
- color:#f0eae2;
+.btn-main {  
+  background: linear-gradient(135deg, #0f172a, #334155);
+  color: #f0eae2;
+  border: 1px solid #334155;  
+}  
+  
+.reset-btn{  
+  margin-top:15px;  
+  background:#c0392b;  
+  color:white;  
+  border:none;  
+  padding:8px 14px;  
+  border-radius:8px;  
+  cursor:pointer;  
+}  
+  
+.btn-back{  
+ background:linear-gradient(135deg,#0f172a,#334155);  
+ color:#f0eae2;  
  border:1px solid #334155;
-}
-.btn:hover{
- box-shadow:0 4px 15px rgba(0,0,0,0.4);
- transform:scale(1.03);
+
+ width: auto;
+ min-height: 40px;
+ padding: 6px 14px;
+ font-size: 14px;
 }
 
-#game #hintBtn,
-#game .btn-back {
-  width: auto;
+/* 👇 حطها هنا مباشرة */
+.btn-small {
   min-height: 36px;
-  padding: 6px 12px;
-  font-size: 14px;
-  border-radius: 12px;
+  font-size: 13px;
+  padding: 5px 12px;
 }
 
-
-
-
-
-
+.btn:hover{  
+ box-shadow:0 4px 15px rgba(0,0,0,0.4);  
+ transform:scale(1.03);  
+}  
+  
+#game #hintBtn,  
+#game .btn-back {  
+  width: auto;  
+  min-height: 36px;  
+  padding: 6px 12px;  
+  font-size: 14px;  
+  border-radius: 12px;  
+}  
 
 /* ===== SETTINGS ===== */
 .setting-item{
- display:flex;justify-content:space-between;align-items:center;
- background:#0f172a;border:1px solid #334155;
- border-radius:14px;padding:14px;margin:10px 0;
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ background:#0f172a;
+ border:1px solid #334155;
+ border-radius:14px;
+ padding:14px;
+ margin:10px 0;
  font-size:18px;
 }
+
 .toggle{
- width:52px;height:28px;border-radius:20px;
- background:#334155;position:relative;cursor:pointer;
+ width:52px;
+ height:28px;
+ border-radius:20px;
+ background:#334155;
+ position:relative;
+ cursor:pointer;
 }
+
 .toggle::after{
- content:"";position:absolute;top:4px;right:4px;
- width:20px;height:20px;border-radius:50%;
- background:#fff;transition:.3s;
+ content:"";
+ position:absolute;
+ top:4px;
+ right:4px;
+ width:20px;
+ height:20px;
+ border-radius:50%;
+ background:#fff;
+ transition:.3s;
 }
+
 .toggle.on{background:var(--accent)}
 .toggle.on::after{right:28px}
 
 /* ===== ANSWER BOXES ===== */
 .answer-boxes{
- display:flex;justify-content:center;gap:8px;margin:12px 0;direction:ltr;
+ display:flex;
+ justify-content:center;
+ gap:8px;
+ margin:12px 0;
+ direction:ltr;
 }
+
 .answer-box{
- width:44px;height:44px;border-radius:10px;
- background:#fff;color:#000;
- display:flex;align-items:center;justify-content:center;font-size:22px;
+ width:44px;
+ height:44px;
+ border-radius:10px;
+ background:#fff;
+ color:#000;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ font-size:22px;
  transition:all .3s ease;
 }
+
 .answer-box.ok{
  background:linear-gradient(135deg,#22c55e,#4ade80);
  color:#fff;
 }
+
 .answer-box.bad{
  background:linear-gradient(135deg,#ef4444,#f87171);
  color:#fff;
 }
+
 .question-text{
   display:none;
   margin:12px 0;
@@ -465,14 +518,14 @@ body::before {
   font-weight:600;
   text-align:center;
 }
+
 /* ===== KEYBOARD ===== */
 .keyboard {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 4 أعمدة لكل صف */
-  gap: 10px; /* المسافة بين الحروف */
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
 }
 
-/* يمكن إزالة أي تعريف مثلث لأنه غير مستخدم */
 .key{
  background:#1e293b;
  padding:14px;
@@ -484,11 +537,13 @@ body::before {
  touch-action:none; 
  transition:transform .08s ease, box-shadow .3s ease, background .3s ease;
 }
+
 .key.locked{
  position:relative;
  opacity:.35;
  pointer-events:none;
 }
+
 .key.locked::after{
  content:"🔒";
  position:absolute;
@@ -498,18 +553,23 @@ body::before {
  justify-content:center;
  font-size:26px;
 }
+
 .key.used{opacity:.25;pointer-events:none}
+
 .key.shake{
  animation:shake .3s;
 }
+
 .key:active{
  transform:scale(0.92);
  box-shadow:0 4px 10px rgba(0,0,0,0.3);
 }
+
 .key:hover:not(.locked){
  background:linear-gradient(135deg,#334155,#1e293b);
  box-shadow:0 4px 12px rgba(0,0,0,0.4);
 }
+
 @keyframes shake{
  0%{transform:translateX(0)}
  25%{transform:translateX(-4px)}
@@ -517,6 +577,7 @@ body::before {
  75%{transform:translateX(-4px)}
  100%{transform:translateX(0)}
 }
+
 /* ===== HEXAGON MODE ===== */
 .hexagon{
   display:grid;
@@ -553,24 +614,34 @@ body::before {
 .hex-cell:hover{
   background:linear-gradient(135deg,#334155,#1e293b);
 }
+
 /* ===== WHEEL ===== */
 .wheel{
- width:260px;height:260px;margin:16px auto;
+ width:260px;
+ height:260px;
+ margin:16px auto;
  border-radius:50%;
  border:3px solid var(--accent);
  position:relative;
  background: conic-gradient(from 0deg, #facc15, #ffea00, #22c55e, #4ade80, #facc15);
  animation: wheelRotate 10s linear infinite;
 }
+
 @keyframes wheelRotate {
   0%{transform:rotate(0deg);}
   100%{transform:rotate(360deg);}
 }
+
 .wheel .key{
- width:52px;height:52px;border-radius:50%;
+ width:52px;
+ height:52px;
+ border-radius:50%;
  background: var(--accent);
  color:#000;
- position:absolute;display:flex;align-items:center;justify-content:center;
+ position:absolute;
+ display:flex;
+ align-items:center;
+ justify-content:center;
  transition:all .3s ease, transform .2s ease;
 }
 
@@ -581,10 +652,16 @@ body::before {
 
 /* ===== DELETE BUTTON ===== */
 .delete{
- background:#0f172a;border:1px solid #334155;
- border-radius:14px;padding:14px;font-size:20px;font-weight:bold;cursor:pointer;
+ background:#0f172a;
+ border:1px solid #334155;
+ border-radius:14px;
+ padding:14px;
+ font-size:20px;
+ font-weight:bold;
+ cursor:pointer;
  transition:all .3s ease;
 }
+
 .delete:hover{
  box-shadow:0 4px 12px rgba(0,0,0,0.3);
  transform:scale(1.05);
@@ -600,21 +677,25 @@ body::before {
   align-items:center;
   z-index:999;
 }
+
 .overlay.active{display:flex}
+
 .win{
- background:#020617;padding:26px;border-radius:22px;
- box-shadow:0 0 60px var(--accent);text-align:center;
-}
-/* تصغير الأزرار داخل بطاقة الاحتفال */
-#stageOverlay .win .btn {
-  padding: 6px 12px;       /* يقلل المساحة الداخلية للزر */
-  font-size: 14px;         /* يصغر حجم الخط داخل الزر */
-  border-radius: 12px;     /* يحافظ على الشكل المستدير */
+ background:#020617;
+ padding:26px;
+ border-radius:22px;
+ box-shadow:0 0 60px var(--accent);
+ text-align:center;
 }
 
-/* مسافة أقل بين الأزرار والنجوم */
+#stageOverlay .win .btn {
+  padding: 6px 12px;
+  font-size: 14px;
+  border-radius: 12px;
+}
+
 #stageOverlay .win #starsView {
-  margin-bottom: 10px;     /* يقلل المسافة بين النجوم والأزرار */
+  margin-bottom: 10px;
 }
 
 /* ===== CONFETTI ===== */
@@ -624,17 +705,20 @@ body::before {
  font-size:26px;
  animation:fall linear forwards;
  pointer-events:none;
- z-index:2000; /* فوق البطاقة والـ overlay */
+ z-index:2000;
  color: #facc15;
 }
+
 .confetti:nth-child(odd){color:#22c55e;}
 .confetti:nth-child(even){color:#ff4444;}
+
 @keyframes fall{
  to{
   transform:translateY(120vh) rotate(720deg) rotateX(360deg);
   opacity:0;
  }
 }
+
 #finalOverlay .win{
   width:90%;
   max-width:420px;
@@ -655,19 +739,15 @@ body::before {
   }
 }
 
-/* ===== MAP GRID SCROLL & SNAP ===== */
-
 /* ===== MAP GRID ===== */
 #mapGrid {
   display: flex;
-  flex-direction: row;
   gap: 12px;
   overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  padding: 10px;
-  min-width: 0; /* مهم لتجنب مشكلة Flexbox على بعض المتصفحات */
+  overflow-y: hidden;
+  padding: 12px;
+  height: 100%;
 }
-
 
 /* ===== BACKGROUND ===== */
 #stageBackground {
@@ -678,38 +758,58 @@ body::before {
   height: 100%;
   background-size: cover;
   background-position: center;
-  z-index: -1; /* تحت كل العناصر */
-  pointer-events: none; /* لا تتداخل مع العناصر */
-  opacity: 0.4; /* يمكن تعديل الشفافية */
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.4;
 }
 
 /* ===== STAGE GRID ===== */
-.stage-key {
-  flex: 0 0 200px;       /* حجم ثابت للبطاقة */
-  max-width: 220px;      /* يمنع البطاقة من التمدد */
-  height: auto;
-  padding: 4px;          /* تقليل padding قليلًا لتجنب الضغط */
-  overflow: hidden;      /* أي محتوى زائد يتم قطعه */
-}
-
 .stage-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(32px, 1fr)); /* أعمدة صغيرة وثابتة */
-  grid-auto-rows: 32px;   /* ارتفاع ثابت لكل خلية */
-  gap: 4px;               /* تقليل الفجوات لتناسب البطاقة */
-  width: 100%;
-  max-width: 220px;       /* لا تتجاوز حجم البطاقة */
+direction: ltr;
+  grid-template-columns: repeat(auto-fit, minmax(18px, 1fr));
+
+  gap: 1px;
+
+  width: 95%;
+  max-width: none;
+
+  aspect-ratio: 1 / 1;
+
   margin: 0 auto;
 }
 
+/* ===== CELL ===== */
 .stage-grid .cell {
-  font-size: clamp(14px, 1.6vw, 18px); /* حجم خط معقول */
+  width: 100%;                 /* 🔥 تثبيت العرض */
   aspect-ratio: 1 / 1;
-  overflow: hidden;                    /* يمنع خروج النص خارج الخلية */
+
   display: flex;
   align-items: center;
   justify-content: center;
+
+  font-size: 10px;
+
+  border: 1px solid #aaa;
+
+  overflow: hidden;            /* 🔥 يمنع التمدد */
 }
+
+/* ===== الحروف داخل الخلايا ===== */
+.stage-grid .cell span {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 0.8em;            /* 🔥 تصغير الحرف */
+  line-height: 1;
+
+  overflow: hidden;            /* 🔥 مهم */
+}
+
 
 /* ===== تأثير بروز وانفجار النجمة ===== */
 .star-animate {
@@ -784,6 +884,98 @@ body::before {
   50%      { transform: translateY(-3px) scale(1.05); }
 }
 
+
+
+
+
+/* ===== RESPONSIVE (LANDSCAPE PRO FINAL) ===== */
+@media (orientation: landscape) {
+
+  /* ===== الحاوية العامة ===== */
+  .cards-container {
+    padding: 6px;
+    gap: 8px;
+
+    height: 100%;
+    align-items: stretch;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  /* ===== الكارد ===== */
+  .card {
+    flex: 0 0 52%;
+    max-width: 320px;
+
+    height: 100%;
+    min-height: 0; /* 🔥 مهم */
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+  }
+
+  /* ===== كارد المرحلة ===== */
+  .stage-key {
+    flex: 0 0 150px;
+    max-width: 150px;
+
+    height: 100%;
+    min-height: 0; /* 🔥 مهم */
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    overflow: hidden;
+  }
+
+  /* ===== GRID (الإصلاح الحقيقي) ===== */
+  .stage-grid {
+    flex: 1 1 auto;
+
+    width: 100%;
+    height: 100%;
+    min-height: 0; /* 🔥 ضروري */
+
+    aspect-ratio: unset; /* 🔥 كيلغي المربع */
+direction: ltr;
+    grid-template-columns: repeat(auto-fit, minmax(10px, 1fr));
+
+    align-content: center; /* 🔥 يخلي grid وسط */
+    justify-content: center;
+
+    overflow: hidden;
+  }
+
+  /* ===== الخلايا ===== */
+  .stage-grid .cell {
+    aspect-ratio: 1 / 1;
+    font-size: 7px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .stage-grid .cell span {
+    font-size: 0.7em;
+  }
+
+  /* ===== الصورة ===== */
+  #questionImg {
+    max-height: 18%;
+    object-fit: contain;
+    flex-shrink: 0;
+  }
+
+}
+
+
+
+
 </style>
 
 </head>
@@ -792,170 +984,207 @@ body::before {
 
 
 
-
-
-
-
-
 <div id="mapBackground"></div>
+
 <div class="card">
 
-<div id="coinsContainer">
+  <div id="coinsContainer">
     <span id="coinCount">0</span> 💰
   </div>
 
-<div id="menu" class="section active">
- <h1>AWAR-Gⵣ</h1>
+  <div id="menu" class="section active">
+    <h1 data-key="title">AWAR-Gⵣ</h1>
 
-<!-- زر فتح المتجر -->
-<button id="openShop">🛒 المتجر</button>
+    <!-- زر فتح المتجر -->
+    <button id="openShop" data-key="shop">shop</button>
 
-<!-- واجهة المتجر -->
-<div id="shopOverlay">
-  <div id="shopBox">
-    <h3>متجر AWALGⵣ</h3>
-    <p id="shopMessage"></p>
+    <!-- واجهة المتجر -->
+    <div id="shopOverlay">
+      <div id="shopBox">
+        <h3 data-key="shopTitle">shop</h3>
+        <p id="shopMessage"></p>
 
-    <button id="watchAdBtn">🎥 مشاهدة إعلان = عملات</button>
-    <button id="buyCoinsBtn">💰 شراء عملات</button>
-    <button id="buyLevelBtn">🧩 شراء مرحلة</button>
-    <button id="buyGameBtn">🎮 شراء لعبة</button>
-    <button id="buyBookBtn">📚 شراء كتاب</button>
+        <button id="watchAdBtn" data-key="watchAd">watch ad</button>
+        <button id="buyCoinsBtn" data-key="buyCoins">buy coins</button>
+        <button id="buyLevelBtn" data-key="buyLevel">buy level</button>
+        <button id="buyGameBtn" data-key="buyGame">buy game</button>
+        <button id="buyBookBtn" data-key="buyBook">buy book</button>
 
-    <button id="closeShop">❌ إغلاق المتجر</button>
-  </div>
-</div>
-
-
+        <button id="closeShop" data-key="closeShop">close</button>
+      </div>
+    </div>
 
 
 
 
 
- <button class="btn btn-main" onclick="openMap()">▶️ ⴱⴷⴰ</button>
 
- <button class="btn btn-back" onclick="show('settings')">🔧 settings</button>
-<button class="secondary-btn" onclick="openHowTo()">ℹ كيفية اللعب</button>
-</div>
-<div id="settings" class="section">
- <h1>⚙️ الإعدادات</h1>
-
- <div class="setting-item">
- <span id="soundLabel">🔊 الصوت</span>
-  <div id="soundToggle" class="toggle"></div>
- </div>
-
-<div class="setting-item">
- <span id="vibeLabel">📳 الاهتزاز</span>
-  <div id="vibeToggle" class="toggle"></div>
-</div>
-<div class="setting-item">
-  <span>🌍 اللغة</span>
-  <select onchange="setLang(this.value)">
-    <option value="ar">العربية</option>
-    <option value="en">English</option>
-    <option value="am">ⵜⴰⵎⴰⵣⵉⵖⵜ</option>
-  </select>
-</div>
-<button onclick="clearGameData()" class="reset-btn">
-  🗑 مسح التقدم
+<button class="btn btn-main" onclick="openMap()" data-key="start">
+  ▶️ Start
 </button>
- <button class="btn btn-back" onclick="show('menu')">←</button>  
-</div>  
-<div class="map-container">
-<div id="map" class="section">  
-  <div id="mapStageBackground"></div> <!-- الخلفية الخاصة بالمراحل -->
-  <h1>⭐ المراحل</h1>  
-  <div id="mapGrid"></div>
-  <button class="btn btn-back" onclick="show('menu')">←</button>
+
+<button class="btn btn-back btn-small" onclick="show('settings')" data-key="settingsBtn">
+  🔧 Settings
+</button>
+
+<button class="secondary-btn" onclick="openHowTo()" data-key="howToBtn">
+  ℹ How to Play
+</button>
+
 </div>
+
+<div id="settings" class="section">
+  <h1 data-key="settings">⚙️ Settings</h1>
+
+  <div class="setting-item">
+    <span id="soundLabel" data-key="sound">🔊 Sound</span>
+    <div id="soundToggle" class="toggle"></div>
+  </div>
+
+  <div class="setting-item">
+    <span id="vibeLabel" data-key="vibe">📳 Vibration</span>
+    <div id="vibeToggle" class="toggle"></div>
+  </div>
+
+  <div class="setting-item">
+    <span data-key="langLabel">🌍 Language</span>
+    <select onchange="setLang(this.value)">
+      <option value="ar">العربية</option>
+      <option value="en">English</option>
+      <option value="am">ⵜⴰⵎⴰⵣⵉⵖⵜ</option>
+    </select>
+  </div>
+ 
+
+<button onclick="clearGameData()" class="reset-btn" data-key="reset">
+  🗑 Reset Progress
+</button>
+
+<button class="btn btn-back" onclick="show('menu')" data-action="back">
+  ←
+</button>  
+
+</div>  
+
+<div class="map-container">
+
+<div id="map" class="section">  
+  <div id="mapStageBackground"></div>
+
+  <h1 data-key="stagesTitle">⭐ Stages</h1>  
+
+  <div id="mapGrid"></div>
+
+  <button class="btn btn-back" onclick="show('menu')" data-action="back">
+    ←
+  </button>
+</div>
+
 <div id="game" class="section">
 
-<div id="stageBackground"></div>
- <h1 id="levelTitle"></h1>
-<img id="questionImg" src="path/to/your/image.jpg" alt="السؤال">
+  <div id="stageBackground"></div>
 
-<div id="questionText" class="question-text"></div>
- <!-- صناديق الإجابة -->
- <div class="answer-boxes" id="boxes"></div>
+  <h1 id="levelTitle"></h1>
+
+  <img id="questionImg" src="path/to/your/image.jpg" alt="question">
+
+  <div id="questionText" class="question-text"></div>
+
+  <!-- صناديق الإجابة -->
+  <div class="answer-boxes" id="boxes"></div>
+
+  <button id="openWheelBtn" data-key="wheel">
+    🎡 Wheel
+  </button>
 
 
-<button id="openWheelBtn">🎡 عجلة الجوائز</button>
 
+<!-- زر التلميح والعداد -->
+<button class="btn btn-hint" id="hintBtn" data-key="hint">
+  💡 Hint
+</button>
 
-
-
-
-
- <!-- زر التلميح والعداد -->
- <button class="btn btn-hint" id="hintBtn">💡 تلميح</button>
 <div id="hintCount">3</div>
 
- <!-- عجلة الأحرف -->
- <div id="wheel" class="wheel"></div>
+<!-- عجلة الأحرف -->
+<div id="wheel" class="wheel"></div>
 
- <!-- لوحة المفاتيح -->
- <div id="keyboard" class="keyboard"></div>
+<!-- لوحة المفاتيح -->
+<div id="keyboard" class="keyboard"></div>
 
- <!-- زر الرجوع للخريطة -->
- <button class="btn btn-back" onclick="show('map')">←</button>
+<!-- زر الرجوع للخريطة -->
+<button class="btn btn-back" onclick="show('map')" data-action="back">
+  ←
+</button>
+
 </div>
 
 <div id="overlay" class="overlay">
- <div class="win"><h2>🔥 أحسنت 🔥</h2></div>
+  <div class="win">
+    <h2 data-key="win">🔥 Well done 🔥</h2>
+  </div>
 </div>
+
 <div id="finalOverlay" class="overlay">
- <div class="win">
-  <h2>🏆 مبروك! 🏆</h2>
-  <p>أنهيت جميع المراحل بنجاح</p>
-  <button class="btn btn-main" onclick="finalOverlay.classList.remove('active'); show('menu');">🏠 القائمة</button>
+  <div class="win">
+    <h2 data-key="final">🏆 Congratulations! 🏆</h2>
+    <p data-key="finalMsg">You finished all stages</p>
+
+    <button class="btn btn-main"
+      onclick="finalOverlay.classList.remove('active'); show('menu');"
+      data-key="menu">
+      🏠 Menu
+    </button>
+  </div>
 </div>
-</div>
+
 <div id="stageOverlay" class="overlay">
- 
-<div class="win">
-  <h2>✨ نهاية المرحلة ✨</h2>
-<div id="overlayStars" class="overlay-stars"></div>
-  <div id="starsView" style="font-size:32px;margin:12px 0"></div>
-  <button class="btn btn-main" id="nextStageBtn">▶️ المرحلة التالية</button>
-  <button class="btn btn-back" onclick="show('map'); stageOverlay.classList.remove('active')">🗺️ الخريطة</button>
- </div>
+  <div class="win">
+    <h2 data-key="stageEnd">✨ Stage Complete ✨</h2>
+
+    <div id="overlayStars" class="overlay-stars"></div>
+
+    <div id="starsView" style="font-size:32px;margin:12px 0"></div>
+
+    <button class="btn btn-main" id="nextStageBtn" data-key="nextStage">
+      ▶️ Next Stage
+    </button>
+
+    <button class="btn btn-back"
+      onclick="show('map'); stageOverlay.classList.remove('active')"
+      data-key="map">
+      🗺️ Map
+    </button>
+  </div>
 </div>
+
+
 <div id="howToBox" class="overlay" style="display:none">
   <div class="overlay-content">
-    <h2>كيفية اللعب How to Play </h2>
 
-    <p>
-This Amazigh words and puzzles game aims to test your knowledge and enrich your vocabulary in a fun way.
-      هذه لعبة كلمات وألغاز أمازيغية تهدف إلى اختبار معلوماتك
-      وتنمية رصيدك اللغوي بطريقة ممتعة.
+    <h2 data-key="howToTitle">How to Play</h2>
 
+    <p data-key="howToDesc">
+      This Amazigh words and puzzles game aims to test your knowledge and enrich your vocabulary in a fun way.
     </p>
 
     <ul>
-      <li>Read the question or look at the image carefully.
-</li>
-<li>اقرأ السؤال أو شاهد الصورة جيدً
-</li>
-      <li>Drag the letters to form the correct word. </li>
-<li>اسحب الحروف لتكوين الكلمة الصحيحة
-</li>
-      <li> Each correct answer earns you stars ⭐.</li>
-<li>كل إجابة صحيحة تمنحك نجوم ⭐.</li>
-      <li>Use stars to request a hint.</li>
- <li>يمكن استعمال النجوم لطلب تلميح</li>
-      <li>Your progress is saved automatically.</li>
-<li>تقدّمك يُحفظ تلقائيًا</li>
-</ul>
-    <p class="note">
-       ⵣ Beta version by Azeddin Bouhouti – New Year's Competition 
-ⵣ ⵣنسخة تجريبية من إعداد عزالدين البحوتي – مسابقة رأس السنة ⵣ
+      <li data-key="how1">Read the question or look at the image carefully.</li>
+      <li data-key="how2">Drag the letters to form the correct word.</li>
+      <li data-key="how3">Each correct answer earns you stars ⭐.</li>
+      <li data-key="how4">Use stars to request a hint.</li>
+      <li data-key="how5">Your progress is saved automatically.</li>
+    </ul>
+
+    <p class="note" data-key="howNote">
+      ⵣ Beta version by Azeddin Bouhouti – New Year's Competition
     </p>
 
-    <button 
-onclick="closeHowTo()">إغلاق</button>
-  </div>
+    <button onclick="closeHowTo()" data-key="close">
+      Close
+    </button>
 
+  </div>
 
 <script>
 
@@ -1123,6 +1352,8 @@ function saveAnswer(stageIndex, qIndex, answerArray) {
 }
 
 
+
+
 function createStageGridForCard(stageIndex) {
 
   const stageCard = mapGrid.children[stageIndex];
@@ -1242,12 +1473,20 @@ function clap(){
 }
 /* ===== SHOW/HIDE SECTIONS ===== */
 function show(id){
-  document.querySelectorAll(".section").forEach(s => { s.classList.remove("active"); s.style.display="none"; });
-  document.body.offsetHeight;
-  document.getElementById("mapBackground").style.display = (id==="map")?"block":"none";
+  document.querySelectorAll(".section")
+    .forEach(s => s.classList.remove("active"));
+
   const el = document.getElementById(id);
-  el.style.display="block";
-  requestAnimationFrame(()=>el.classList.add("active"));
+  if (!el) return;
+
+  requestAnimationFrame(() => {
+    el.classList.add("active");
+  });
+
+  const bg = document.getElementById("mapBackground");
+  if (bg) {
+    bg.style.display = (id === "map") ? "block" : "none";
+  }
 }
 
 /* ===== تغيير اللغة ===== */
@@ -1257,29 +1496,164 @@ function setLang(l){
   applyLang();
 }
 const translations = {
-  ar:{title:"أوار-Gⵣ",start:"▶️ بدء",settings:"⚙️ الإعدادات",settingsBtn:"🔧 الإعدادات",howToBtn:"ℹ كيفية اللعب",langLabel:"🌍 اللغة",stage:"مرحلة",stagesTitle:"⭐ المراحل",level:"المرحلة",question:"سؤال",back:"⬅️ رجوع",hint:"💡 تلميح",win:"🔥 أحسنت 🔥",final:"🏆 مبروك! 🏆",sound:"🔊 الصوت",vibe:"📳 الاهتزاز"},
-  en:{title:"AWAR-Gⵣ",start:"▶️ Start",settings:"⚙️ Settings",settingsBtn:"🔧 Settings",howToBtn:"ℹ How to Play",langLabel:"🌍 Language",stage:"Stage",stagesTitle:"⭐ Stages",level:"Stage",question:"Question",back:"⬅️ Back",hint:"💡 Hint",win:"🔥 Well done 🔥",final:"🏆 Congratulations! 🏆",sound:"🔊 Sound",vibe:"📳 Vibration"},
-  am:{title:"ⴰⵡⴰⵔ-Gⵣ",start:"▶️ ⴱⴷⴰ",settings:"⚙️ ⵜⵉⵙⵎⵉⵍⵉⵏ",settingsBtn:"🔧 ⵜⵉⵙⵎⵉⵍⵉⵏ",howToBtn:"ℹ ⵜⴰⵙⴽⴰⵡⵜ",langLabel:"🌍 ⵜⵉⵙⴽⵍⵓⵏ",stage:"ⵖⴰⵔⴰ",stagesTitle:"⭐ ⵉⵖⴰⵔⴰⵏ",level:"ⵖⴰⵔⴰ",question:"ⵜⵉⵙⴽⴰ",back:"⬅️ ⵔⵔⴰⵊⵓ",hint:"💡 ⵜⴰⵙⴽⴰ",win:"🔥 ⴰⵢⵢⵓⵣ 🔥",final:"🏆 ⴰⵢⵢⵓⵣ! 🏆",sound:"🔊 ⴰⵙⵙⵓⵏ",vibe:"📳 ⴰⵏⵣⵣⵓⵣ"}
+
+  ar:{
+    title:"أوار-Gⵣ",
+    start:"▶️ بدء",
+    settings:"⚙️ الإعدادات",
+    settingsBtn:"🔧 الإعدادات",
+    howToBtn:"ℹ كيفية اللعب",
+    langLabel:"🌍 اللغة",
+    stage:"مرحلة",
+    stagesTitle:"⭐ المراحل",
+    level:"المرحلة",
+    question:"سؤال",
+    back:"⬅️ رجوع",
+    hint:"💡 تلميح",
+    win:"🔥 أحسنت 🔥",
+    final:"🏆 مبروك! 🏆",
+    finalMsg:"أنهيت جميع المراحل بنجاح",
+    menu:"🏠 القائمة",
+    nextStage:"▶️ المرحلة التالية",
+    map:"🗺️ الخريطة",
+    stageEnd:"✨ نهاية المرحلة ✨",
+    sound:"🔊 الصوت",
+    vibe:"📳 الاهتزاز",
+    reset:"🗑 مسح التقدم",
+
+    howToTitle:"كيفية اللعب",
+    howToDesc:"هذه لعبة كلمات وألغاز أمازيغية تهدف إلى اختبار معلوماتك وتنمية رصيدك اللغوي بطريقة ممتعة.",
+    how1:"اقرأ السؤال أو شاهد الصورة جيدًا.",
+    how2:"اسحب الحروف لتكوين الكلمة الصحيحة.",
+    how3:"كل إجابة صحيحة تمنحك نجوم ⭐.",
+    how4:"يمكن استعمال النجوم لطلب تلميح.",
+    how5:"تقدّمك يُحفظ تلقائيًا.",
+    howNote:"نسخة تجريبية من إعداد عزالدين البحوتي",
+    close:"إغلاق",
+
+    shop:"🛒 المتجر",
+    shopTitle:"متجر",
+    watchAd:"🎥 مشاهدة إعلان = عملات",
+    buyCoins:"💰 شراء عملات",
+    buyLevel:"🧩 شراء مرحلة",
+    buyGame:"🎮 شراء لعبة",
+    buyBook:"📚 شراء كتاب",
+    closeShop:"❌ إغلاق",
+    wheel:"🎡 عجلة"
+  },
+
+  en:{
+    title:"AWAR-Gⵣ",
+    start:"▶️ Start",
+    settings:"⚙️ Settings",
+    settingsBtn:"🔧 Settings",
+    howToBtn:"ℹ How to Play",
+    langLabel:"🌍 Language",
+    stage:"Stage",
+    stagesTitle:"⭐ Stages",
+    level:"Stage",
+    question:"Question",
+    back:"⬅️ Back",
+    hint:"💡 Hint",
+    win:"🔥 Well done 🔥",
+    final:"🏆 Congratulations! 🏆",
+    finalMsg:"You finished all stages",
+    menu:"🏠 Menu",
+    nextStage:"▶️ Next Stage",
+    map:"🗺️ Map",
+    stageEnd:"✨ Stage Complete ✨",
+    sound:"🔊 Sound",
+    vibe:"📳 Vibration",
+    reset:"🗑 Reset Progress",
+
+    howToTitle:"How to Play",
+    howToDesc:"This Amazigh words and puzzles game aims to test your knowledge and enrich your vocabulary in a fun way.",
+    how1:"Read the question or look at the image carefully.",
+    how2:"Drag the letters to form the correct word.",
+    how3:"Each correct answer earns you stars ⭐.",
+    how4:"Use stars to request a hint.",
+    how5:"Your progress is saved automatically.",
+    howNote:"ⵣ Beta version by Azeddin Bouhouti",
+    close:"Close",
+
+    shop:"🛒 Shop",
+    shopTitle:"Shop",
+    watchAd:"🎥 Watch Ad = Coins",
+    buyCoins:"💰 Buy Coins",
+    buyLevel:"🧩 Buy Level",
+    buyGame:"🎮 Buy Game",
+    buyBook:"📚 Buy Book",
+    closeShop:"❌ Close",
+    wheel:"🎡 Wheel"
+  },
+
+  am:{
+    title:"ⴰⵡⴰⵔ-Gⵣ",
+    start:"▶️ ⴱⴷⴰ",
+    settings:"⚙️ ⵜⵉⵙⵎⵉⵍⵉⵏ",
+    settingsBtn:"🔧 ⵜⵉⵙⵎⵉⵍⵉⵏ",
+    howToBtn:"ℹ ⵜⴰⵙⴽⴰⵡⵜ",
+    langLabel:"🌍 ⵜⵉⵙⴽⵍⵓⵏ",
+    stage:"ⵖⴰⵔⴰ",
+    stagesTitle:"⭐ ⵉⵖⴰⵔⴰⵏ",
+    level:"ⵖⴰⵔⴰ",
+    question:"ⵜⵉⵙⴽⴰ",
+    back:"⬅️ ⵔⵔⴰⵊⵓ",
+    hint:"💡 ⵜⴰⵙⴽⴰ",
+    win:"🔥 ⴰⵢⵢⵓⵣ 🔥",
+    final:"🏆 ⴰⵢⵢⵓⵣ! 🏆",
+    finalMsg:"ⵜⵙⵎⴷⴷⵉⴷ ⴽⵓⵍ ⵉⵖⴰⵔⴰⵏ",
+    menu:"🏠 ⵜⴰⵏⴰⵍⵉⵜ",
+    nextStage:"▶️ ⵖⴰⵔⴰ ⵢⴰⴷⵏ",
+    map:"🗺️ ⵜⴰⵙⵎⵓⵏⵜ",
+    stageEnd:"✨ ⵜⴰⵎⵓⵏⵜ ⵏ ⵖⴰⵔⴰ ✨",
+    sound:"🔊 ⴰⵙⵙⵓⵏ",
+    vibe:"📳 ⴰⵏⵣⵣⵓⵣ",
+    reset:"🗑 ⴰⵙⵙⴼⴰⵔ ⵏ ⵜⴰⵣⵣⴰⵔⵜ",
+
+    howToTitle:"ⵜⴰⵙⴽⴰⵡⵜ",
+    howToDesc:"ⴷ ⴰⵡⵔⴰⵔ ⵏ ⵜⵉⵙⴽⴰ ⵏ ⵜⴰⵎⴰⵣⵉⵖⵜ ⵉⴳⴰ ⴰⴷ ⵉⵙⴽⵔ ⵉⵎⴰⵡⴰⵏⵏ ⵏⵏⴽ.",
+    how1:"ⵖⵔ ⵜⵉⵙⴽⴰ ⵏⴻⵖ ⵥⵕ ⵜⵓⴳⴳⴰ.",
+    how2:"ⵙⵙⵉⵡⴹ ⵉⵙⴽⵉⵍⵏ.",
+    how3:"ⴽⵓⵍ ⵜⴰⵎⵓⵏⵜ ⵜⴼⴽ ⵉⵜⵔⴰⵏ ⭐.",
+    how4:"ⵙⵙⵎⵔⵙ ⵉⵜⵔⴰⵏ ⵉ ⵜⵙⴽⴰ.",
+    how5:"ⴰⵙⴼⴰⵔ ⵉⵜⵜⵢⴰⵃⴼⴰⵣ.",
+    howNote:"ⵏⵙⵅⴰ ⴰⵎⵙⴰⵔⵓ",
+    close:"ⵙⴽⵯⵔ",
+
+    shop:"🛒 ⴰⵙⵓⵇ",
+    shopTitle:"ⴰⵙⵓⵇ",
+    watchAd:"🎥 ⵙⴽⵔ ⴰⵙⴼⵍⵎ",
+    buyCoins:"💰 ⵙⵙⵖⵏ ⵉⴷⵔⴰⵔⵏ",
+    buyLevel:"🧩 ⵙⵙⵖⵏ ⵜⴰⵎⵓⵏⵜ",
+    buyGame:"🎮 ⵙⵙⵖⵏ ⴰⵡⵔⴰⵔ",
+    buyBook:"📚 ⵙⵙⵖⵏ ⴰⴷⵍⵉⵙ",
+    closeShop:"❌ ⵙⴽⵯⵔ",
+    wheel:"🎡 ⴰⵙⴳⵓⵔ"
+  }
+
 };
+
+
+
 function applyLang(){
   const t = translations[currentLang];
-  document.querySelector("#menu h1").textContent = t.title;
-  document.querySelector("#settings h1").textContent = t.settings;
-  document.querySelector(".btn-main").textContent = t.start;
-  document.querySelector("button[onclick=\"show('settings')\"]").textContent = t.settingsBtn;
-  document.getElementById("soundLabel").textContent = t.sound;
-  document.getElementById("vibeLabel").textContent = t.vibe;
-  document.querySelector(".secondary-btn").textContent = t.howToBtn;
-  document.querySelector("#settings select")?.previousElementSibling && 
-    (document.querySelector("#settings select").previousElementSibling.textContent = t.langLabel);
-  document.querySelector("#map h1").textContent = t.stagesTitle;
-  document.querySelectorAll('[data-action="back"]').forEach(btn => btn.textContent = t.back);
-  document.querySelector("#overlay h2").textContent = t.win;
-  document.querySelector("#stageOverlay h2").textContent = t.win;
-  document.querySelector("#finalOverlay h2").textContent = t.final;
-  document.querySelector("#finalOverlay button") && 
-    (document.querySelector("#finalOverlay button").textContent = t.start);
-  document.body.dir = (currentLang==="ar")?"rtl":"ltr";
+
+  // ترجمة جميع العناصر لي فيها data-key
+  document.querySelectorAll("[data-key]").forEach(el => {
+    const key = el.getAttribute("data-key");
+    if (t[key]) {
+      el.textContent = t[key];
+    }
+  });
+
+  // أزرار الرجوع
+  document.querySelectorAll('[data-action="back"]').forEach(btn => {
+    btn.textContent = t.back;
+  });
+
+  // الاتجاه (RTL / LTR)
+  document.body.dir = (currentLang === "ar") ? "rtl" : "ltr";
 }
 applyLang();
 
@@ -1447,6 +1821,7 @@ stages[2] = {
    
     { q: 3, col: 0, row: 2, dir: "horizontal", length: 7 }
     
+
   ],
   qs: [
     { a: "ⵄⵎⵉ", text: { ar: "4 كلمة عمودية ", en: "Vertical 1", am: "ⵄⵎⵉ" } },
@@ -1466,7 +1841,6 @@ stages[2] = {
     
   ]
 };
-
 
 // ===== مرحلة ⵣ - 3 =====
 stages[3] = {
@@ -1502,98 +1876,195 @@ stages[3] = {
   ]
 };
 
-  // ===== مرحلة ⵣ - 4 =====
-stages[4] = {
-  name: "مرحلة ⵣ",
-  grid: { cols: 7, rows: 7 },
-  layout: [
+  
 
- 
-    { q: 0, col: 1, row: 0, dir: "vertical", length: 7 },
-   
-    { q: 1, col: 1, row: 3, dir: "horizontal", length: 3 },
-    { q: 2, col: 3, row: 0, dir: "vertical", length: 7 }
-  ],
-  qs: [
-    { a: "ⵊⵓⴳⴰⴱⴳⴷ", text: { ar: "العمود الأوسط", en: "Middle column", am: "ⵊⵓⴳⴰⴱⴳⴷ" } },
-    
-    { a: "ⴰⵎⴳ", text: { ar: "كلمة عمودية 1", en: "Vertical 4", am: "ⴰⵎⴳ" } },
-    
-    { a: "ⵉⵢⴰⴳⴷ⵷ⵙ", text: { ar: "أفقية 3", en: "Horizontal 1", am: "ⵉⵢⴰⴳⴷ⵷ⵙ" } }
-  ],
-  answers: [
-    
-    ["ⵊ","ⵓ","ⴳ","ⴰ","ⴱ","ⴳ","ⴷ"],
-      ["ⵉ","ⵢ","ⴰ","ⴳ","ⴷ","⵷","ⵙ"],
+ stages[4] = { "name": "4مرحلة ", "grid": { "cols": 7, "rows": 7 }, "layout": [ { "q": 0, "row": 1, "col": 3, "dir": "vertical", "length": 5 }, { "q": 1, "row": 1, "col": 5, "dir": "vertical", "length": 5 }, { "q": 2, "row": 4, "col": 3, "dir": "horizontal", "length": 4 }, { "q": 3, "row": 2, "col": 1, "dir": "vertical", "length": 4 }, { "q": 4, "row": 0, "col": 0, "dir": "horizontal", "length": 3 } ], "qs": [ { "a": "ⴰⵔⵔⴰⵖ", "text": { "ar": "جبل", "en": "mountain", "am": "ⴰⵔⵔⴰⵖ" } }, { "a": "ⵓⵙⵙⵓⵍ", "text": { "ar": "نار", "en": "fire", "am": "ⵓⵙⵙⵓⵍ" } }, { "a": "ⴰⵢⵓⴷ", "text": { "ar": "ماء", "en": "water", "am": "ⴰⵢⵓⴷ" } }, { "a": "ⴰⵎⵉⵍ", "text": { "ar": "حجر", "en": "stone", "am": "ⴰⵎⵉⵍ" } }, { "a": "ⵢⵓⵔ", "text": { "ar": "نهر", "en": "river", "am": "ⵢⵓⵔ" } } ], "answers": [ [ "ⴰ", "ⵔ", "ⵔ", "ⴰ", "ⵖ" ], [ "ⵓ", "ⵙ", "ⵙ", "ⵓ", "ⵍ" ], [ "ⴰ", "ⵢ", "ⵓ", "ⴷ" ], [ "ⴰ", "ⵎ", "ⵉ", "ⵍ" ], [ "ⵢ", "ⵓ", "ⵔ" ] ] };
 
-    ["ⴰ","ⵎ","ⴳ"]
-   
-  ]
-};
 
-  // ===== مرحلة ⵣ - 5 =====
+
+
+// ===== مرحلة ⵣ - 5 =====
 stages[5] = {
-  name: "مرحلة ⵣ",
-  grid: { cols: 7, rows: 7 },
-  layout: [
-
- 
-    { q: 0, col: 0, row: 0, dir: "vertical", length: 7 },
-   
-    { q: 1, col: 0, row: 0, dir: "horizontal", length: 4 },
-    { q: 2, col: 0, row: 6, dir: "horizontal", length: 4 }
-  ],
-  qs: [
-    { a: "ⴰⵓⴳⴰⴱⴳⴷ", text: { ar: "العمود الأوسط", en: "Middle column", am: "ⴰⵓⴳⴰⴱⴳⴷ" } },
-    
-    { a: "ⴰⵎⴳⵉ", text: { ar: "كلمة عمودية 1", en: "Vertical 4", am: "ⴰⵎⴳⵉ" } },
-    
-    { a: "ⴷⵢⴰⴷ", text: { ar: "أفقية 3", en: "Horizontal 1", am: "ⴷⵢⴰⴷ" } }
-  ],
-  answers: [
-    
-    ["ⴰ","ⵓ","ⴳ","ⴰ","ⴱ","ⴳ","ⴷ"],
-      ["ⴷ","ⵢ","ⴰ","ⴳ","ⴷ"],
-
-    ["ⴰ","ⵎ","ⴳ","ⵉ"]
-   
-  ]
-};
-
-
-
-// ===== مرحلة ⵣ - 6 =====
-stages[6] = {
-  name: "مرحلة ⵣ - 5",
+  name: "مرحلة ⵣ - 7",
   grid: { cols: 7, rows: 7 },
   layout: [
-    { q: 0, col: 0, row: 0, dir: "vertical", length: 3 },
-    { q: 1, col: 3, row: 0, dir: "vertical", length: 7 },
-    { q: 2, col: 0, row: 5, dir: "vertical", length: 3 },
-    { q: 3, col: 6, row: 0, dir: "vertical", length: 3 },
-    { q: 4, col: 6, row: 5, dir: "vertical", length: 3 },
-    { q: 5, col: 0, row: 2, dir: "horizontal", length: 7 },
-    { q: 6, col: 0, row: 5, dir: "horizontal", length: 7 }
+    { q: 0, col: 0, row: 0, dir: "vertical", length: 3 },   // ⴰⵢⴷⵉ
+    { q: 1, col: 2, row: 0, dir: "vertical", length: 5 },   // ⵉⵣⵣⴻⵔ
+    { q: 2, col: 4, row: 0, dir: "vertical", length: 4 },   // ⴰⵍⵎⵓⴷ
+    { q: 3, col: 0, row: 2, dir: "horizontal", length: 7 }, // ⵎⴰⴳⴷⵓⵙⵔ
+    { q: 4, col: 1, row: 5, dir: "horizontal", length: 6 }  // ⴳⴰⵎⴳⵉⵔ
   ],
   qs: [
-    { a: "ⵓⵎⵉ", text: { ar: "كلمة عمودية 4", en: "Vertical 1", am: "ⵓⵎⵉ" } },
-    { a: "ⵢⵓⴳⴰⴱⴳⴷ", text: { ar: "العمود الأوسط", en: "Middle column", am: "ⵢⵓⴳⴰⴱⴳⴷ" } },
-    { a: "ⴳⵉⴷ", text: { ar: "كلمة عمودية 3", en: "Vertical 3", am: "ⴳⵉⴷ" } },
-    { a: "ⴷⵎⵙ", text: { ar: "كلمة عمودية 1", en: "Vertical 4", am: "ⴷⵎⵙ" } },
-    { a: "ⴷⴰⵔ", text: { ar: "كلمة عمودية 2", en: "Vertical 5", am: "ⴷⴰⵔ" } },
-    { a: "ⵉⵎⴰⴳⴷⵓⵙ", text: { ar: "أفقية 3", en: "Horizontal 1", am: "ⵉⵎⴰⴳⴷⵓⵙ" } },
-    { a: "ⴳⴰⵎⴳⵉⵔⴷ", text: { ar: "أفقية 2", en: "Horizontal 2", am: "ⴳⴰⵎⴳⵉⵔⴷ" } }
+    { a: "ⴰⵢⴷⵉ", text: { ar: "كلب", en: "dog", am: "ⴰⵢⴷⵉ" } },
+    { a: "ⵉⵣⵣⴻⵔ", text: { ar: "يجري", en: "to run", am: "ⵉⵣⵣⴻⵔ" } },
+    { a: "ⴰⵍⵎⵓⴷ", text: { ar: "طائر", en: "bird", am: "ⴰⵍⵎⵓⴷ" } },
+    { a: "ⵎⴰⴳⴷⵓⵙⵔ", text: { ar: "أفقية 3", en: "Horizontal 3", am: "ⵎⴰⴳⴷⵓⵙⵔ" } },
+    { a: "ⴳⴰⵎⴳⵉⵔ", text: { ar: "أفقية 2", en: "Horizontal 2", am: "ⴳⴰⵎⴳⵉⵔ" } }
   ],
   answers: [
-    ["ⵓ","ⵎ","ⵉ"],
-    ["ⵢ","ⵓ","ⴳ","ⴰ","ⴱ","ⴳ","ⴷ"],
-    ["ⴳ","ⵉ","ⴷ"],
-    ["ⴷ","ⵎ","ⵙ"],
-    ["ⴷ","ⴰ","ⵔ"],
-    ["ⵉ","ⵎ","ⴰ","ⴳ","ⴷ","ⵓ","ⵙ"],
+    ["ⴰ","ⵢ","ⴷ","ⵉ"],                   // عمودية 1
+    ["ⵉ","ⵣ","ⵣ","ⴻ","ⵔ"],              // عمودية 2
+    ["ⴰ","ⵍ","ⵎ","ⵓ"],                   // عمودية 3
+    ["ⵎ","ⴰ","ⴳ","ⴷ","ⵓ","ⵙ","ⵔ"],     // أفقية 3
+    ["ⴳ","ⴰ","ⵎ","ⴳ","ⵉ","ⵔ"]          // أفقية 2
+  ]
+};
+
+stages[6] = {
+  name: "مرحلة 1",
+  grid: { cols: 7, rows: 7 },
+
+  layout: [
+    { q: 0, row: 3, col: 0, dir: "horizontal", length: 5 },
+    { q: 1, row: 0, col: 0, dir: "horizontal", length: 6 },
+    { q: 2, row: 1, col: 6, dir: "vertical", length: 4 },
+    { q: 3, row: 6, col: 0, dir: "horizontal", length: 7 }
+  ],
+
+  qs: [
+    { a: "ⵉⵣⵣⴻⵔ", text: { ar: "يجري", en: "run", am: "ⵉⵣⵣⴻⵔ" } },
+    { a: "ⵎⴰⴳⴷⵓⵙ", text: { ar: "يأكل", en: "eat", am: "ⵎⴰⴳⴷⵓⵙ" } },
+    { a: "ⴰⵢⴷⵉ", text: { ar: "كلب", en: "dog", am: "ⴰⵢⴷⵉ" } },
+    { a: "ⴳⴰⵎⴳⵉⵔⴷ", text: { ar: "يشرب", en: "drink", am: "ⴳⴰⵎⴳⵉⵔⴷ" } }
+  ],
+
+  answers: [
+    ["ⵉ","ⵣ","ⵣ","ⴻ","ⵔ"],
+    ["ⵎ","ⴰ","ⴳ","ⴷ","ⵓ","ⵙ"],
+    ["ⴰ","ⵢ","ⴷ","ⵉ"],
     ["ⴳ","ⴰ","ⵎ","ⴳ","ⵉ","ⵔ","ⴷ"]
   ]
 };
+
+
+stages[7] = {
+  name: "مرحلة 1",
+
+  grid: { cols: 7, rows: 7 },
+
+  layout: [
+    { q: 0, row: 3, col: 1, dir: "horizontal", length: 4 },
+    { q: 1, row: 3, col: 4, dir: "vertical", length: 4 },
+    { q: 2, row: 0, col: 0, dir: "horizontal", length: 6 },
+    { q: 3, row: 3, col: 1, dir: "vertical", length: 4 },
+    { q: 4, row: 1, col: 6, dir: "vertical", length: 5 }
+  ],
+
+  qs: [
+    { a: "ⴰⵢⴷⵉ", text: { ar: "كلب", en: "dog", am: "ⴰⵢⴷⵉ" } },
+    { a: "ⵉⵣⵣⵔ", text: { ar: "يجري", en: "run", am: "ⵉⵣⵣⵔ" } },
+    { a: "ⵎⴰⴳⴷⵓⵙ", text: { ar: "يأكل", en: "eat", am: "ⵎⴰⴳⴷⵓⵙ" } },
+    { a: "ⴰⴼⵓⵙ", text: { ar: "يد", en: "hand", am: "ⴰⴼⵓⵙ" } },
+    { a: "ⴰⴷⴷⴰⵍ", text: { ar: "باب", en: "door", am: "ⴰⴷⴷⴰⵍ" } }
+  ],
+
+  answers: [
+    ["ⴰ","ⵢ","ⴷ","ⵉ"],
+    ["ⵉ","ⵣ","ⵣ","ⵔ"],
+    ["ⵎ","ⴰ","ⴳ","ⴷ","ⵓ","ⵙ"],
+    ["ⴰ","ⴼ","ⵓ","ⵙ"],
+    ["ⴰ","ⴷ","ⴷ","ⴰ","ⵍ"]
+  ]
+};
+
+
+stages[8] = {
+  name: "مرحلة ⵣ الذكية",
+  grid: { cols: 7, rows: 7 },
+  layout: [
+    { q: 0, row: 3, col: 1, dir: "horizontal", length: 5 },
+    { q: 1, row: 3, col: 1, dir: "vertical", length: 4 },
+    { q: 2, row: 5, col: 1, dir: "horizontal", length: 5 },
+    { q: 3, row: 0, col: 0, dir: "horizontal", length: 4 },
+    { q: 4, row: 0, col: 6, dir: "vertical", length: 3 }
+  ],
+  qs: [
+    {
+      a: "ⴰⵔⵔⴰⵖ",
+      text: { ar: "جبل", en: "mountain", am: "ⴰⵔⵔⴰⵖ" }
+    },
+    {
+      a: "ⴰⵢⵓⴷ",
+      text: { ar: "ماء", en: "water", am: "ⴰⵢⵓⴷ" }
+    },
+    {
+      a: "ⵓⵙⵙⵓⵍ",
+      text: { ar: "نار", en: "fire", am: "ⵓⵙⵙⵓⵍ" }
+    },
+    {
+      a: "ⴰⵎⵉⵍ",
+      text: { ar: "حجر", en: "stone", am: "ⴰⵎⵉⵍ" }
+    },
+    {
+      a: "ⵢⵓⵍ",
+      text: { ar: "نهر", en: "river", am: "ⵢⵓⵍ" }
+    }
+  ],
+  answers: [
+    ["ⴰ", "ⵔ", "ⵔ", "ⴰ", "ⵖ"],
+    ["ⴰ", "ⵢ", "ⵓ", "ⴷ"],
+    ["ⵓ", "ⵙ", "ⵙ", "ⵓ", "ⵍ"],
+    ["ⴰ", "ⵎ", "ⵉ", "ⵍ"],
+    ["ⵢ", "ⵓ", "ⵍ"]
+  ]
+};
+
+
+
+
+
+stages[9] = { "name": "مرحلة 1", "grid": { "cols": 7, "rows": 7 }, "layout": [ { "q": 0, "row": 3, "col": 1, "dir": "horizontal", "length": 5 }, { "q": 1, "row": 1, "col": 1, "dir": "horizontal", "length": 5 }, { "q": 2, "row": 3, "col": 4, "dir": "vertical", "length": 4 }, { "q": 3, "row": 3, "col": 1, "dir": "vertical", "length": 4 }, { "q": 4, "row": 6, "col": 3, "dir": "horizontal", "length": 4 } ], "qs": [ { "a": "ⴰⵔⵔⴰⵖ", "text": { "ar": "جبل", "en": "mountain", "am": "ⴰⵔⵔⴰⵖ" } }, { "a": "ⵓⵙⵙⵓⵍ", "text": { "ar": "نار", "en": "fire", "am": "ⵓⵙⵙⵓⵍ" } }, { "a": "ⴰⵢⵓⴷ", "text": { "ar": "ماء", "en": "water", "am": "ⴰⵢⵓⴷ" } }, { "a": "ⴰⵎⵉⵍ", "text": { "ar": "حجر", "en": "stone", "am": "ⴰⵎⵉⵍ" } }, { "a": "ⴰⴷⴷⴰ", "text": { "ar": "بيت", "en": "house", "am": "ⴰⴷⴷⴰ" } } ], "answers": [ [ "ⴰ", "ⵔ", "ⵔ", "ⴰ", "ⵖ" ], [ "ⵓ", "ⵙ", "ⵙ", "ⵓ", "ⵍ" ], [ "ⴰ", "ⵢ", "ⵓ", "ⴷ" ], [ "ⴰ", "ⵎ", "ⵉ", "ⵍ" ], [ "ⴰ", "ⴷ", "ⴷ", "ⴰ" ] ] };
+
+
+
+stages[10] = { "name": "مرحلة 1", "grid": { "cols": 7, "rows": 7 }, "layout": [ { "q": 0, "row": 3, "col": 1, "dir": "horizontal", "length": 5 }, { "q": 1, "row": 1, "col": 2, "dir": "horizontal", "length": 5 }, { "q": 2, "row": 3, "col": 4, "dir": "vertical", "length": 4 }, { "q": 3, "row": 3, "col": 1, "dir": "vertical", "length": 4 }, { "q": 4, "row": 6, "col": 3, "dir": "horizontal", "length": 4 }, { "q": 5, "row": 0, "col": 0, "dir": "vertical", "length": 3 } ], "qs": [ { "a": "ⴰⵔⵔⴰⵖ", "text": { "ar": "جبل", "en": "mountain", "am": "ⴰⵔⵔⴰⵖ" } }, { "a": "ⵓⵙⵙⵓⵍ", "text": { "ar": "نار", "en": "fire", "am": "ⵓⵙⵙⵓⵍ" } }, { "a": "ⴰⵢⵓⴷ", "text": { "ar": "ماء", "en": "water", "am": "ⴰⵢⵓⴷ" } }, { "a": "ⴰⵎⵉⵍ", "text": { "ar": "حجر", "en": "stone", "am": "ⴰⵎⵉⵍ" } }, { "a": "ⴰⴷⴷⴰ", "text": { "ar": "بيت", "en": "house", "am": "ⴰⴷⴷⴰ" } }, { "a": "ⵢⵓⵍ", "text": { "ar": "نهر", "en": "river", "am": "ⵢⵓⵍ" } } ], "answers": [ [ "ⴰ", "ⵔ", "ⵔ", "ⴰ", "ⵖ" ], [ "ⵓ", "ⵙ", "ⵙ", "ⵓ", "ⵍ" ], [ "ⴰ", "ⵢ", "ⵓ", "ⴷ" ], [ "ⴰ", "ⵎ", "ⵉ", "ⵍ" ], [ "ⴰ", "ⴷ", "ⴷ", "ⴰ" ], [ "ⵢ", "ⵓ", "ⵍ" ] ] };
+
+
+
+stages[11] = { "name": "مرحلة 1", "grid": { "cols": 7, "rows": 7 }, "layout": [ { "q": 0, "row": 3, "col": 1, "dir": "horizontal", "length": 5 }, { "q": 1, "row": 1, "col": 2, "dir": "horizontal", "length": 5 }, { "q": 2, "row": 3, "col": 4, "dir": "vertical", "length": 4 }, { "q": 3, "row": 3, "col": 1, "dir": "vertical", "length": 4 }, { "q": 4, "row": 6, "col": 3, "dir": "horizontal", "length": 4 }, { "q": 5, "row": 0, "col": 0, "dir": "vertical", "length": 3 } ], "qs": [ { "a": "ⴰⵔⵔⴰⵖ", "text": { "ar": "جبل", "en": "mountain", "am": "ⴰⵔⵔⴰⵖ" } }, { "a": "ⵓⵙⵙⵓⵍ", "text": { "ar": "نار", "en": "fire", "am": "ⵓⵙⵙⵓⵍ" } }, { "a": "ⴰⵢⵓⴷ", "text": { "ar": "ماء", "en": "water", "am": "ⴰⵢⵓⴷ" } }, { "a": "ⴰⵎⵉⵍ", "text": { "ar": "حجر", "en": "stone", "am": "ⴰⵎⵉⵍ" } }, { "a": "ⴰⴷⴷⴰ", "text": { "ar": "بيت", "en": "house", "am": "ⴰⴷⴷⴰ" } }, { "a": "ⵢⵓⵍ", "text": { "ar": "نهر", "en": "river", "am": "ⵢⵓⵍ" } } ], "answers": [ [ "ⴰ", "ⵔ", "ⵔ", "ⴰ", "ⵖ" ], [ "ⵓ", "ⵙ", "ⵙ", "ⵓ", "ⵍ" ], [ "ⴰ", "ⵢ", "ⵓ", "ⴷ" ], [ "ⴰ", "ⵎ", "ⵉ", "ⵍ" ], [ "ⴰ", "ⴷ", "ⴷ", "ⴰ" ], [ "ⵢ", "ⵓ", "ⵍ" ] ] };
+
+
+
+stages[12] = { "name": "مرحلة 1", "grid": { "cols": 7, "rows": 7 }, "layout": [ { "q": 0, "row": 3, "col": 1, "dir": "horizontal", "length": 5 }, { "q": 1, "row": 1, "col": 1, "dir": "horizontal", "length": 5 }, { "q": 2, "row": 3, "col": 4, "dir": "vertical", "length": 4 }, { "q": 3, "row": 3, "col": 1, "dir": "vertical", "length": 4 }, { "q": 4, "row": 6, "col": 3, "dir": "horizontal", "length": 4 } ], "qs": [ { "a": "ⴰⵔⵔⴰⵖ", "text": { "ar": "جبل", "en": "mountain", "am": "ⴰⵔⵔⴰⵖ" } }, { "a": "ⵓⵙⵙⵓⵍ", "text": { "ar": "نار", "en": "fire", "am": "ⵓⵙⵙⵓⵍ" } }, { "a": "ⴰⵢⵓⴷ", "text": { "ar": "ماء", "en": "water", "am": "ⴰⵢⵓⴷ" } }, { "a": "ⴰⵎⵉⵍ", "text": { "ar": "حجر", "en": "stone", "am": "ⴰⵎⵉⵍ" } }, { "a": "ⴰⴷⴷⴰ", "text": { "ar": "بيت", "en": "house", "am": "ⴰⴷⴷⴰ" } } ], "answers": [ [ "ⴰ", "ⵔ", "ⵔ", "ⴰ", "ⵖ" ], [ "ⵓ", "ⵙ", "ⵙ", "ⵓ", "ⵍ" ], [ "ⴰ", "ⵢ", "ⵓ", "ⴷ" ], [ "ⴰ", "ⵎ", "ⵉ", "ⵍ" ], [ "ⴰ", "ⴷ", "ⴷ", "ⴰ" ] ] };
+
+
+
+stages[13] = { "name": "مرحلة 1", "grid": { "cols": 7, "rows": 7 }, "layout": [ { "q": 0, "row": 0, "col": 0, "dir": "horizontal", "length": 5 }, { "q": 1, "row": 0, "col": 6, "dir": "vertical", "length": 5 }, { "q": 2, "row": 0, "col": 0, "dir": "vertical", "length": 4 }, { "q": 3, "row": 0, "col": 3, "dir": "vertical", "length": 4 }, { "q": 4, "row": 5, "col": 0, "dir": "horizontal", "length": 4 }, { "q": 5, "row": 4, "col": 4, "dir": "horizontal", "length": 3 } ], "qs": [ { "a": "ⴰⵔⵔⴰⵖ", "text": { "ar": "جبل", "en": "mountain", "am": "ⴰⵔⵔⴰⵖ" } }, { "a": "ⵓⵙⵙⵓⵍ", "text": { "ar": "نار", "en": "fire", "am": "ⵓⵙⵙⵓⵍ" } }, { "a": "ⴰⵢⵓⴷ", "text": { "ar": "ماء", "en": "water", "am": "ⴰⵢⵓⴷ" } }, { "a": "ⴰⵎⵉⵍ", "text": { "ar": "حجر", "en": "stone", "am": "ⴰⵎⵉⵍ" } }, { "a": "ⵢⴰⵔⴰ", "text": { "ar": "سماء", "en": "sky", "am": "ⵢⴰⵔⴰ" } }, { "a": "ⵢⵓⵍ", "text": { "ar": "نهر", "en": "river", "am": "ⵢⵓⵍ" } } ], "answers": [ [ "ⴰ", "ⵔ", "ⵔ", "ⴰ", "ⵖ" ], [ "ⵓ", "ⵙ", "ⵙ", "ⵓ", "ⵍ" ], [ "ⴰ", "ⵢ", "ⵓ", "ⴷ" ], [ "ⴰ", "ⵎ", "ⵉ", "ⵍ" ], [ "ⵢ", "ⴰ", "ⵔ", "ⴰ" ], [ "ⵢ", "ⵓ", "ⵍ" ] ] };
+
+ 
+
+stages[14] = { "name": "مرحلة 1", "grid": { "cols": 7, "rows": 7 }, "layout": [ { "q": 0, "row": 3, "col": 1, "dir": "horizontal", "length": 5 }, { "q": 1, "row": 3, "col": 4, "dir": "vertical", "length": 4 }, { "q": 2, "row": 5, "col": 1, "dir": "horizontal", "length": 5 }, { "q": 3, "row": 1, "col": 1, "dir": "horizontal", "length": 4 }, { "q": 4, "row": 0, "col": 1, "dir": "vertical", "length": 4 }, { "q": 5, "row": 0, "col": 6, "dir": "vertical", "length": 3 } ], "qs": [ { "a": "ⴰⵔⵔⴰⵖ", "text": { "ar": "جبل", "en": "mountain", "am": "ⴰⵔⵔⴰⵖ" } }, { "a": "ⴰⵢⵓⴷ", "text": { "ar": "ماء", "en": "water", "am": "ⴰⵢⵓⴷ" } }, { "a": "ⵓⵙⵙⵓⵍ", "text": { "ar": "نار", "en": "fire", "am": "ⵓⵙⵙⵓⵍ" } }, { "a": "ⴰⵎⵉⵍ", "text": { "ar": "حجر", "en": "stone", "am": "ⴰⵎⵉⵍ" } }, { "a": "ⵢⴰⵔⴰ", "text": { "ar": "سماء", "en": "sky", "am": "ⵢⴰⵔⴰ" } }, { "a": "ⵢⵓⵍ", "text": { "ar": "نهر", "en": "river", "am": "ⵢⵓⵍ" } } ], "answers": [ [ "ⴰ", "ⵔ", "ⵔ", "ⴰ", "ⵖ" ], [ "ⴰ", "ⵢ", "ⵓ", "ⴷ" ], [ "ⵓ", "ⵙ", "ⵙ", "ⵓ", "ⵍ" ], [ "ⴰ", "ⵎ", "ⵉ", "ⵍ" ], [ "ⵢ", "ⴰ", "ⵔ", "ⴰ" ], [ "ⵢ", "ⵓ", "ⵍ" ] ] };
+
+
+
+stages[15] = { "name": "مرحلة 15", "grid": { "cols": 7, "rows": 7 }, "layout": [ { "q": 0, "row": 1, "col": 3, "dir": "vertical", "length": 5 }, { "q": 1, "row": 1, "col": 5, "dir": "vertical", "length": 5 }, { "q": 2, "row": 4, "col": 3, "dir": "horizontal", "length": 4 }, { "q": 3, "row": 2, "col": 1, "dir": "vertical", "length": 4 }, { "q": 4, "row": 0, "col": 0, "dir": "horizontal", "length": 3 } ], "qs": [ { "a": "ⴰⵔⵔⴰⵖ", "text": { "ar": "جبل", "en": "mountain", "am": "ⴰⵔⵔⴰⵖ" } }, { "a": "ⵓⵙⵙⵓⵍ", "text": { "ar": "نار", "en": "fire", "am": "ⵓⵙⵙⵓⵍ" } }, { "a": "ⴰⵢⵓⴷ", "text": { "ar": "ماء", "en": "water", "am": "ⴰⵢⵓⴷ" } }, { "a": "ⴰⵎⵉⵍ", "text": { "ar": "حجر", "en": "stone", "am": "ⴰⵎⵉⵍ" } }, { "a": "ⵢⵓⵍ", "text": { "ar": "نهر", "en": "river", "am": "ⵢⵓⵍ" } } ], "answers": [ [ "ⴰ", "ⵔ", "ⵔ", "ⴰ", "ⵖ" ], [ "ⵓ", "ⵙ", "ⵙ", "ⵓ", "ⵍ" ], [ "ⴰ", "ⵢ", "ⵓ", "ⴷ" ], [ "ⴰ", "ⵎ", "ⵉ", "ⵍ" ], [ "ⵢ", "ⵓ", "ⵍ" ] ] };
+
+
+
+stages[16] = { "name": "مرحلة 1", "grid": { "cols": 7, "rows": 7 }, "layout": [ { "q": 0, "row": 2, "col": 3, "dir": "vertical", "length": 4 }, { "q": 1, "row": 2, "col": 0, "dir": "horizontal", "length": 5 }, { "q": 2, "row": 4, "col": 0, "dir": "horizontal", "length": 4 }, { "q": 3, "row": 4, "col": 1, "dir": "vertical", "length": 3 }, { "q": 4, "row": 1, "col": 6, "dir": "vertical", "length": 5 }, { "q": 5, "row": 0, "col": 2, "dir": "horizontal", "length": 4 }, { "q": 6, "row": 1, "col": 0, "dir": "vertical", "length": 4 }, { "q": 7, "row": 5, "col": 3, "dir": "horizontal", "length": 4 } ], "qs": [ { "a": "ⴰⴷⴷⴰ", "text": { "ar": "بيت", "en": "house", "am": "ⴰⴷⴷⴰ" } }, { "a": "ⴰⵔⵔⴰⵖ", "text": { "ar": "جبل", "en": "mountain", "am": "ⴰⵔⵔⴰⵖ" } }, { "a": "ⴰⵢⵓⴷ", "text": { "ar": "ماء", "en": "water", "am": "ⴰⵢⵓⴷ" } }, { "a": "ⵢⵓⵍ", "text": { "ar": "نهر", "en": "river", "am": "ⵢⵓⵍ" } }, { "a": "ⵓⵙⵙⵓⵍ", "text": { "ar": "نار", "en": "fire", "am": "ⵓⵙⵙⵓⵍ" } }, { "a": "ⵓⵍⵍⵓ", "text": { "ar": "طين", "en": "mud", "am": "ⵓⵍⵍⵓ" } }, { "a": "ⵢⴰⵔⴰ", "text": { "ar": "سماء", "en": "sky", "am": "ⵢⴰⵔⴰ" } }, { "a": "ⴰⵎⵉⵍ", "text": { "ar": "حجر", "en": "stone", "am": "ⴰⵎⵉⵍ" } } ], "answers": [ [ "ⴰ", "ⴷ", "ⴷ", "ⴰ" ], [ "ⴰ", "ⵔ", "ⵔ", "ⴰ", "ⵖ" ], [ "ⴰ", "ⵢ", "ⵓ", "ⴷ" ], [ "ⵢ", "ⵓ", "ⵍ" ], [ "ⵓ", "ⵙ", "ⵙ", "ⵓ", "ⵍ" ], [ "ⵓ", "ⵍ", "ⵍ", "ⵓ" ], [ "ⵢ", "ⴰ", "ⵔ", "ⴰ" ], [ "ⴰ", "ⵎ", "ⵉ", "ⵍ" ] ] };
+
+
+
+
+stages[17] = { "name": "مرحلة 1", "grid": { "cols": 7, "rows": 7 }, "layout": [ { "q": 0, "row": 2, "col": 3, "dir": "vertical", "length": 4 }, { "q": 1, "row": 2, "col": 0, "dir": "horizontal", "length": 5 }, { "q": 2, "row": 5, "col": 3, "dir": "horizontal", "length": 4 }, { "q": 3, "row": 4, "col": 0, "dir": "horizontal", "length": 4 }, { "q": 4, "row": 3, "col": 6, "dir": "vertical", "length": 4 }, { "q": 5, "row": 4, "col": 1, "dir": "vertical", "length": 3 }, { "q": 6, "row": 0, "col": 1, "dir": "horizontal", "length": 5 }, { "q": 7, "row": 1, "col": 0, "dir": "vertical", "length": 4 } ], "qs": [ { "a": "ⴰⴷⴷⴰ", "text": { "ar": "بيت", "en": "house", "am": "ⴰⴷⴷⴰ" } }, { "a": "ⴰⵔⵔⴰⵖ", "text": { "ar": "جبل", "en": "mountain", "am": "ⴰⵔⵔⴰⵖ" } }, { "a": "ⴰⵎⵉⵍ", "text": { "ar": "حجر", "en": "stone", "am": "ⴰⵎⵉⵍ" } }, { "a": "ⴰⵢⵓⴷ", "text": { "ar": "ماء", "en": "water", "am": "ⴰⵢⵓⴷ" } }, { "a": "ⵓⵍⵍⵓ", "text": { "ar": "طين", "en": "mud", "am": "ⵓⵍⵍⵓ" } }, { "a": "ⵢⵓⵍ", "text": { "ar": "نهر", "en": "river", "am": "ⵢⵓⵍ" } }, { "a": "ⵓⵙⵙⵓⵍ", "text": { "ar": "نار", "en": "fire", "am": "ⵓⵙⵙⵓⵍ" } }, { "a": "ⵢⴰⵔⴰ", "text": { "ar": "سماء", "en": "sky", "am": "ⵢⴰⵔⴰ" } } ], "answers": [ [ "ⴰ", "ⴷ", "ⴷ", "ⴰ" ], [ "ⴰ", "ⵔ", "ⵔ", "ⴰ", "ⵖ" ], [ "ⴰ", "ⵎ", "ⵉ", "ⵍ" ], [ "ⴰ", "ⵢ", "ⵓ", "ⴷ" ], [ "ⵓ", "ⵍ", "ⵍ", "ⵓ" ], [ "ⵢ", "ⵓ", "ⵍ" ], [ "ⵓ", "ⵙ", "ⵙ", "ⵓ", "ⵍ" ], [ "ⵢ", "ⴰ", "ⵔ", "ⴰ" ] ] };
+
+
+
+
+stages[18] = { "name": "مرحلة 1", "grid": { "cols": 7, "rows": 7 }, "layout": [ { "q": 0, "row": 2, "col": 3, "dir": "vertical", "length": 4 }, { "q": 1, "row": 2, "col": 0, "dir": "horizontal", "length": 5 }, { "q": 2, "row": 4, "col": 0, "dir": "horizontal", "length": 4 }, { "q": 3, "row": 1, "col": 6, "dir": "vertical", "length": 5 }, { "q": 4, "row": 5, "col": 3, "dir": "horizontal", "length": 4 }, { "q": 5, "row": 1, "col": 0, "dir": "vertical", "length": 4 }, { "q": 6, "row": 4, "col": 1, "dir": "vertical", "length": 3 }, { "q": 7, "row": 0, "col": 2, "dir": "horizontal", "length": 4 } ], "qs": [ { "a": "ⴰⴷⴷⴰ", "text": { "ar": "بيت", "en": "house", "am": "ⴰⴷⴷⴰ" } }, { "a": "ⴰⵔⵔⴰⵖ", "text": { "ar": "جبل", "en": "mountain", "am": "ⴰⵔⵔⴰⵖ" } }, { "a": "ⴰⵢⵓⴷ", "text": { "ar": "ماء", "en": "water", "am": "ⴰⵢⵓⴷ" } }, { "a": "ⵓⵙⵙⵓⵍ", "text": { "ar": "نار", "en": "fire", "am": "ⵓⵙⵙⵓⵍ" } }, { "a": "ⴰⵎⵉⵍ", "text": { "ar": "حجر", "en": "stone", "am": "ⴰⵎⵉⵍ" } }, { "a": "ⵢⴰⵔⴰ", "text": { "ar": "سماء", "en": "sky", "am": "ⵢⴰⵔⴰ" } }, { "a": "ⵢⵓⵍ", "text": { "ar": "نهر", "en": "river", "am": "ⵢⵓⵍ" } }, { "a": "ⵓⵍⵍⵓ", "text": { "ar": "طين", "en": "mud", "am": "ⵓⵍⵍⵓ" } } ], "answers": [ [ "ⴰ", "ⴷ", "ⴷ", "ⴰ" ], [ "ⴰ", "ⵔ", "ⵔ", "ⴰ", "ⵖ" ], [ "ⴰ", "ⵢ", "ⵓ", "ⴷ" ], [ "ⵓ", "ⵙ", "ⵙ", "ⵓ", "ⵍ" ], [ "ⴰ", "ⵎ", "ⵉ", "ⵍ" ], [ "ⵢ", "ⴰ", "ⵔ", "ⴰ" ], [ "ⵢ", "ⵓ", "ⵍ" ], [ "ⵓ", "ⵍ", "ⵍ", "ⵓ" ] ] };
+
+
+
+
+stages[19] = { "name": "مرحلة 1", "grid": { "cols": 7, "rows": 7 }, "layout": [ { "q": 0, "row": 2, "col": 3, "dir": "vertical", "length": 4 }, { "q": 1, "row": 2, "col": 0, "dir": "horizontal", "length": 5 }, { "q": 2, "row": 4, "col": 0, "dir": "horizontal", "length": 4 }, { "q": 3, "row": 1, "col": 6, "dir": "vertical", "length": 5 }, { "q": 4, "row": 0, "col": 2, "dir": "horizontal", "length": 4 }, { "q": 5, "row": 5, "col": 3, "dir": "horizontal", "length": 4 }, { "q": 6, "row": 1, "col": 0, "dir": "vertical", "length": 4 }, { "q": 7, "row": 4, "col": 1, "dir": "vertical", "length": 3 } ], "qs": [ { "a": "ⴰⴷⴷⴰ", "text": { "ar": "بيت", "en": "house", "am": "ⴰⴷⴷⴰ" } }, { "a": "ⴰⵔⵔⴰⵖ", "text": { "ar": "جبل", "en": "mountain", "am": "ⴰⵔⵔⴰⵖ" } }, { "a": "ⴰⵢⵓⴷ", "text": { "ar": "ماء", "en": "water", "am": "ⴰⵢⵓⴷ" } }, { "a": "ⵓⵙⵙⵓⵍ", "text": { "ar": "نار", "en": "fire", "am": "ⵓⵙⵙⵓⵍ" } }, { "a": "ⵓⵍⵍⵓ", "text": { "ar": "طين", "en": "mud", "am": "ⵓⵍⵍⵓ" } }, { "a": "ⴰⵎⵉⵍ", "text": { "ar": "حجر", "en": "stone", "am": "ⴰⵎⵉⵍ" } }, { "a": "ⵢⴰⵔⴰ", "text": { "ar": "سماء", "en": "sky", "am": "ⵢⴰⵔⴰ" } }, { "a": "ⵢⵓⵍ", "text": { "ar": "نهر", "en": "river", "am": "ⵢⵓⵍ" } } ], "answers": [ [ "ⴰ", "ⴷ", "ⴷ", "ⴰ" ], [ "ⴰ", "ⵔ", "ⵔ", "ⴰ", "ⵖ" ], [ "ⴰ", "ⵢ", "ⵓ", "ⴷ" ], [ "ⵓ", "ⵙ", "ⵙ", "ⵓ", "ⵍ" ], [ "ⵓ", "ⵍ", "ⵍ", "ⵓ" ], [ "ⴰ", "ⵎ", "ⵉ", "ⵍ" ], [ "ⵢ", "ⴰ", "ⵔ", "ⴰ" ], [ "ⵢ", "ⵓ", "ⵍ" ] ] };
+
+
+
+stages[20] = { "name": "مرحلة 1", "grid": { "cols": 7, "rows": 7 }, "layout": [ { "q": 0, "row": 2, "col": 3, "dir": "vertical", "length": 4 }, { "q": 1, "row": 5, "col": 0, "dir": "horizontal", "length": 4 }, { "q": 2, "row": 2, "col": 2, "dir": "horizontal", "length": 5 }, { "q": 3, "row": 0, "col": 2, "dir": "horizontal", "length": 4 }, { "q": 4, "row": 4, "col": 3, "dir": "horizontal", "length": 4 }, { "q": 5, "row": 2, "col": 6, "dir": "vertical", "length": 5 }, { "q": 6, "row": 0, "col": 0, "dir": "vertical", "length": 4 } ], "qs": [ { "a": "ⴰⵌⴰⵎ", "text": { "ar": "نار صغيرة", "en": "small fire", "am": "ⴰⵌⴰⵎ" } }, { "a": "ⵓⵍⴻⵎ", "text": { "ar": "واد", "en": "riverbed", "am": "ⵓⵍⴻⵎ" } }, { "a": "ⵎⴰⵢⵎⴰ", "text": { "ar": "طيور", "en": "birds", "am": "ⵎⴰⵢⵎⴰ" } }, { "a": "ⵓⵣⵉⵔ", "text": { "ar": "فاكهة", "en": "fruit", "am": "ⵓⵣⵉⵔ" } }, { "a": "ⴰⵎⵓⵔ", "text": { "ar": "عين", "en": "eye", "am": "ⴰⵎⵓⵔ" } }, { "a": "ⴰⵎⵔⴰⵙ", "text": { "ar": "سماء", "en": "sky", "am": "ⴰⵎⵔⴰⵙ" } }, { "a": "ⴰⵢⴷⵉ", "text": { "ar": "كلب", "en": "dog", "am": "ⴰⵢⴷⵉ" } } ], "answers": [ [ "ⴰ", "ⵌ", "ⴰ", "ⵎ" ], [ "ⵓ", "ⵍ", "ⴻ", "ⵎ" ], [ "ⵎ", "ⴰ", "ⵢ", "ⵎ", "ⴰ" ], [ "ⵓ", "ⵣ", "ⵉ", "ⵔ" ], [ "ⴰ", "ⵎ", "ⵓ", "ⵔ" ], [ "ⴰ", "ⵎ", "ⵔ", "ⴰ", "ⵙ" ], [ "ⴰ", "ⵢ", "ⴷ", "ⵉ" ] ] };
+
+
+
+stages[21] = { "name": "مرحلة 1", "grid": { "cols": 7, "rows": 7 }, "layout": [ { "q": 0, "row": 2, "col": 3, "dir": "vertical", "length": 4 }, { "q": 1, "row": 4, "col": 3, "dir": "horizontal", "length": 4 }, { "q": 2, "row": 0, "col": 6, "dir": "vertical", "length": 6 }, { "q": 3, "row": 2, "col": 1, "dir": "horizontal", "length": 4 }, { "q": 4, "row": 0, "col": 0, "dir": "horizontal", "length": 5 }, { "q": 5, "row": 5, "col": 0, "dir": "horizontal", "length": 4 }, { "q": 6, "row": 3, "col": 0, "dir": "vertical", "length": 4 } ], "qs": [ { "a": "ⴰⵌⴰⵎ", "text": { "ar": "نار صغيرة", "en": "small fire", "am": "ⴰⵌⴰⵎ" } }, { "a": "ⴰⵢⴷⵉ", "text": { "ar": "كلب", "en": "dog", "am": "ⴰⵢⴷⵉ" } }, { "a": "ⵜⵉⵎⵙⵉⵙ", "text": { "ar": "نار", "en": "fire", "am": "ⵜⵉⵎⵙⵉⵙ" } }, { "a": "ⵉⵎⴰⵏ", "text": { "ar": "ماء", "en": "water", "am": "ⵉⵎⴰⵏ" } }, { "a": "ⵎⴰⵢⵎⴰ", "text": { "ar": "طيور", "en": "birds", "am": "ⵎⴰⵢⵎⴰ" } }, { "a": "ⵓⵍⴻⵎ", "text": { "ar": "واد", "en": "riverbed", "am": "ⵓⵍⴻⵎ" } }, { "a": "ⴰⵎⵓⵔ", "text": { "ar": "عين", "en": "eye", "am": "ⴰⵎⵓⵔ" } } ], "answers": [ [ "ⴰ", "ⵌ", "ⴰ", "ⵎ" ], [ "ⴰ", "ⵢ", "ⴷ", "ⵉ" ], [ "ⵜ", "ⵉ", "ⵎ", "ⵙ", "ⵉ", "ⵙ" ], [ "ⵉ", "ⵎ", "ⴰ", "ⵏ" ], [ "ⵎ", "ⴰ", "ⵢ", "ⵎ", "ⴰ" ], [ "ⵓ", "ⵍ", "ⴻ", "ⵎ" ], [ "ⴰ", "ⵎ", "ⵓ", "ⵔ" ] ] };
 
 
 
@@ -2242,6 +2713,9 @@ function celebrateStage(stageStars, coinAmount = 30) {
     }, 1000 + i * 150);
   }
 }
+
+
+
 function updateStarsDisplay(stageIndex, starCount) {
   const stageCard = mapGrid.children[stageIndex];
   if (!stageCard) return;
@@ -2276,6 +2750,13 @@ function showOverlayStars(stageStars) {
     }
   }
 }
+
+
+
+
+
+
+
 // ===== صوت التك بدون ملف خارجي =====
 let lastTick = -1;
 function playTick() {
@@ -2428,6 +2909,10 @@ function applyWheelPrize(index){
     result.textContent = "لم تربح شيئًا ❌";
   }
 }
+
+
+
+
 let spinning = false;
 
 document.getElementById("wheelSpinBtn").addEventListener("click", () => {
@@ -2486,6 +2971,13 @@ setTimeout(() => {
 requestAnimationFrame(animate);
 });
 
+
+
+
+
+
+
+
 const shop = document.getElementById("shopOverlay");
 
 document.getElementById("openShop").onclick = () => {
@@ -2516,6 +3008,9 @@ document.getElementById("buyGameBtn").onclick = () => {
 document.getElementById("buyBookBtn").onclick = () => {
   window.open("https://gumroad.com/yourbook");
 }
+
+
+
 </script>
 </body>
 </html>
