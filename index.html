@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <title> AWAR-Gⵣ</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <link
 
  href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
@@ -70,10 +70,6 @@
 #buyGameBtn { background: #8b5cf6; color: white; }
 #buyBookBtn { background: #ec4899; color: white; }
 #closeShop { background: #ef4444; color: white; }
-
-
-
-
 
 
 
@@ -177,15 +173,6 @@ body {
 }
 
 /* ===== الواجهة العلوية Overlay ===== */
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.65);
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 
 .overlay-content {
   background: linear-gradient(
@@ -272,7 +259,6 @@ body::before {
   100% { transform: translate(-50%, -50%); }
 }
 
-
 /* ===== البطاقة العامة ===== */  
   
 #coinsContainer {  
@@ -288,288 +274,333 @@ body::before {
 #coinCount {  
   margin-right: 6px;  
 }  
-
-html, body {
-  height: 100%;
-  margin: 0;
-  overflow: hidden; /* بدون scroll عام */
-}
-
-#app {
-  width: 100vw;
-  height: 100vh;
-  position: relative;
-  overflow: hidden;
-}
-
-.cards-container {
+.card{
   width: 100%;
+  max-width: 480px;
+
   height: 100%;
+  min-height: 0;
 
-  display: flex;
-  gap: 12px;
-  padding: 16px;
-
-  overflow-x: auto;
-  overflow-y: hidden;
-
-  align-items: stretch; /* ✅ مهم */
-}
-
-.card {
-  flex: 0 0 83%;
-  max-width: 420px;
-
-  height: 100%; /* ✅ مهم */
-
-  background: #0f172a;
-  border-radius: 20px;
-  padding: 12px;
+  margin: auto;
 
   display: flex;
   flex-direction: column;
 
-  overflow: hidden;
-}
+  background: #020617;
+  border-radius: 20px;
 
-/* ===== صورة السؤال داخل البطاقة ===== */  
-#questionImg {
-  width: 100%;
-  height: auto;
-
-  max-height: 35%; /* ❗ بدل 260px */
-
-  object-fit: contain;
-  border-radius: 16px;
-  margin-bottom: 8px;
-
-  flex-shrink: 0; /* ✅ مهم */
+  overflow: hidden; /* تبقى */
 }
   
-/* ===== بطاقات المراحل ===== */  
-.stage-key {
-  flex: 0 0 240px;
-  max-width: 240px;
+/* ===== صورة السؤال داخل البطاقة ===== */  
 
-  height: 340px; /* ✅ زيدنا الطول */
 
-  padding: 8px;
-  border-radius: 14px;
-
-  background: #1e293b;
-  color: #fff;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center; /* ✅ يخلي grid وسط */
-
-  overflow: hidden; /* ❗ مهم بزاف */
-  position: relative; /* باش lock يبقى صحيح */
+ #levelTitle {
+  font-size: 14px;
+  margin: 2px 0;
+  flex-shrink: 1;
 }
 
+
+
+
+.stage-key.locked {  
+  opacity: .35;  
+  pointer-events: none;  
+}  
+  
+.stage-key.locked::after {  
+  content: "🔒";  
+  position: absolute;  
+  top: 50%;  
+  left: 50%;  
+  transform: translate(-50%, -50%);  
+  font-size: 26px;  
+}  
+  
+  
 /* ===== SECTIONS ===== */  
+  
 .section {
-  position: absolute; /* ✅ مهم */
-  inset: 0;
   display: none;
+  flex: 1;
+  min-height: 0;
+  overflow: auto; /* 🔥 مهم */
 }
 
 .section.active {
-  display: flex; /* ❗ بدل block */
+  display: flex;
   flex-direction: column;
 }
 
-/* ===== BUTTONS ===== */  
+
+/* ===== GAME LAYOUT ===== */
+
+#game{
+  display:flex;
+  flex-direction:column;
+  height:100%;
+  min-height:0;
+  overflow:hidden;
+}
+
+/* ===== LANDSCAPE (تصحيح نهائي) ===== */
+@media (orientation: landscape){
+
+  /* الحاوية الرئيسية */
+  #game{
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  /* 🔝 TOP (يسار) */
+  .game-top{
+    flex: 0 0 25%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 6px;
+    gap: 6px;
+
+    overflow: hidden;
+  }
+
+  /* 🧠 MIDDLE (الوسط) */
+  .game-middle{
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 6px;
+    padding: 6px;
+
+    overflow: hidden;
+  }
+
+  /* 🧠 تقسيم داخلي */
+  .question-area{
+    flex: 0 0 auto;
+  }
+
+  .keyboard-area{
+    flex: 1;
+    min-height: 0;
+
+    display: flex;
+
+    overflow: auto; /* 🔥 هنا الحل */
+  }
+
+  /* الكلافيي */
+  .keyboard{
+    flex: 1;
+    min-height: 0;
+
+    overflow: auto; /* 🔥 مهم */
+  }
+
+  /* 🎮 BOTTOM (يمين) */
+  .game-bottom{
+    flex: 0 0 30%;
+    min-width: 0;
+    min-height: 0;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    padding: 6px;
+    gap: 6px;
+
+    overflow: hidden;
+  }
+
+  /* 🔹 تصغير الأزرار */
+  #game #hintBtn,  
+  #game .btn-back{  
+    width: auto;  
+    min-height: 32px;  
+    padding: 5px 10px;  
+    font-size: 13px;  
+    border-radius: 10px;  
+  }
+
+}
+
+} /* 🔥 هادي كانت ناقصة */
+
+/* ===== BUTTONS (خارج landscape) ===== */
 .btn{  
- width:100%;
- min-height:44px;
- margin:5px 0;
- border:none;
- border-radius:16px;  
- font-size:15px;
- font-weight:700;
- cursor:pointer;  
- transition:all .3s ease;  
+  width:100%;
+  min-height:46px;
+  margin:6px 0;
+  border:none;
+  border-radius:14px;
+  font-size:15px;
+  font-weight:700;
+  cursor:pointer;
+  transition:all .2s ease;
 }  
 
-.btn-main {  
-  background: linear-gradient(135deg, #0f172a, #334155);
-  color: #f0eae2;
-  border: 1px solid #334155;  
+.btn-main{  
+  background:linear-gradient(135deg,#0f172a,#334155);
+  color:#f0eae2;
+  border:1px solid #334155;
 }  
   
 .reset-btn{  
-  margin-top:15px;  
+  margin-top:8px;  
   background:#c0392b;  
-  color:white;  
-  border:none;  
-  padding:8px 14px;  
+  color:#fff;  
+  padding:6px 12px;  
   border-radius:8px;  
-  cursor:pointer;  
 }  
   
 .btn-back{  
- background:linear-gradient(135deg,#0f172a,#334155);  
- color:#f0eae2;  
- border:1px solid #334155;
-
- width: auto;
- min-height: 40px;
- padding: 6px 14px;
- font-size: 14px;
-}
-
-/* 👇 حطها هنا مباشرة */
-.btn-small {
-  min-height: 36px;
-  font-size: 13px;
-  padding: 5px 12px;
-}
+  background:linear-gradient(135deg,#0f172a,#334155);  
+  color:#f0eae2;  
+  border:1px solid #334155;  
+}  
 
 .btn:hover{  
- box-shadow:0 4px 15px rgba(0,0,0,0.4);  
- transform:scale(1.03);  
-}  
-  
-#game #hintBtn,  
-#game .btn-back {  
-  width: auto;  
-  min-height: 36px;  
-  padding: 6px 12px;  
-  font-size: 14px;  
-  border-radius: 12px;  
-}  
+  box-shadow:0 3px 8px rgba(0,0,0,0.3);  
+  transform:scale(1.02);  
+}
+
+
+
+
+
+
 
 /* ===== SETTINGS ===== */
 .setting-item{
- display:flex;
- justify-content:space-between;
- align-items:center;
- background:#0f172a;
- border:1px solid #334155;
- border-radius:14px;
- padding:14px;
- margin:10px 0;
+ display:flex;justify-content:space-between;align-items:center;
+ background:#0f172a;border:1px solid #334155;
+ border-radius:14px;padding:14px;margin:10px 0;
  font-size:18px;
 }
-
 .toggle{
- width:52px;
- height:28px;
- border-radius:20px;
- background:#334155;
- position:relative;
- cursor:pointer;
+ width:52px;height:28px;border-radius:20px;
+ background:#334155;position:relative;cursor:pointer;
 }
-
 .toggle::after{
- content:"";
- position:absolute;
- top:4px;
- right:4px;
- width:20px;
- height:20px;
- border-radius:50%;
- background:#fff;
- transition:.3s;
+ content:"";position:absolute;top:4px;right:4px;
+ width:20px;height:20px;border-radius:50%;
+ background:#fff;transition:.3s;
 }
-
 .toggle.on{background:var(--accent)}
 .toggle.on::after{right:28px}
 
 /* ===== ANSWER BOXES ===== */
 .answer-boxes{
- display:flex;
- justify-content:center;
- gap:8px;
- margin:12px 0;
- direction:ltr;
+ display:flex;justify-content:center;gap:8px;margin:12px 0;direction:ltr;
 }
-
 .answer-box{
- width:44px;
- height:44px;
- border-radius:10px;
- background:#fff;
- color:#000;
- display:flex;
- align-items:center;
- justify-content:center;
- font-size:22px;
+ width:44px;height:44px;border-radius:10px;
+ background:#fff;color:#000;
+ display:flex;align-items:center;justify-content:center;font-size:22px;
  transition:all .3s ease;
 }
-
 .answer-box.ok{
  background:linear-gradient(135deg,#22c55e,#4ade80);
  color:#fff;
 }
-
 .answer-box.bad{
  background:linear-gradient(135deg,#ef4444,#f87171);
  color:#fff;
 }
-
-.question-text{
-  display:none;
-  margin:12px 0;
-  font-size:18px;
-  line-height:1.7;
-  font-weight:600;
-  text-align:center;
+#questionImg{
+  width:100%;
+  max-height:80px;
+  object-fit:contain;
 }
 
+.question-text{
+  font-size:14px;
+  text-align:center;
+  line-height:1.3;
+
+  overflow:hidden;
+}
 /* ===== KEYBOARD ===== */
-.keyboard {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
+
+/* ===== KEYBOARD FINAL CLEAN ===== */
+.keyboard{
+  flex:1;
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  grid-template-rows:repeat(3,1fr);
+
+  gap:6px;
+
+  overflow:hidden;
 }
 
 .key{
- background:#1e293b;
- padding:14px;
- border-radius:14px;
- text-align:center;
- font-size:22px;
- font-weight:bold;
- cursor:pointer;
- touch-action:none; 
- transition:transform .08s ease, box-shadow .3s ease, background .3s ease;
+  background:#1e293b;
+
+  width:100%;
+  height:100%;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:10px;
+
+  font-size:16px;   /* معتدل */
+  font-weight:bold;
+
+  cursor:pointer;
+  touch-action:none;
+
+  transition:transform .08s ease, box-shadow .3s ease, background .3s ease;
 }
 
 .key.locked{
- position:relative;
- opacity:.35;
- pointer-events:none;
+  position:relative;
+  opacity:.35;
+  pointer-events:none;
 }
+
 
 .key.locked::after{
- content:"🔒";
- position:absolute;
- inset:0;
- display:flex;
- align-items:center;
- justify-content:center;
- font-size:26px;
+  content:"🔒";
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:20px;
 }
 
-.key.used{opacity:.25;pointer-events:none}
+.key.used{
+  opacity:.25;
+  pointer-events:none
+}
 
 .key.shake{
- animation:shake .3s;
+  animation:shake .3s;
 }
 
 .key:active{
- transform:scale(0.92);
- box-shadow:0 4px 10px rgba(0,0,0,0.3);
+  transform:scale(0.9);
+  box-shadow:0 3px 8px rgba(0,0,0,0.3);
 }
 
 .key:hover:not(.locked){
- background:linear-gradient(135deg,#334155,#1e293b);
- box-shadow:0 4px 12px rgba(0,0,0,0.4);
+  background:linear-gradient(135deg,#334155,#1e293b);
+  box-shadow:0 3px 10px rgba(0,0,0,0.4);
 }
-
 @keyframes shake{
  0%{transform:translateX(0)}
  25%{transform:translateX(-4px)}
@@ -577,7 +608,6 @@ html, body {
  75%{transform:translateX(-4px)}
  100%{transform:translateX(0)}
 }
-
 /* ===== HEXAGON MODE ===== */
 .hexagon{
   display:grid;
@@ -617,51 +647,67 @@ html, body {
 
 /* ===== WHEEL ===== */
 .wheel{
- width:260px;
- height:260px;
- margin:16px auto;
- border-radius:50%;
- border:3px solid var(--accent);
- position:relative;
- background: conic-gradient(from 0deg, #facc15, #ffea00, #22c55e, #4ade80, #facc15);
- animation: wheelRotate 10s linear infinite;
+  display: none;              /* 🔥 يمنع الظهور عند تحميل الصفحة */
+
+  width: 180px;               /* 🔥 صغرناها باش ما تزاحمش */
+  height: 180px;
+  margin: 8px auto;
+
+  border-radius: 50%;
+  border: 3px solid var(--accent);
+
+  position: relative;
+
+  background: conic-gradient(
+    from 0deg,
+    #facc15,
+    #ffea00,
+    #22c55e,
+    #4ade80,
+    #facc15
+  );
+
+  animation: wheelRotate 10s linear infinite;
 }
 
+/* دوران */
 @keyframes wheelRotate {
   0%{transform:rotate(0deg);}
   100%{transform:rotate(360deg);}
 }
 
+/* الحروف داخل العجلة */
 .wheel .key{
- width:52px;
- height:52px;
- border-radius:50%;
- background: var(--accent);
- color:#000;
- position:absolute;
- display:flex;
- align-items:center;
- justify-content:center;
- transition:all .3s ease, transform .2s ease;
+  width: 40px;               /* 🔥 صغرنا */
+  height: 40px;
+
+  border-radius: 50%;
+
+  background: var(--accent);
+  color: #000;
+
+  position: absolute;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 14px;           /* 🔥 متوازن */
+
+  transition: all .3s ease, transform .2s ease;
 }
 
+/* hover */
 .wheel .key:hover{
- transform:scale(1.2);
- box-shadow:0 6px 15px rgba(0,0,0,0.4);
+  transform: scale(1.15);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
 }
-
 /* ===== DELETE BUTTON ===== */
 .delete{
- background:#0f172a;
- border:1px solid #334155;
- border-radius:14px;
- padding:14px;
- font-size:20px;
- font-weight:bold;
- cursor:pointer;
+ background:#0f172a;border:1px solid #334155;
+ border-radius:14px;padding:14px;font-size:20px;font-weight:bold;cursor:pointer;
  transition:all .3s ease;
 }
-
 .delete:hover{
  box-shadow:0 4px 12px rgba(0,0,0,0.3);
  transform:scale(1.05);
@@ -677,25 +723,21 @@ html, body {
   align-items:center;
   z-index:999;
 }
-
 .overlay.active{display:flex}
-
 .win{
- background:#020617;
- padding:26px;
- border-radius:22px;
- box-shadow:0 0 60px var(--accent);
- text-align:center;
+ background:#020617;padding:26px;border-radius:22px;
+ box-shadow:0 0 60px var(--accent);text-align:center;
 }
-
+/* تصغير الأزرار داخل بطاقة الاحتفال */
 #stageOverlay .win .btn {
-  padding: 6px 12px;
-  font-size: 14px;
-  border-radius: 12px;
+  padding: 6px 12px;       /* يقلل المساحة الداخلية للزر */
+  font-size: 14px;         /* يصغر حجم الخط داخل الزر */
+  border-radius: 12px;     /* يحافظ على الشكل المستدير */
 }
 
+/* مسافة أقل بين الأزرار والنجوم */
 #stageOverlay .win #starsView {
-  margin-bottom: 10px;
+  margin-bottom: 10px;     /* يقلل المسافة بين النجوم والأزرار */
 }
 
 /* ===== CONFETTI ===== */
@@ -705,20 +747,17 @@ html, body {
  font-size:26px;
  animation:fall linear forwards;
  pointer-events:none;
- z-index:2000;
+ z-index:2000; /* فوق البطاقة والـ overlay */
  color: #facc15;
 }
-
 .confetti:nth-child(odd){color:#22c55e;}
 .confetti:nth-child(even){color:#ff4444;}
-
 @keyframes fall{
  to{
   transform:translateY(120vh) rotate(720deg) rotateX(360deg);
   opacity:0;
  }
 }
-
 #finalOverlay .win{
   width:90%;
   max-width:420px;
@@ -739,14 +778,23 @@ html, body {
   }
 }
 
-/* ===== MAP GRID ===== */
+/* ===== MAP GRID SCROLL & SNAP ===== */
 #mapGrid {
+  flex: 1;
+  min-height: 0;
+  min-width: 0; /* 🔥 مهم باش flex ما يتقطعش */
+
   display: flex;
+  flex-direction: row;
+  align-items: stretch;
+
   gap: 12px;
+  padding: 10px;
+
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 12px;
-  height: 100%;
+
+  scroll-snap-type: x mandatory;
 }
 
 /* ===== BACKGROUND ===== */
@@ -758,56 +806,59 @@ html, body {
   height: 100%;
   background-size: cover;
   background-position: center;
-  z-index: -1;
-  pointer-events: none;
-  opacity: 0.4;
+  z-index: -1; /* تحت كل العناصر */
+  pointer-events: none; /* لا تتداخل مع العناصر */
+  opacity: 0.4; /* يمكن تعديل الشفافية */
 }
 
-/* ===== STAGE GRID ===== */
-.stage-grid {
-  display: grid;
-direction: ltr;
-  grid-template-columns: repeat(auto-fit, minmax(18px, 1fr));
 
-  gap: 1px;
 
-  width: 95%;
-  max-width: none;
-
-  aspect-ratio: 1 / 1;
-
-  margin: 0 auto;
-}
-
-/* ===== CELL ===== */
-.stage-grid .cell {
-  width: 100%;                 /* 🔥 تثبيت العرض */
-  aspect-ratio: 1 / 1;
+/* ===== كارد المرحلة ===== */
+.stage-key {
+  flex: 0 0 160px;
+  max-width: 160px;
 
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
 
-  font-size: 10px;
-
-  border: 1px solid #aaa;
-
-  overflow: hidden;            /* 🔥 يمنع التمدد */
+  overflow: hidden;
 }
 
-/* ===== الحروف داخل الخلايا ===== */
-.stage-grid .cell span {
+/* ===== GRID مضبوط ===== */
+.stage-grid {
+  display: grid;
+
+  grid-template-columns: repeat(8, 1fr);
+
   width: 100%;
   height: 100%;
 
+  gap: 4px;
+
+  grid-auto-rows: 1fr;
+
+  min-height: 0;
+  min-width: 0;
+
+  overflow: hidden;
+}
+
+/* ===== الخلايا ===== */
+.stage-grid .cell {
   display: flex;
   align-items: center;
   justify-content: center;
 
-  font-size: 0.8em;            /* 🔥 تصغير الحرف */
-  line-height: 1;
+  aspect-ratio: 1 / 1;
 
-  overflow: hidden;            /* 🔥 مهم */
+  font-size: clamp(10px, 2vw, 14px);
+
+  overflow: hidden;
+}
+
+/* النص داخل الخلية */
+.stage-grid .cell span {
+  font-size: 0.8em;
 }
 
 
@@ -886,93 +937,100 @@ direction: ltr;
 
 
 
-
-
-/* ===== RESPONSIVE (LANDSCAPE PRO FINAL) ===== */
+/* ===== RESPONSIVE (LANDSCAPE PRO FIXED) ===== */
 @media (orientation: landscape) {
 
-  /* ===== الحاوية العامة ===== */
-  .cards-container {
-    padding: 6px;
-    gap: 8px;
+/* ===== الحاوية العامة (تصحيح) ===== */
+.cards-container {
+  flex: 1;
+  min-height: 0;
 
-    height: 100%;
-    align-items: stretch;
+  display: flex;
+  align-items: stretch;
 
-    overflow-x: auto;
-    overflow-y: hidden;
-  }
+  padding: 6px;
+  gap: 8px;
 
-  /* ===== الكارد ===== */
-  .card {
-    flex: 0 0 52%;
-    max-width: 320px;
+  overflow-x: auto;
+  overflow-y: hidden;
 
-    height: 100%;
-    min-height: 0; /* 🔥 مهم */
-
-    display: flex;
-    flex-direction: column;
-
-    overflow: hidden;
-  }
-
-  /* ===== كارد المرحلة ===== */
-  .stage-key {
-    flex: 0 0 150px;
-    max-width: 150px;
-
-    height: 100%;
-    min-height: 0; /* 🔥 مهم */
-
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-
-    overflow: hidden;
-  }
-
-  /* ===== GRID (الإصلاح الحقيقي) ===== */
-  .stage-grid {
-    flex: 1 1 auto;
-
-    width: 100%;
-    height: 100%;
-    min-height: 0; /* 🔥 ضروري */
-
-    aspect-ratio: unset; /* 🔥 كيلغي المربع */
-direction: ltr;
-    grid-template-columns: repeat(auto-fit, minmax(10px, 1fr));
-
-    align-content: center; /* 🔥 يخلي grid وسط */
-    justify-content: center;
-
-    overflow: hidden;
-  }
-
-  /* ===== الخلايا ===== */
-  .stage-grid .cell {
-    aspect-ratio: 1 / 1;
-    font-size: 7px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .stage-grid .cell span {
-    font-size: 0.7em;
-  }
-
-  /* ===== الصورة ===== */
-  #questionImg {
-    max-height: 18%;
-    object-fit: contain;
-    flex-shrink: 0;
-  }
-
+  scroll-snap-type: x mandatory;
 }
 
+
+
+/* ===== كارد المرحلة (تصحيح) ===== */
+.stage-key {
+  flex: 0 0 auto; /* 🔥 مايتضغطش */
+  width: 160px;
+  max-width: 160px;
+
+  height: 100%;
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  overflow: hidden;
+}
+
+/* ===== wheel ===== */
+#wheel {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ===== إصلاح GRID ===== */
+.stage-grid {
+  flex: 1;
+  min-height: 0;
+  min-width: 0; /* 🔥 مهم */
+
+  width: 100%;
+  height: 100%;
+
+  display: grid;
+
+  /* رجعنا grid الصحيح */
+  grid-template-columns: repeat(auto-fit, minmax(28px, 1fr));
+  grid-auto-rows: 28px;
+
+  gap: 4px;
+
+  align-content: center;
+  justify-content: center;
+
+  overflow: hidden;
+}
+
+/* ===== الخلايا ===== */
+.stage-grid .cell {
+  aspect-ratio: 1 / 1;
+  font-size: 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+}
+
+.stage-grid .cell span {
+  font-size: 0.75em;
+}
+
+/* ===== المحتوى ===== */
+.content {
+  flex: 1;
+  min-height: 0;
+  min-width: 0; /* 🔥 مهم */
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+}
 
 
 
@@ -984,207 +1042,173 @@ direction: ltr;
 
 
 
-<div id="mapBackground"></div>
 
+<div id="mapBackground"></div>
 <div class="card">
 
-  <div id="coinsContainer">
+<div id="coinsContainer">
     <span id="coinCount">0</span> 💰
   </div>
 
-  <div id="menu" class="section active">
-    <h1 data-key="title">AWAR-Gⵣ</h1>
+<div id="menu" class="section active">
+ <h1>AWAR-Gⵣ</h1>
 
-    <!-- زر فتح المتجر -->
-    <button id="openShop" data-key="shop">shop</button>
+<!-- زر فتح المتجر -->
+<button id="openShop">🛒 المتجر</button>
 
-    <!-- واجهة المتجر -->
-    <div id="shopOverlay">
-      <div id="shopBox">
-        <h3 data-key="shopTitle">shop</h3>
-        <p id="shopMessage"></p>
+<!-- واجهة المتجر -->
+<div id="shopOverlay">
+  <div id="shopBox">
+    <h3>متجر AWALGⵣ</h3>
+    <p id="shopMessage"></p>
 
-        <button id="watchAdBtn" data-key="watchAd">watch ad</button>
-        <button id="buyCoinsBtn" data-key="buyCoins">buy coins</button>
-        <button id="buyLevelBtn" data-key="buyLevel">buy level</button>
-        <button id="buyGameBtn" data-key="buyGame">buy game</button>
-        <button id="buyBookBtn" data-key="buyBook">buy book</button>
+    <button id="watchAdBtn">🎥 مشاهدة إعلان = عملات</button>
+    <button id="buyCoinsBtn">💰 شراء عملات</button>
+    <button id="buyLevelBtn">🧩 شراء مرحلة</button>
+    <button id="buyGameBtn">🎮 شراء لعبة</button>
+    <button id="buyBookBtn">📚 شراء كتاب</button>
 
-        <button id="closeShop" data-key="closeShop">close</button>
-      </div>
-    </div>
-
-
-
-
-
-
-<button class="btn btn-main" onclick="openMap()" data-key="start">
-  ▶️ Start
-</button>
-
-<button class="btn btn-back btn-small" onclick="show('settings')" data-key="settingsBtn">
-  🔧 Settings
-</button>
-
-<button class="secondary-btn" onclick="openHowTo()" data-key="howToBtn">
-  ℹ How to Play
-</button>
-
+    <button id="closeShop">❌ إغلاق المتجر</button>
+  </div>
 </div>
 
+
+
+
+
+
+
+ <button class="btn btn-main" onclick="openMap()">▶️ ⴱⴷⴰ</button>
+
+ <button class="btn btn-back" onclick="show('settings')">🔧 settings</button>
+<button class="secondary-btn" onclick="openHowTo()">ℹ كيفية اللعب</button>
+</div>
 <div id="settings" class="section">
-  <h1 data-key="settings">⚙️ Settings</h1>
+ <h1>⚙️ الإعدادات</h1>
 
-  <div class="setting-item">
-    <span id="soundLabel" data-key="sound">🔊 Sound</span>
-    <div id="soundToggle" class="toggle"></div>
-  </div>
+ <div class="setting-item">
+ <span id="soundLabel">🔊 الصوت</span>
+  <div id="soundToggle" class="toggle"></div>
+ </div>
 
-  <div class="setting-item">
-    <span id="vibeLabel" data-key="vibe">📳 Vibration</span>
-    <div id="vibeToggle" class="toggle"></div>
-  </div>
-
-  <div class="setting-item">
-    <span data-key="langLabel">🌍 Language</span>
-    <select onchange="setLang(this.value)">
-      <option value="ar">العربية</option>
-      <option value="en">English</option>
-      <option value="am">ⵜⴰⵎⴰⵣⵉⵖⵜ</option>
-    </select>
-  </div>
- 
-
-<button onclick="clearGameData()" class="reset-btn" data-key="reset">
-  🗑 Reset Progress
+<div class="setting-item">
+ <span id="vibeLabel">📳 الاهتزاز</span>
+  <div id="vibeToggle" class="toggle"></div>
+</div>
+<div class="setting-item">
+  <span>🌍 اللغة</span>
+  <select onchange="setLang(this.value)">
+    <option value="ar">العربية</option>
+    <option value="en">English</option>
+    <option value="am">ⵜⴰⵎⴰⵣⵉⵖⵜ</option>
+  </select>
+</div>
+<button onclick="clearGameData()" class="reset-btn">
+  🗑 مسح التقدم
 </button>
-
-<button class="btn btn-back" onclick="show('menu')" data-action="back">
-  ←
-</button>  
-
+ <button class="btn btn-back" onclick="show('menu')">←</button>  
 </div>  
-
 <div class="map-container">
-
 <div id="map" class="section">  
-  <div id="mapStageBackground"></div>
-
-  <h1 data-key="stagesTitle">⭐ Stages</h1>  
-
+  <div id="mapStageBackground"></div> <!-- الخلفية الخاصة بالمراحل -->
+  <h1>⭐ المراحل</h1>  
   <div id="mapGrid"></div>
-
-  <button class="btn btn-back" onclick="show('menu')" data-action="back">
-    ←
-  </button>
+  <button class="btn btn-back" onclick="show('menu')">←</button>
 </div>
 
 <div id="game" class="section">
 
-  <div id="stageBackground"></div>
+  <!-- 🔝 TOP -->
+  <div class="game-top">
+    <h1 id="levelTitle"></h1>
+    <img id="questionImg" src="" alt="">
+    <div id="questionText" class="question-text"></div>
+  </div>
 
-  <h1 id="levelTitle"></h1>
+  <!-- 🧠 MIDDLE (مقسّم) -->
+<div class="game-middle">
 
-  <img id="questionImg" src="path/to/your/image.jpg" alt="question">
+  <!-- 🧠 السؤال + الجواب -->
+  <div class="question-area">
+    <div id="boxes" class="answer-boxes"></div>
+    <div id="wheel" class="wheel"></div>
+  </div>
 
-  <div id="questionText" class="question-text"></div>
-
-  <!-- صناديق الإجابة -->
-  <div class="answer-boxes" id="boxes"></div>
-
-  <button id="openWheelBtn" data-key="wheel">
-    🎡 Wheel
-  </button>
-
-
-
-<!-- زر التلميح والعداد -->
-<button class="btn btn-hint" id="hintBtn" data-key="hint">
-  💡 Hint
-</button>
-
-<div id="hintCount">3</div>
-
-<!-- عجلة الأحرف -->
-<div id="wheel" class="wheel"></div>
-
-<!-- لوحة المفاتيح -->
-<div id="keyboard" class="keyboard"></div>
-
-<!-- زر الرجوع للخريطة -->
-<button class="btn btn-back" onclick="show('map')" data-action="back">
-  ←
-</button>
+  <!-- 🎮 الكلافيي -->
+  <div class="keyboard-area">
+    <div id="keyboard" class="keyboard"></div>
+  </div>
 
 </div>
+
+  <!-- 🎮 BOTTOM -->
+  <div class="game-bottom">
+    <div class="bottom-bar">
+      <button id="openWheelBtn">🎡</button>
+      <button id="hintBtn">💡</button>
+      <span id="hintCount">3</span>
+      <button class="btn-back" onclick="show('map')">←</button>
+    </div>
+  </div>
+
+</div>
+
 
 <div id="overlay" class="overlay">
-  <div class="win">
-    <h2 data-key="win">🔥 Well done 🔥</h2>
-  </div>
+ <div class="win"><h2>🔥 أحسنت 🔥</h2></div>
 </div>
-
 <div id="finalOverlay" class="overlay">
-  <div class="win">
-    <h2 data-key="final">🏆 Congratulations! 🏆</h2>
-    <p data-key="finalMsg">You finished all stages</p>
-
-    <button class="btn btn-main"
-      onclick="finalOverlay.classList.remove('active'); show('menu');"
-      data-key="menu">
-      🏠 Menu
-    </button>
-  </div>
+ <div class="win">
+  <h2>🏆 مبروك! 🏆</h2>
+  <p>أنهيت جميع المراحل بنجاح</p>
+  <button class="btn btn-main" onclick="finalOverlay.classList.remove('active'); show('menu');">🏠 القائمة</button>
 </div>
-
+</div>
 <div id="stageOverlay" class="overlay">
-  <div class="win">
-    <h2 data-key="stageEnd">✨ Stage Complete ✨</h2>
-
-    <div id="overlayStars" class="overlay-stars"></div>
-
-    <div id="starsView" style="font-size:32px;margin:12px 0"></div>
-
-    <button class="btn btn-main" id="nextStageBtn" data-key="nextStage">
-      ▶️ Next Stage
-    </button>
-
-    <button class="btn btn-back"
-      onclick="show('map'); stageOverlay.classList.remove('active')"
-      data-key="map">
-      🗺️ Map
-    </button>
-  </div>
+ 
+<div class="win">
+  <h2>✨ نهاية المرحلة ✨</h2>
+<div id="overlayStars" class="overlay-stars"></div>
+  <div id="starsView" style="font-size:32px;margin:12px 0"></div>
+  <button class="btn btn-main" id="nextStageBtn">▶️ المرحلة التالية</button>
+  <button class="btn btn-back" onclick="show('map'); stageOverlay.classList.remove('active')">🗺️ الخريطة</button>
+ </div>
 </div>
-
-
 <div id="howToBox" class="overlay" style="display:none">
   <div class="overlay-content">
+    <h2>كيفية اللعب How to Play </h2>
 
-    <h2 data-key="howToTitle">How to Play</h2>
+    <p>
+This Amazigh words and puzzles game aims to test your knowledge and enrich your vocabulary in a fun way.
+      هذه لعبة كلمات وألغاز أمازيغية تهدف إلى اختبار معلوماتك
+      وتنمية رصيدك اللغوي بطريقة ممتعة.
 
-    <p data-key="howToDesc">
-      This Amazigh words and puzzles game aims to test your knowledge and enrich your vocabulary in a fun way.
     </p>
 
     <ul>
-      <li data-key="how1">Read the question or look at the image carefully.</li>
-      <li data-key="how2">Drag the letters to form the correct word.</li>
-      <li data-key="how3">Each correct answer earns you stars ⭐.</li>
-      <li data-key="how4">Use stars to request a hint.</li>
-      <li data-key="how5">Your progress is saved automatically.</li>
-    </ul>
-
-    <p class="note" data-key="howNote">
-      ⵣ Beta version by Azeddin Bouhouti – New Year's Competition
+      <li>Read the question or look at the image carefully.
+</li>
+<li>اقرأ السؤال أو شاهد الصورة جيدً
+</li>
+      <li>Drag the letters to form the correct word. </li>
+<li>اسحب الحروف لتكوين الكلمة الصحيحة
+</li>
+      <li> Each correct answer earns you stars ⭐.</li>
+<li>كل إجابة صحيحة تمنحك نجوم ⭐.</li>
+      <li>Use stars to request a hint.</li>
+ <li>يمكن استعمال النجوم لطلب تلميح</li>
+      <li>Your progress is saved automatically.</li>
+<li>تقدّمك يُحفظ تلقائيًا</li>
+</ul>
+    <p class="note">
+       ⵣ Beta version by Azeddin Bouhouti – New Year's Competition 
+ⵣ ⵣنسخة تجريبية من إعداد عزالدين البحوتي – مسابقة رأس السنة ⵣ
     </p>
 
-    <button onclick="closeHowTo()" data-key="close">
-      Close
-    </button>
-
+    <button 
+onclick="closeHowTo()">إغلاق</button>
   </div>
+
 
 <script>
 
@@ -1352,8 +1376,6 @@ function saveAnswer(stageIndex, qIndex, answerArray) {
 }
 
 
-
-
 function createStageGridForCard(stageIndex) {
 
   const stageCard = mapGrid.children[stageIndex];
@@ -1473,21 +1495,20 @@ function clap(){
 }
 /* ===== SHOW/HIDE SECTIONS ===== */
 function show(id){
-  document.querySelectorAll(".section")
-    .forEach(s => s.classList.remove("active"));
-
-  const el = document.getElementById(id);
-  if (!el) return;
-
-  requestAnimationFrame(() => {
-    el.classList.add("active");
+  document.querySelectorAll(".section").forEach(s => {
+    s.classList.remove("active");
+    s.style.display = "none";
   });
 
-  const bg = document.getElementById("mapBackground");
-  if (bg) {
-    bg.style.display = (id === "map") ? "block" : "none";
-  }
+  document.getElementById("mapBackground").style.display =
+    (id === "map") ? "block" : "none";
+
+  const el = document.getElementById(id);
+
+  el.style.display = ""; // 🔥 خليه فارغ
+  requestAnimationFrame(() => el.classList.add("active"));
 }
+
 
 /* ===== تغيير اللغة ===== */
 function setLang(l){
@@ -1496,164 +1517,29 @@ function setLang(l){
   applyLang();
 }
 const translations = {
-
-  ar:{
-    title:"أوار-Gⵣ",
-    start:"▶️ بدء",
-    settings:"⚙️ الإعدادات",
-    settingsBtn:"🔧 الإعدادات",
-    howToBtn:"ℹ كيفية اللعب",
-    langLabel:"🌍 اللغة",
-    stage:"مرحلة",
-    stagesTitle:"⭐ المراحل",
-    level:"المرحلة",
-    question:"سؤال",
-    back:"⬅️ رجوع",
-    hint:"💡 تلميح",
-    win:"🔥 أحسنت 🔥",
-    final:"🏆 مبروك! 🏆",
-    finalMsg:"أنهيت جميع المراحل بنجاح",
-    menu:"🏠 القائمة",
-    nextStage:"▶️ المرحلة التالية",
-    map:"🗺️ الخريطة",
-    stageEnd:"✨ نهاية المرحلة ✨",
-    sound:"🔊 الصوت",
-    vibe:"📳 الاهتزاز",
-    reset:"🗑 مسح التقدم",
-
-    howToTitle:"كيفية اللعب",
-    howToDesc:"هذه لعبة كلمات وألغاز أمازيغية تهدف إلى اختبار معلوماتك وتنمية رصيدك اللغوي بطريقة ممتعة.",
-    how1:"اقرأ السؤال أو شاهد الصورة جيدًا.",
-    how2:"اسحب الحروف لتكوين الكلمة الصحيحة.",
-    how3:"كل إجابة صحيحة تمنحك نجوم ⭐.",
-    how4:"يمكن استعمال النجوم لطلب تلميح.",
-    how5:"تقدّمك يُحفظ تلقائيًا.",
-    howNote:"نسخة تجريبية من إعداد عزالدين البحوتي",
-    close:"إغلاق",
-
-    shop:"🛒 المتجر",
-    shopTitle:"متجر",
-    watchAd:"🎥 مشاهدة إعلان = عملات",
-    buyCoins:"💰 شراء عملات",
-    buyLevel:"🧩 شراء مرحلة",
-    buyGame:"🎮 شراء لعبة",
-    buyBook:"📚 شراء كتاب",
-    closeShop:"❌ إغلاق",
-    wheel:"🎡 عجلة"
-  },
-
-  en:{
-    title:"AWAR-Gⵣ",
-    start:"▶️ Start",
-    settings:"⚙️ Settings",
-    settingsBtn:"🔧 Settings",
-    howToBtn:"ℹ How to Play",
-    langLabel:"🌍 Language",
-    stage:"Stage",
-    stagesTitle:"⭐ Stages",
-    level:"Stage",
-    question:"Question",
-    back:"⬅️ Back",
-    hint:"💡 Hint",
-    win:"🔥 Well done 🔥",
-    final:"🏆 Congratulations! 🏆",
-    finalMsg:"You finished all stages",
-    menu:"🏠 Menu",
-    nextStage:"▶️ Next Stage",
-    map:"🗺️ Map",
-    stageEnd:"✨ Stage Complete ✨",
-    sound:"🔊 Sound",
-    vibe:"📳 Vibration",
-    reset:"🗑 Reset Progress",
-
-    howToTitle:"How to Play",
-    howToDesc:"This Amazigh words and puzzles game aims to test your knowledge and enrich your vocabulary in a fun way.",
-    how1:"Read the question or look at the image carefully.",
-    how2:"Drag the letters to form the correct word.",
-    how3:"Each correct answer earns you stars ⭐.",
-    how4:"Use stars to request a hint.",
-    how5:"Your progress is saved automatically.",
-    howNote:"ⵣ Beta version by Azeddin Bouhouti",
-    close:"Close",
-
-    shop:"🛒 Shop",
-    shopTitle:"Shop",
-    watchAd:"🎥 Watch Ad = Coins",
-    buyCoins:"💰 Buy Coins",
-    buyLevel:"🧩 Buy Level",
-    buyGame:"🎮 Buy Game",
-    buyBook:"📚 Buy Book",
-    closeShop:"❌ Close",
-    wheel:"🎡 Wheel"
-  },
-
-  am:{
-    title:"ⴰⵡⴰⵔ-Gⵣ",
-    start:"▶️ ⴱⴷⴰ",
-    settings:"⚙️ ⵜⵉⵙⵎⵉⵍⵉⵏ",
-    settingsBtn:"🔧 ⵜⵉⵙⵎⵉⵍⵉⵏ",
-    howToBtn:"ℹ ⵜⴰⵙⴽⴰⵡⵜ",
-    langLabel:"🌍 ⵜⵉⵙⴽⵍⵓⵏ",
-    stage:"ⵖⴰⵔⴰ",
-    stagesTitle:"⭐ ⵉⵖⴰⵔⴰⵏ",
-    level:"ⵖⴰⵔⴰ",
-    question:"ⵜⵉⵙⴽⴰ",
-    back:"⬅️ ⵔⵔⴰⵊⵓ",
-    hint:"💡 ⵜⴰⵙⴽⴰ",
-    win:"🔥 ⴰⵢⵢⵓⵣ 🔥",
-    final:"🏆 ⴰⵢⵢⵓⵣ! 🏆",
-    finalMsg:"ⵜⵙⵎⴷⴷⵉⴷ ⴽⵓⵍ ⵉⵖⴰⵔⴰⵏ",
-    menu:"🏠 ⵜⴰⵏⴰⵍⵉⵜ",
-    nextStage:"▶️ ⵖⴰⵔⴰ ⵢⴰⴷⵏ",
-    map:"🗺️ ⵜⴰⵙⵎⵓⵏⵜ",
-    stageEnd:"✨ ⵜⴰⵎⵓⵏⵜ ⵏ ⵖⴰⵔⴰ ✨",
-    sound:"🔊 ⴰⵙⵙⵓⵏ",
-    vibe:"📳 ⴰⵏⵣⵣⵓⵣ",
-    reset:"🗑 ⴰⵙⵙⴼⴰⵔ ⵏ ⵜⴰⵣⵣⴰⵔⵜ",
-
-    howToTitle:"ⵜⴰⵙⴽⴰⵡⵜ",
-    howToDesc:"ⴷ ⴰⵡⵔⴰⵔ ⵏ ⵜⵉⵙⴽⴰ ⵏ ⵜⴰⵎⴰⵣⵉⵖⵜ ⵉⴳⴰ ⴰⴷ ⵉⵙⴽⵔ ⵉⵎⴰⵡⴰⵏⵏ ⵏⵏⴽ.",
-    how1:"ⵖⵔ ⵜⵉⵙⴽⴰ ⵏⴻⵖ ⵥⵕ ⵜⵓⴳⴳⴰ.",
-    how2:"ⵙⵙⵉⵡⴹ ⵉⵙⴽⵉⵍⵏ.",
-    how3:"ⴽⵓⵍ ⵜⴰⵎⵓⵏⵜ ⵜⴼⴽ ⵉⵜⵔⴰⵏ ⭐.",
-    how4:"ⵙⵙⵎⵔⵙ ⵉⵜⵔⴰⵏ ⵉ ⵜⵙⴽⴰ.",
-    how5:"ⴰⵙⴼⴰⵔ ⵉⵜⵜⵢⴰⵃⴼⴰⵣ.",
-    howNote:"ⵏⵙⵅⴰ ⴰⵎⵙⴰⵔⵓ",
-    close:"ⵙⴽⵯⵔ",
-
-    shop:"🛒 ⴰⵙⵓⵇ",
-    shopTitle:"ⴰⵙⵓⵇ",
-    watchAd:"🎥 ⵙⴽⵔ ⴰⵙⴼⵍⵎ",
-    buyCoins:"💰 ⵙⵙⵖⵏ ⵉⴷⵔⴰⵔⵏ",
-    buyLevel:"🧩 ⵙⵙⵖⵏ ⵜⴰⵎⵓⵏⵜ",
-    buyGame:"🎮 ⵙⵙⵖⵏ ⴰⵡⵔⴰⵔ",
-    buyBook:"📚 ⵙⵙⵖⵏ ⴰⴷⵍⵉⵙ",
-    closeShop:"❌ ⵙⴽⵯⵔ",
-    wheel:"🎡 ⴰⵙⴳⵓⵔ"
-  }
-
+  ar:{title:"أوار-Gⵣ",start:"▶️ بدء",settings:"⚙️ الإعدادات",settingsBtn:"🔧 الإعدادات",howToBtn:"ℹ كيفية اللعب",langLabel:"🌍 اللغة",stage:"مرحلة",stagesTitle:"⭐ المراحل",level:"المرحلة",question:"سؤال",back:"⬅️ رجوع",hint:"💡 تلميح",win:"🔥 أحسنت 🔥",final:"🏆 مبروك! 🏆",sound:"🔊 الصوت",vibe:"📳 الاهتزاز"},
+  en:{title:"AWAR-Gⵣ",start:"▶️ Start",settings:"⚙️ Settings",settingsBtn:"🔧 Settings",howToBtn:"ℹ How to Play",langLabel:"🌍 Language",stage:"Stage",stagesTitle:"⭐ Stages",level:"Stage",question:"Question",back:"⬅️ Back",hint:"💡 Hint",win:"🔥 Well done 🔥",final:"🏆 Congratulations! 🏆",sound:"🔊 Sound",vibe:"📳 Vibration"},
+  am:{title:"ⴰⵡⴰⵔ-Gⵣ",start:"▶️ ⴱⴷⴰ",settings:"⚙️ ⵜⵉⵙⵎⵉⵍⵉⵏ",settingsBtn:"🔧 ⵜⵉⵙⵎⵉⵍⵉⵏ",howToBtn:"ℹ ⵜⴰⵙⴽⴰⵡⵜ",langLabel:"🌍 ⵜⵉⵙⴽⵍⵓⵏ",stage:"ⵖⴰⵔⴰ",stagesTitle:"⭐ ⵉⵖⴰⵔⴰⵏ",level:"ⵖⴰⵔⴰ",question:"ⵜⵉⵙⴽⴰ",back:"⬅️ ⵔⵔⴰⵊⵓ",hint:"💡 ⵜⴰⵙⴽⴰ",win:"🔥 ⴰⵢⵢⵓⵣ 🔥",final:"🏆 ⴰⵢⵢⵓⵣ! 🏆",sound:"🔊 ⴰⵙⵙⵓⵏ",vibe:"📳 ⴰⵏⵣⵣⵓⵣ"}
 };
-
-
-
 function applyLang(){
   const t = translations[currentLang];
-
-  // ترجمة جميع العناصر لي فيها data-key
-  document.querySelectorAll("[data-key]").forEach(el => {
-    const key = el.getAttribute("data-key");
-    if (t[key]) {
-      el.textContent = t[key];
-    }
-  });
-
-  // أزرار الرجوع
-  document.querySelectorAll('[data-action="back"]').forEach(btn => {
-    btn.textContent = t.back;
-  });
-
-  // الاتجاه (RTL / LTR)
-  document.body.dir = (currentLang === "ar") ? "rtl" : "ltr";
+  document.querySelector("#menu h1").textContent = t.title;
+  document.querySelector("#settings h1").textContent = t.settings;
+  document.querySelector(".btn-main").textContent = t.start;
+  document.querySelector("button[onclick=\"show('settings')\"]").textContent = t.settingsBtn;
+  document.getElementById("soundLabel").textContent = t.sound;
+  document.getElementById("vibeLabel").textContent = t.vibe;
+  document.querySelector(".secondary-btn").textContent = t.howToBtn;
+  document.querySelector("#settings select")?.previousElementSibling && 
+    (document.querySelector("#settings select").previousElementSibling.textContent = t.langLabel);
+  document.querySelector("#map h1").textContent = t.stagesTitle;
+  document.querySelectorAll('[data-action="back"]').forEach(btn => btn.textContent = t.back);
+  document.querySelector("#overlay h2").textContent = t.win;
+  document.querySelector("#stageOverlay h2").textContent = t.win;
+  document.querySelector("#finalOverlay h2").textContent = t.final;
+  document.querySelector("#finalOverlay button") && 
+    (document.querySelector("#finalOverlay button").textContent = t.start);
+  document.body.dir = (currentLang==="ar")?"rtl":"ltr";
 }
 applyLang();
 
@@ -1876,11 +1762,39 @@ stages[3] = {
   ]
 };
 
-  
+  // ===== مرحلة ⵣ - 4 =====
+stages[4] = {
+  name: "مرحلة ⵣ",
+  grid: { cols: 7, rows: 7 },
+  layout: [
 
- stages[4] = { "name": "4مرحلة ", "grid": { "cols": 7, "rows": 7 }, "layout": [ { "q": 0, "row": 1, "col": 3, "dir": "vertical", "length": 5 }, { "q": 1, "row": 1, "col": 5, "dir": "vertical", "length": 5 }, { "q": 2, "row": 4, "col": 3, "dir": "horizontal", "length": 4 }, { "q": 3, "row": 2, "col": 1, "dir": "vertical", "length": 4 }, { "q": 4, "row": 0, "col": 0, "dir": "horizontal", "length": 3 } ], "qs": [ { "a": "ⴰⵔⵔⴰⵖ", "text": { "ar": "جبل", "en": "mountain", "am": "ⴰⵔⵔⴰⵖ" } }, { "a": "ⵓⵙⵙⵓⵍ", "text": { "ar": "نار", "en": "fire", "am": "ⵓⵙⵙⵓⵍ" } }, { "a": "ⴰⵢⵓⴷ", "text": { "ar": "ماء", "en": "water", "am": "ⴰⵢⵓⴷ" } }, { "a": "ⴰⵎⵉⵍ", "text": { "ar": "حجر", "en": "stone", "am": "ⴰⵎⵉⵍ" } }, { "a": "ⵢⵓⵔ", "text": { "ar": "نهر", "en": "river", "am": "ⵢⵓⵔ" } } ], "answers": [ [ "ⴰ", "ⵔ", "ⵔ", "ⴰ", "ⵖ" ], [ "ⵓ", "ⵙ", "ⵙ", "ⵓ", "ⵍ" ], [ "ⴰ", "ⵢ", "ⵓ", "ⴷ" ], [ "ⴰ", "ⵎ", "ⵉ", "ⵍ" ], [ "ⵢ", "ⵓ", "ⵔ" ] ] };
+    { q: 1, col: 1, row: 3, dir: "horizontal", length: 3 },
 
+    { q: 0, col: 1, row: 0, dir: "vertical", length: 7 },
 
+    { q: 2, col: 3, row: 0, dir: "vertical", length: 7 }
+  ],
+
+  qs: [
+    { a: "ⴰⵎⴳ", text: { ar: "أفقية 3", en: "Horizontal 1", am: "ⴰⵎⴳ" } },
+
+    { a: "ⵊⵓⴳⴰⴱⴳⴷ", text: { ar: "العمود الأوسط", en: "Middle column", am: "ⵊⵓⴳⴰⴱⴳⴷ" } },
+
+    { a: "ⵉⵢⴰⴳⴷ⵷ⵙ", text: { ar: "كلمة عمودية 1", en: "Vertical 4", am: "ⵉⵢⴰⴳⴷ⵷ⵙ" } }
+  ],
+
+  answers: [
+
+    ["ⵊ","ⵓ","ⴳ","ⴰ","ⴱ","ⴳ","ⴷ"],
+
+    ["ⴰ","ⵎ","ⴳ"],
+
+    ["ⵉ","ⵢ","ⴰ","ⴳ","ⴷ","⵷","ⵙ"]
+
+  ]
+};
+
+ 
 
 
 // ===== مرحلة ⵣ - 5 =====
@@ -2037,7 +1951,7 @@ stages[14] = { "name": "مرحلة 1", "grid": { "cols": 7, "rows": 7 }, "layout
 
 
 
-stages[15] = { "name": "مرحلة 15", "grid": { "cols": 7, "rows": 7 }, "layout": [ { "q": 0, "row": 1, "col": 3, "dir": "vertical", "length": 5 }, { "q": 1, "row": 1, "col": 5, "dir": "vertical", "length": 5 }, { "q": 2, "row": 4, "col": 3, "dir": "horizontal", "length": 4 }, { "q": 3, "row": 2, "col": 1, "dir": "vertical", "length": 4 }, { "q": 4, "row": 0, "col": 0, "dir": "horizontal", "length": 3 } ], "qs": [ { "a": "ⴰⵔⵔⴰⵖ", "text": { "ar": "جبل", "en": "mountain", "am": "ⴰⵔⵔⴰⵖ" } }, { "a": "ⵓⵙⵙⵓⵍ", "text": { "ar": "نار", "en": "fire", "am": "ⵓⵙⵙⵓⵍ" } }, { "a": "ⴰⵢⵓⴷ", "text": { "ar": "ماء", "en": "water", "am": "ⴰⵢⵓⴷ" } }, { "a": "ⴰⵎⵉⵍ", "text": { "ar": "حجر", "en": "stone", "am": "ⴰⵎⵉⵍ" } }, { "a": "ⵢⵓⵍ", "text": { "ar": "نهر", "en": "river", "am": "ⵢⵓⵍ" } } ], "answers": [ [ "ⴰ", "ⵔ", "ⵔ", "ⴰ", "ⵖ" ], [ "ⵓ", "ⵙ", "ⵙ", "ⵓ", "ⵍ" ], [ "ⴰ", "ⵢ", "ⵓ", "ⴷ" ], [ "ⴰ", "ⵎ", "ⵉ", "ⵍ" ], [ "ⵢ", "ⵓ", "ⵍ" ] ] };
+stages[15] = { "name": "مرحلة 1", "grid": { "cols": 7, "rows": 7 }, "layout": [ { "q": 0, "row": 1, "col": 3, "dir": "vertical", "length": 5 }, { "q": 1, "row": 1, "col": 5, "dir": "vertical", "length": 5 }, { "q": 2, "row": 4, "col": 3, "dir": "horizontal", "length": 4 }, { "q": 3, "row": 2, "col": 1, "dir": "vertical", "length": 4 }, { "q": 4, "row": 0, "col": 0, "dir": "horizontal", "length": 3 } ], "qs": [ { "a": "ⴰⵔⵔⴰⵖ", "text": { "ar": "جبل", "en": "mountain", "am": "ⴰⵔⵔⴰⵖ" } }, { "a": "ⵓⵙⵙⵓⵍ", "text": { "ar": "نار", "en": "fire", "am": "ⵓⵙⵙⵓⵍ" } }, { "a": "ⴰⵢⵓⴷ", "text": { "ar": "ماء", "en": "water", "am": "ⴰⵢⵓⴷ" } }, { "a": "ⴰⵎⵉⵍ", "text": { "ar": "حجر", "en": "stone", "am": "ⴰⵎⵉⵍ" } }, { "a": "ⵢⵓⵍ", "text": { "ar": "نهر", "en": "river", "am": "ⵢⵓⵍ" } } ], "answers": [ [ "ⴰ", "ⵔ", "ⵔ", "ⴰ", "ⵖ" ], [ "ⵓ", "ⵙ", "ⵙ", "ⵓ", "ⵍ" ], [ "ⴰ", "ⵢ", "ⵓ", "ⴷ" ], [ "ⴰ", "ⵎ", "ⵉ", "ⵍ" ], [ "ⵢ", "ⵓ", "ⵍ" ] ] };
 
 
 
@@ -2519,6 +2433,7 @@ function createStageGrid(rows = 2, cols = 2) {
 
 document.addEventListener("DOMContentLoaded", () => {
   applyLang();
+  show("menu");
 });
 
 function clearGameData() {
@@ -3008,6 +2923,9 @@ document.getElementById("buyGameBtn").onclick = () => {
 document.getElementById("buyBookBtn").onclick = () => {
   window.open("https://gumroad.com/yourbook");
 }
+
+
+
 
 
 
