@@ -341,15 +341,13 @@ html, body {
 /* ===== صورة السؤال داخل البطاقة ===== */  
 #questionImg {
   width: 100%;
-  height: auto;
-
-  max-height: 35%; /* ❗ بدل 260px */
+  max-height: 120px;
 
   object-fit: contain;
   border-radius: 16px;
   margin-bottom: 8px;
 
-  flex-shrink: 0; /* ✅ مهم */
+  flex-shrink: 0;
 }
   
 /* ===== بطاقات المراحل ===== */  
@@ -526,7 +524,7 @@ margin-top: auto;
   line-height:1.7;
   font-weight:600;
   text-align:center;
-}
+}   
 
 /* ===== KEYBOARD ===== */
 .keyboard {
@@ -949,11 +947,16 @@ margin-top: auto;
   }
 
   /* ===== GAME LAYOUT ===== */
-  #game {
-    display: flex;          /* 🔥 مهم (كان ناقص) */
-    flex-direction: row;
-    gap: 10px;
-  }
+ #game{
+  display:flex;
+  flex-direction:column;
+  height:100%;
+  min-height:0;
+  overflow:hidden;
+}
+#game > *{
+  min-height:0;
+}
 
   #wheel {
     flex: 1;
@@ -993,15 +996,7 @@ margin-top: auto;
     font-size: 0.75em;
   }
 
-  /* ===== صورة السؤال ===== */
-  #questionImg {
-    max-height: 20%;
-    object-fit: contain;
-    flex-shrink: 0;
-  }
-
 }
-
 
 
 
@@ -1010,7 +1005,6 @@ margin-top: auto;
 
 </head>
 <body>
-
 
 
 
@@ -1116,9 +1110,11 @@ margin-top: auto;
 
   <h1 id="levelTitle"></h1>
 
-  <img id="questionImg" src="path/to/your/image.jpg" alt="question">
+<img id="questionImg" src="path/to/your/image.jpg" alt="question">
 
   <div id="questionText" class="question-text"></div>
+
+
 
   <!-- صناديق الإجابة -->
   <div class="answer-boxes" id="boxes"></div>
@@ -1215,6 +1211,9 @@ margin-top: auto;
     </button>
 
   </div>
+
+
+
 
 <script>
 
@@ -1785,7 +1784,7 @@ stages[0] = {
     { q: 5, col: 0, row: 2, dir: "horizontal", length: 7 },
     { q: 6, col: 0, row: 5, dir: "horizontal", length: 7 }
   ],
-  qs: [
+ qs: [
   { 
     a: "ⵄⵎⵉ",
     img: "flowers.jpg",
