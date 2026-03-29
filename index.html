@@ -334,18 +334,21 @@ html, body {
 
   display: flex;
   flex-direction: column;
-
+min-height: 0;
   overflow: hidden;
 }
 
 /* ===== صورة السؤال داخل البطاقة ===== */  
 #questionImg {
   width: 100%;
-  max-height: 120px;
+  height: auto;
+
+  max-height: 22vh;   /* 🔥 بدل px → يتأقلم مع الشاشة */
 
   object-fit: contain;
-  border-radius: 16px;
-  margin-bottom: 8px;
+  border-radius: 12px;
+
+  margin: 4px 0;
 
   flex-shrink: 0;
 }
@@ -489,22 +492,26 @@ margin-top: auto;
 .answer-boxes{
  display:flex;
  justify-content:center;
- gap:8px;
- margin:12px 0;
+ gap:6px;
+ margin:4px 0;
  direction:ltr;
+ flex-wrap: wrap;
+}
+#boxes {
+  flex-shrink: 0;
 }
 
 .answer-box{
- width:44px;
- height:44px;
- border-radius:10px;
+ width:38px;
+ height:38px;
+ border-radius:8px;
  background:#fff;
  color:#000;
  display:flex;
  align-items:center;
  justify-content:center;
- font-size:22px;
- transition:all .3s ease;
+ font-size:18px;
+ transition:all .2s ease;
 }
 
 .answer-box.ok{
@@ -532,7 +539,11 @@ margin-top: auto;
   grid-template-columns: repeat(4, 1fr);
   gap: 10px;
 }
-
+#wheel,
+#keyboard {
+  flex: 1;
+  min-height: 0;
+}
 .key{
  background:#1e293b;
  padding:14px;
@@ -656,6 +667,20 @@ margin-top: auto;
  transform:scale(1.2);
  box-shadow:0 6px 15px rgba(0,0,0,0.4);
 }
+
+/* 👇 هنا مباشرة */
+#openWheelBtn {
+  width: auto;
+  min-height: 26px;
+  padding: 2px 8px;
+  font-size: 12px;
+
+  align-self: center;
+  margin: 4px 0;
+
+  flex-shrink: 0;
+}
+
 
 /* ===== DELETE BUTTON ===== */
 .delete{
@@ -916,6 +941,7 @@ margin-top: auto;
   }
 
   /* ===== الكارد ===== */
+
   .card {
     flex: 0 0 60%;
     max-width: 360px;
@@ -932,6 +958,21 @@ margin-top: auto;
   }
 
   /* ===== كارد المرحلة ===== */
+
+#game h1 {
+  font-size: 18px;
+  margin: 4px 0;
+  line-height: 1.1;
+  flex-shrink: 0;
+}
+
+#questionImg,
+#boxes,
+#hintBtn,
+#hintCount,
+#openWheelBtn {
+  flex-shrink: 0;
+}
   .stage-key {
     flex: 0 0 160px;
     max-width: 160px;
@@ -1110,7 +1151,7 @@ margin-top: auto;
 
   <h1 id="levelTitle"></h1>
 
-<img id="questionImg" src="path/to/your/image.jpg" alt="question">
+<img id="questionImg" alt="question" style="display:none;">
 
   <div id="questionText" class="question-text"></div>
 
